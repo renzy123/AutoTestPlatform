@@ -70,12 +70,8 @@ class SuitCaseMapping(models.Model):
     测试套件/测试用例映射表
     suit:测试套件ID
     case:测试用例ID
-    create_time:创建时间
-    create_user:创建者
     desc:说明描述
     """
     suit = models.IntegerField()
     case = models.IntegerField()
-    create_time = models.DateTimeField(auto_now_add=True)
-    create_user = models.IntegerField()
     desc = models.CharField(max_length=100, null=True)

@@ -9,6 +9,5 @@ urlpatterns = [
     path('caseDetail/', views.init_case_detail, name="caseDetail"),
     path('delCase/', views.del_case, name="delCase"),
     path('isCaseExists/', views.is_case_exists, name="isCaseExists"),
-    path('suitList/', ),
-
+    path('suitList/', views.init_suit_page, name="suitList"),
 ]

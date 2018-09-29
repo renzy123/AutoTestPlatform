@@ -7,7 +7,7 @@ from AutoTestPlatform.CommonModels import ResultEnum, SqlResultData, result_to_j
 from product import views as pViews
 from product.models import Product
 from testcase.dataModels import TestCaseData, TestCaseDetail
-from testcase.models import TestCase, CaseModule
+from testcase.models import TestCase, CaseModule, SuitCaseMapping, TestSuite
 from user.models import User
 from user.userUtils import user_dict
 from utils.consts import *
@@ -159,7 +159,19 @@ def init_case_detail(request):
 def init_suit_page(request):
     """初始化测试用例详情页面"""
     if request.method == "GET":
-        return
+        suits = TestSuite.objects.all()
+        # 获取第一个测试套件的相关信息
+
+
+
+
+        return render(request, "pages/testcase/suite.html", {"suits": suits})
+
+
+def new_suit_page(request):
+    """进行新建测试条件的方法"""
+    if request.method == "GET":
+        return render(request, "pages/testcase/newSuit.html")
 
 
 def del_case(request, case_id=None):
