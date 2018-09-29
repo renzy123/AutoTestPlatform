@@ -692,6 +692,7 @@
 
 
 
+
 </script>
 
 <script id="preTemplate" type="text/x-jsrender">
@@ -710,10 +711,41 @@
 
 
 
+
 </script>
 
 
 <script type="text/javascript">
+
+
+    {#    function editButtonClickEvent(element) {#}
+    {#			    为span按钮添加点击事件，具体的功能为当其为点击编辑时，切换input的可输入状态为可输入#}
+    {#                当其为OK时，切换input的状态为不可输入，同时发送请求，修改测试用例#}
+    {#        let status = element.html().trim();#}
+    {#        let btID = element.attr("id").trim();#}
+    {#        if (status === "编辑") {#}
+    {#            if (btID === "btPreEdit") {#}
+    {#                $("div#preCondition textarea").removeAttr("disabled");#}
+    {#            }#}
+    {#            else if (btID === "btStepEdit") {#}
+    {#                $("div#steps textarea").removeAttr("disabled");#}
+    {#            }#}
+    {##}
+    {#            element.html("OK");#}
+    {#            element.removeClass("btn-danger");#}
+    {#            element.addClass("btn-success");#}
+    {#        } else if (status === "OK") {#}
+    {#            if (btID === "btPreEdit") {#}
+    {#                $("div#preCondition textarea").attr("disabled", "disabled");#}
+    {#            }#}
+    {#            else if (btID === "btStepEdit") {#}
+    {#                $("div#steps textarea").attr("disabled", "disabled");#}
+    {#            }#}
+    {#            element.html("编辑");#}
+    {#            element.removeClass("btn-success");#}
+    {#            element.addClass("btn-danger");#}
+    {#        }#}
+    {#    }#}
 
     function submitData(id) {
         $.ajax({
@@ -782,8 +814,69 @@
         let row = rowTemplate(step_expects);
         row_steps_expects.html(row);
     }
+
+    {#    function updateCase(id) {#}
+    {#updateType:1为更新title,2为更新更新前置条件,3为更新步骤和期望#}
+    {#        let caseDetail = caseData();#}
+    {#        let updateType = 1;#}
+    {#        if (id === "btPreEdit") {#}
+    {#            updateType = 2;#}
+    {#        }#}
+    {#        else if (id === "btStepEdit") {#}
+    {#            updateType = 3;#}
+    {#        }#}
+    {#        $.ajax({#}
+    {#            url: "{% url 'testcase:detail' %}",#}
+    {#            type: "post",#}
+    {#            data: {'caseData': JSON.stringify(caseDetail), "type": updateType, csrfmiddlewaretoken: '{{ csrf_token }}'},#}
+    {#            dataType: "json",#}
+    {#            success: function (data) {#}
+    {#                console.log(data);#}
+    {#            }#}
+    {#        })#}
+    {#    }#}
+
+
+    {#    function caseData() {#}
+    {# 用于修改测试用例,从所有textArea中获取测试用例的当前值，封装成为一个json对象，传输到View中进行处理#}
+    {#        console.log("调用数据收集！");#}
+    {#        let title = $("#lbTitle").html();#}
+    {#        let all_pres = $("div#preCondition textarea");#}
+    {#        let pre_list = [];#}
+    {#        for (let i = 0; i < all_pres.length; i++) {#}
+    {#            pre_list.push(all_pres[i].innerHTML.trim());#}
+    {#        }#}
+    {#        let row_steps_expects = $("table#tSteps tbody tr");#}
+    {#        let steps = [];#}
+    {#        let expects = [];#}
+    {# 取出所有的步骤#}
+    {#        for (let i = 0; i < row_steps_expects.length; i++) {#}
+    {# 取出单行中的步骤和期望#}
+    {#            steps.push($(row_steps_expects[i]).children("td:first").children("textarea").html().trim());#}
+    {#            expects.push($(row_steps_expects[i]).children("td:last").children("textarea").html().trim());#}
+    {#        }#}
+    {##}
+    {#        let caseDetail = {};#}
+    {#        caseDetail["title"] = title;#}
+    {#        caseDetail["pres"] = pre_list;#}
+    {#        caseDetail["steps"] = steps;#}
+    {#        caseDetail["expects"] = expects;#}
+    {##}
+    {#        console.log(caseDetail);#}
+    {##}
+    {#        return caseDetail#}
+    {##}
+    {#    }#}
+
+
     $(document).ready(function () {
             $.views.settings.delimiters("<%", "%>");
+            {#            $("#btPreEdit").click(function () {#}
+            {#                editButtonClickEvent($(this));#}
+            {#            });#}
+            {#            $("#btStepEdit").click(function () {#}
+            {#                editButtonClickEvent($(this));#}
+            {#            });#}
             $("a.list-group-item:first").addClass("active");
             {#为左侧的导航列表添加点击事件#}
             $("a.list-group-item").click(function () {

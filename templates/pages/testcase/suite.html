@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load staticfiles %}
-{% load customTags %}
 <head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Test Automation Home</title>
+    <title>Test Automation</title>
 
 
     <!-- Bootstrap Core CSS -->
@@ -20,31 +19,12 @@
     <!-- Custom Fonts -->
     <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
 
-
-    {#    <link href="{% static 'js/prettyCode/prettify.css' %}" rel="stylesheet" type="text/css">#}
-    <style type="text/css">
-        .textarea {
-            resize: none;
-            overflow-y: hidden;
-        }
-
-        .panel.noborder {
-            border: none;
-            box-shadow: none;
-        }
-
-        .panel.noborder > .panel-heading {
-            border: 1px solid #dddddd;
-            border-radius: 0;
-        }
-
-        table.borderless td, table.borderless th {
-            border: none !important;
-        }
-    </style>
 </head>
+
 <body>
+
 <div id="wrapper">
+
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
@@ -252,22 +232,11 @@
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>
-
                     <li>
-                        <a href="{% url "testcase:list" %}"><i class="fa fa-edit fa-fw"></i> 测试用例</a>
+                        <a href="{% url "product:info" %}"><i class="fa fa-table fa-fw"></i> 产品</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 脚本管理<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{% url "script:upload" %}">上传脚本</a>
-                            </li>
-                            <li>
-                                {#                                TODO 增加产品管理相关功能#}
-                                <a href="#">脚本一览</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
+                        <a href="./pages/forms.html"><i class="fa fa-edit fa-fw"></i> 测试用例</a>
                     </li>
                     <li>
                         <a href="#"><i class="fa fa-wrench fa-fw"></i> 执行<span class="fa arrow"></span></a>
@@ -342,107 +311,209 @@
         </div>
         <!-- /.navbar-static-side -->
     </nav>
-    <div id="wrapper">
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">上传脚本</h1>
-                </div>
-                <!-- /.col-lg-12 -->
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">导入测试用例</h1>
             </div>
-            <div class="alert alert-info alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                请选择相应的脚本类型，并从右侧的测试用例列表中，选择对应的测试用例！
-            </div>
-            <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-5">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            上传脚本
-                        </div>
-                        <div class="panel-body">
-                            <form role="form" action="{% url 'script:upload' %}" method="POST"
-                                  enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label>请选择脚本类型</label>
-                                    <select class="form-control" id="scriptType" name="scriptType">
-                                        {% for t in types %}
-                                            <option value="{{ t.id }}">{{ t.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>请从右侧选择对应的测试用例</label>
-                                    <input class="form-control" type="text" name="case" id="case" placeholder="请选择测试用例!"
-                                           readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>请选择文件</label>
-                                    <input type="file" style="display: none;" id="scriptFile"
-                                           name="scriptFile"/>
-                                    <div class="input-group">
-                                        <input id="photoCover" class="form-control" type="text"
-                                               style="height:30px;">
-                                        <span class="input-group-addon">
-                                    													<a href="#" id="caseFile"
-                                                                                           onclick="$('input[id=scriptFile]').click();">Browse</a>
-                                    												</span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>脚本描述</label>
-                                    <textarea class="form-control" name="desc" id="desc" placeholder="请输入脚本描述！!"
-                                    ></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-default">提交</button>
-                            </form>
-                        </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        从XML文件导入测试用例
                     </div>
-                </div>
-                <!-- /.col-lg-4 -->
-                <div class="col-lg-7">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-list"></span>
-                            用例列表
+                    <div class="panel-body">
+
+                        <div class="alert alert-info">
+                            <P>从XML文件中导入测试用例到系统，请下载相应的Excel文件编辑测试用例后，生成XML文件</P>
+                            <P>请注意，一定要将XML文件的编码格式保存为UTF-8</P>
+                            <P>EXCEL文件下载为
+                                <a href="#">点击这里</a>
+                            </P>
                         </div>
-                        <!-- .panel-heading -->
-                        <div class="panel-body">
-                            <div class="panel-group" id="listPanel">
-                                {% for case_module,case_list in module_case_dict.items %}
-                                    {#  生成标题#}
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#listPanel"
-                                                   href="#group{{ case_module | timestamp }}">
-                                                    {{ case_module }}</a>
-                                            </h4>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <form role="form">
+
+                                    <p class="info">
+                                        <label>添加者</label>
+                                        <span style="margin-left: 15px;">{{ user }}</span>
+                                    </p>
+
+                                    <div class="form-group">
+                                        <label>请选择产品</label>
+                                        <select class="form-control" id="products">
+
+                                            {% for product in products %}
+                                                <option>{{ product }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label>请选择文件</label>
+                                        <input type="file" style="display: none;" id="leFile">
+                                        <div class="input-group">
+                                            <input id="photoCover" class="form-control" type="text"
+                                                   style="height:30px;">
+                                            <span class="input-group-addon">
+													<a href="#" id="caseFile" onclick="$('input[id=leFile]').click();">Browse</a>
+												</span>
+
                                         </div>
-                                        <div id="group{{ case_module | timestamp }}" class="panel-collapse collapse in">
-                                            <div class="panel-body">
-                                                <div class="list-group">
-                                                    {#  生成测试用例列表#}
-                                                    {% for case in case_list %}
-                                                        <a class="list-group-item" href="#"
-                                                           name="{{ case.id }}">{{ case.title }}</a>
-                                                    {% empty %}
-                                                        <p>该模块下无测试用例</p>
-                                                    {% endfor %}
+                                    </div>
+
+                                    <button type="submit" class="btn btn-default">提交</button>
+
+                                </form>
+                            </div>
+                            <!-- /.col-lg-6 (nested) -->
+                            <div class="col-lg-8" id="divProductInfo">
+
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        <button class="btn btn-default btn-xs disabled"
+                                                id="p_id">{{ relatedData.pid }}</button>
+                                        <label class="header" style="margin-left: 10px;"
+                                               id="p_name">{{ relatedData.name }}</label>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="statusAndDesc" class="row col-lg-12">
+                                            <div class="row">
+                                                <div class="col-lg-1 text-left">
+                                                    <button class="btn btn-warning btn-xs disabled"
+                                                            id="p_status">未获取
+                                                    </button>
+
                                                 </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-12 text-left" style="margin-top: 10px;">
+										<span class="info" id="pDesc">
+											{{ relatedData.desc }}
+										</span>
+
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row col-lg-12">
+                                            <hr/>
+                                            <label class="header">负责人</label>
+                                        </div>
+                                        <div class="row col-lg-8 text-left" style="margin-top: 20px;">
+
+                                            <table class="table  table-hover" style="margin-left: 50px">
+                                                <tr>
+                                                    <td class="col-lg-3">
+                                                <span class="fa fa-user"
+                                                      style="margin-left: 30px;">&nbsp;&nbsp;产品负责人</span>
+                                                    </td>
+                                                    <td class="col-lg-5">
+                                                            <span style="margin-left: 20px;"
+                                                                  id="p_manager">{{ relatedData.manager }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                            <span class="fa fa-calendar-times-o"
+                                                                  style="margin-left: 30px;">&nbsp;&nbsp;测试负责人</span>
+                                                    </td>
+                                                    <td>
+                                                        <span style="margin-left: 25px;">{{ relatedData.incharge_user }}</span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+
+                                        </div>
+                                        <div class="row col-lg-12">
+                                            <hr/>
+                                            <label class="header">基本信息</label>
+                                        </div>
+                                        <div class="row col-lg-8 text-left" style="margin-top: 20px;">
+                                            <table class="table  table-hover" style="margin-left: 50px">
+                                                <tr>
+                                                    <td class="col-lg-3">
+                                                <span class="fa fa-user"
+                                                      style="margin-left: 30px;">&nbsp;&nbsp;由谁创建</span>
+                                                    </td>
+                                                    <td class="col-lg-5">
+                                                            <span style="margin-left: 20px;"
+                                                                  id="p_create_user">{{ relatedData.create_user }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                            <span class="fa fa-calendar-times-o"
+                                                                  style="margin-left: 30px;">&nbsp;&nbsp;创建时间</span>
+                                                    </td>
+                                                    <td>
+                                                          <span style="margin-left: 20px;"
+                                                                id="p_create_time">{{ relatedData.create_time }}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                <span class="fa fa-warning"
+                                                      style="margin-left: 30px;">&nbsp;&nbsp;访问控制</span>
+                                                    </td>
+                                                    <td>
+                                                            <span style="margin-left: 20px;"
+                                                                  id="p_privileges">{{ relatedData.privileges }}</span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="row col-lg-12">
+                                            <hr/>
+                                            <label class="header">其他信息</label>
+                                            <div class="row col-lg-12 text-left" style="margin-top: 20px;">
+                                                <table class="table  table-hover" style="margin-left: 50px">
+                                                    <tr>
+                                                        <td class="col-lg-3">
+                                                                <span class="fa fa-bar-chart-o"
+                                                                      style="margin-left: 30px;">&nbsp;&nbsp;测试用例</span>
+                                                        </td>
+                                                        <td class="col-lg-5">
+                                                            <span id="p_testcase_count">{{ relatedData.test_case_count }}</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                <span class="fa fa-tasks"
+                                                      style="margin-left: 30px;">&nbsp;&nbsp;关联任务</span>
+                                                        </td>
+                                                        <td>
+                                                            <span id="p_task_count">{{ relatedData.task_count }}</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
-                                {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- /.row (nested) -->
                 </div>
+                <!-- /.panel-body -->
             </div>
+            <!-- /.panel -->
         </div>
+        <!-- /.col-lg-12 -->
     </div>
+    <!-- /.row -->
+</div>
+<!-- /#page-wrapper -->
 </div>
 <!-- /#wrapper -->
 
@@ -458,35 +529,74 @@
 <!-- Custom Theme JavaScript -->
 <script src="{% static 'js/custom.min.js' %}"></script>
 
-{#<script src="{% static 'js/prettyCode/run_prettify.js' %}"></script>#}
-
-<script src="{% static 'js/jsrender.min.js' %}"></script>
-
-
 <script type="text/javascript">
 
-    $('input[id=scriptFile]').change(function () {
+    $('input[id=leFile]').change(function () {
         $('#photoCover').val($(this).val());
     });
 
-    $(document).ready(function () {
-            $.views.settings.delimiters("<%", "%>");
-            {#            $("#btPreEdit").click(function () {#}
-            {#                editButtonClickEvent($(this));#}
-            {#            });#}
-            {#            $("#btStepEdit").click(function () {#}
-            {#                editButtonClickEvent($(this));#}
-            {#            });#}
-            $("a.list-group-item:first").addClass("active");
-            {#为左侧的导航列表添加点击事件#}
-            $("a.list-group-item").click(function () {
-                $("a.list-group-item").removeClass("active");
-                $(this).addClass("active");
-                $("#case").val($(this).html());
-            });
+
+    function changeStatus(status) {
+
+        $("#p_status").html(status);
+        if (String(status) === "完成") {
+            $("#p_status").removeClass();
+            $("#p_status").addClass("btn btn-success btn-xs disabled")
+
         }
-    )
+        else if (String(status) === "正常") {
+            $("#p_status").removeClass();
+            $("#p_status").addClass("btn btn-success btn-xs disabled");
+        }
+        else {
+            $("#p_status").removeClass();
+            $("#p_status").addClass("btn btn-warning btn-xs disabled");
+        }
+
+
+    }
+
+
+    $(document).ready(function () {
+        changeStatus("{{ relatedData.status }}")
+    });
+
+
+    $("#products").change(function () {
+        var productName = $(this).val();
+        $.ajax({
+                url: '{% url "product:detailForPost" %}',
+                type: 'post',
+                data: {'name': productName, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+
+                    {# 解析Json数据#}
+                    var jsonObj = data;
+                    console.log(jsonObj);
+                    $("#p_id").html(jsonObj.pid);
+                    $("#p_create_time").html(jsonObj.create_time);
+                    $("#p_create_user").html(jsonObj.create_user);
+                    $("#p_desc").html(jsonObj.desc);
+                    $("#p_manager").html(jsonObj.manager);
+                    $("#p_name").html(jsonObj.name);
+                    $("#p_privileges").html(jsonObj.privileges);
+                    $("#p_tester").html(jsonObj.inCharge_user);
+                    $("#p_task_count").html(jsonObj.task_count);
+                    $("#p_testcase_count").html(jsonObj.testcase_count);
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+
+            },
+        )
+    });
+
+
 </script>
+
 
 </body>
 

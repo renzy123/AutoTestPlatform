@@ -156,6 +156,12 @@ def init_case_detail(request):
                        })
 
 
+def init_suit_page(request):
+    """初始化测试用例详情页面"""
+    if request.method == "GET":
+        return
+
+
 def del_case(request, case_id=None):
     """
     删除当前操作的测试用例

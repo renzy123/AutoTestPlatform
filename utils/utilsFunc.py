@@ -76,5 +76,11 @@ def path_script_storage():
     return storage_dir
 
 
+def base_path():
+    """返回当前项目的根目录"""
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return BASE_DIR
+
+
 if __name__ == '__main__':
     print(first_letter_of_chinese("默认模组"))

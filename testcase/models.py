@@ -32,7 +32,6 @@ class TestCase(models.Model):
     editable = models.BooleanField(default=True)
 
 
-
 class CaseModule(models.Model):
     """
     模块的数据模型
@@ -46,3 +45,37 @@ class CaseModule(models.Model):
     create_time = models.DateTimeField(auto_now=True)
     create_user = models.IntegerField()
     desc = models.TextField()
+
+
+class TestSuite(models.Model):
+    """测试套件描述类
+    字段说明：
+    title:标题
+    create_time:创建时间
+    create_user:创建者
+    desc:说明描述
+    setup:测试套件的setup脚本
+    teardown:测试套件的teardown脚本
+    """
+    title = models.CharField(max_length=100)
+    create_time = models.DateTimeField(auto_now_add=True)
+    create_user = models.IntegerField()
+    desc = models.CharField(max_length=100, null=True)
+    setup = models.IntegerField(null=True)
+    teardown = models.IntegerField(null=True)
+
+
+class SuitCaseMapping(models.Model):
+    """
+    测试套件/测试用例映射表
+    suit:测试套件ID
+    case:测试用例ID
+    create_time:创建时间
+    create_user:创建者
+    desc:说明描述
+    """
+    suit = models.IntegerField()
+    case = models.IntegerField()
+    create_time = models.DateTimeField(auto_now_add=True)
+    create_user = models.IntegerField()
+    desc = models.CharField(max_length=100, null=True)
