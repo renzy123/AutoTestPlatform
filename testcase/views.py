@@ -161,17 +161,26 @@ def init_suit_page(request):
     if request.method == "GET":
         suits = TestSuite.objects.all()
         # 获取第一个测试套件的相关信息
-
-
-
-
         return render(request, "pages/testcase/suite.html", {"suits": suits})
 
 
 def new_suit_page(request):
     """进行新建测试条件的方法"""
     if request.method == "GET":
-        return render(request, "pages/testcase/newSuit.html")
+        module_queryset = CaseModule.objects.all()
+        module_dict = dict(
+            [(m.id, m) for m in module_queryset]
+        )
+        case_queryset = TestCase.objects.all()
+        # 根据用例列表来进行分组，生成DICT
+        module_case_dict = {}
+        for _id in module_dict.keys():
+            case_list = [case for case in case_queryset if case.case_module == _id]
+            module_case_dict[module_dict.get(_id).name] = case_list
+            # 传输数据说明：
+            # module_case_list：NAME:LIST
+        return render(request, "pages/testcase/newSuit.html",
+                      {"module_case_dict": module_case_dict})
 
 
 def del_case(request, case_id=None):

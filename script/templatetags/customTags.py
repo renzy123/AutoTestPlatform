@@ -28,7 +28,4 @@ def times(obj):
 
 @register.filter(name="item")
 def item(iterator, i):
-    print(iterator)
-    print(i)
-    print(iterator[i])
     return iterator[i]

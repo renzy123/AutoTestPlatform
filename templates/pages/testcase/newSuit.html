@@ -19,6 +19,11 @@
     <link href="{% static 'css/custom.css' %}" rel="stylesheet">
     <!-- Custom Fonts -->
     <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- DataTables CSS -->
+    <link href="{% static 'css/datatable/dataTables.bootstrap.min.css' %}s" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="{% static 'css/datatable/dataTables.responsive.css' %}s" rel="stylesheet">
 
 
     {#    <link href="{% static 'js/prettyCode/prettify.css' %}" rel="stylesheet" type="text/css">#}
@@ -260,7 +265,7 @@
                         <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 脚本管理<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="{% url "script:upload" %}">上传脚本</a>
+                                <a href="{% url "script:upload" %}">新增套件</a>
                             </li>
                             <li>
                                 {#                                TODO 增加产品管理相关功能#}
@@ -346,54 +351,54 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">上传脚本</h1>
+                    <h1 class="page-header">新增测试套件</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
             <div class="alert alert-info alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                请选择相应的脚本类型，并从右侧的测试用例列表中，选择对应的测试用例！
+                请输入测试条件名，并从右侧的测试用例列表中，添加测试用例！
+                同时请指定Setup和TearDown!
             </div>
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-5">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            上传脚本
+                            新增
                         </div>
                         <div class="panel-body">
                             <form role="form" action="{% url 'script:upload' %}" method="POST"
                                   enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <label>请选择脚本类型</label>
-                                    <select class="form-control" id="scriptType" name="scriptType">
-                                        {% for t in types %}
-                                            <option value="{{ t.id }}">{{ t.name }}</option>
-                                        {% endfor %}
-                                    </select>
+                                    <label>请输入名称</label>
+                                    <input class="form-control" type="text" name="suitName" id="suitName"
+                                           placeholder="请输入测试套件名称">
                                 </div>
                                 <div class="form-group">
-                                    <label>请从右侧选择对应的测试用例</label>
-                                    <input class="form-control" type="text" name="case" id="case" placeholder="请选择测试用例!"
-                                           readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>请选择文件</label>
-                                    <input type="file" style="display: none;" id="scriptFile"
-                                           name="scriptFile"/>
-                                    <div class="input-group">
-                                        <input id="photoCover" class="form-control" type="text"
-                                               style="height:30px;">
-                                        <span class="input-group-addon">
-                                    													<a href="#" id="caseFile"
-                                                                                           onclick="$('input[id=scriptFile]').click();">Browse</a>
-                                    												</span>
+                                    <label>setup</label>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-default" data-toggle="modal"
+                                                data-target="#scripts" id="btSetup">从已有脚本中选择
+                                        </button>
+                                        <button type="button" class="btn btn-default" data-toggle="modal"
+                                                data-target="#scripts">新增代码
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>脚本描述</label>
-                                    <textarea class="form-control" name="desc" id="desc" placeholder="请输入脚本描述！!"
+                                    <label>TearDown</label>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-default" id="btTeardown">从已有脚本中选择</button>
+                                        <button type="button" class="btn btn-default">新增代码</button>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <textarea class="form-control" name="desc" id="desc" placeholder="请输入测试套件描述！!"
                                     ></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-default">提交</button>
@@ -401,12 +406,64 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="scripts" tabindex="-1" role="dialog"
+                     aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" style="width: 800px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    请选择脚本
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <table width="100%" class="table table-striped table-bordered table-hover"
+                                       id="tScripts">
+                                    <thead>
+                                    <tr>
+                                        <th>脚本名</th>
+                                        <th>创建者</th>
+                                        <th>最后修改者</th>
+                                        <th>最后运行时间</th>
+                                        <th>运行次数</th>
+                                        <th>脚本类型</th>
+                                        <th>说明</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><a href="#">0</a></td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td class="center">3</td>
+                                        <td class="center">4</td>
+                                        <td class="center">5</td>
+                                        <td class="center">6</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                                <button type="button" class="btn btn-primary">
+                                    确认
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+
+
                 <!-- /.col-lg-4 -->
                 <div class="col-lg-7">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <span class="fa fa-list"></span>
-                            用例列表
+                            请选择测试用例
                         </div>
                         <!-- .panel-heading -->
                         <div class="panel-body">
@@ -421,13 +478,15 @@
                                                     {{ case_module }}</a>
                                             </h4>
                                         </div>
-                                        <div id="group{{ case_module | timestamp }}" class="panel-collapse collapse in">
+                                        <div id="group{{ case_module | timestamp }}"
+                                             class="panel-collapse collapse in">
                                             <div class="panel-body">
                                                 <div class="list-group">
                                                     {#  生成测试用例列表#}
                                                     {% for case in case_list %}
                                                         <a class="list-group-item" href="#"
                                                            name="{{ case.id }}">{{ case.title }}</a>
+
                                                     {% empty %}
                                                         <p>该模块下无测试用例</p>
                                                     {% endfor %}
@@ -461,13 +520,25 @@
 {#<script src="{% static 'js/prettyCode/run_prettify.js' %}"></script>#}
 
 <script src="{% static 'js/jsrender.min.js' %}"></script>
+<!-- DataTables JavaScript -->
+<script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
+<script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
 
 
 <script type="text/javascript">
+    function display_script_info() {
+        $.ajax({
+            url: "{% url 'script:list' %}",
+            type: "post",
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+            }
+        })
+    }
 
-    $('input[id=scriptFile]').change(function () {
-        $('#photoCover').val($(this).val());
-    });
 
     $(document).ready(function () {
             $.views.settings.delimiters("<%", "%>");
@@ -480,10 +551,25 @@
             $("a.list-group-item:first").addClass("active");
             {#为左侧的导航列表添加点击事件#}
             $("a.list-group-item").click(function () {
-                $("a.list-group-item").removeClass("active");
-                $(this).addClass("active");
-                $("#case").val($(this).html());
+                if ($(this).hasClass("active")) {
+                    $(this).removeClass("active")
+                }
+                else {
+                    $(this).addClass("active");
+                }
             });
+
+        $('#tScripts').DataTable({
+            responsive: true
+        });
+
+        {#            为脚本选择按钮点击点击事件#}
+
+        $("#btSetup").click(function () {
+            display_script_info()
+        })
+
+
         }
     )
 </script>

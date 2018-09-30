@@ -86,11 +86,14 @@ def init_scripts_list(request):
     """构建脚本列表页面"""
     if request.method == "GET":
         # 初始化页面
-
         pass
     if request.method == "POST":
         # 处理AJAX请求
-        pass
+        scripts = Script.objects.all()
+        script_types = ScriptType.objects.all()
+        print(scripts)
+        print(script_types)
+        return JsonResponse(request, {"scripts": scripts, "types": script_types})
 
 
 def find_script_with_case(request):
