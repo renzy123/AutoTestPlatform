@@ -4,12 +4,14 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
+from script.dataModels import ScriptData
 from script.form import ScriptUploadForm
 from script.models import ScriptType, Script
 from testcase.models import CaseModule
 from testcase.models import TestCase
 from user.models import User
 from utils.consts import *
+from utils.utilsFunc import *
 
 
 # Create your views here.
@@ -90,10 +92,11 @@ def init_scripts_list(request):
     if request.method == "POST":
         # 处理AJAX请求
         scripts = Script.objects.all()
+        scripts = [serialize_model(ScriptData(script)) for script in scripts]
         script_types = ScriptType.objects.all()
-        print(scripts)
-        print(script_types)
-        return JsonResponse(request, {"scripts": scripts, "types": script_types})
+        script_types = [serialize_model(sType) for sType in script_types]
+        data = {"scripts": scripts, "types": script_types}
+        return JsonResponse(data)
 
 
 def find_script_with_case(request):

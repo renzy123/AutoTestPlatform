@@ -10,5 +10,7 @@ urlpatterns = [
     path('delCase/', views.del_case, name="delCase"),
     path('isCaseExists/', views.is_case_exists, name="isCaseExists"),
     path('suitList/', views.init_suit_page, name="suitList"),
-    path('addSuit/', views.new_suit_page, name="newSuit"),
+    path('newSuit/', views.new_suit_page, name="newSuit"),
+    path('addSuit/', views.new_suit, name="addSuit"),
+
 ]

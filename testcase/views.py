@@ -6,8 +6,9 @@ from django.shortcuts import render, redirect
 from AutoTestPlatform.CommonModels import ResultEnum, SqlResultData, result_to_json
 from product import views as pViews
 from product.models import Product
+from testcase import form
 from testcase.dataModels import TestCaseData, TestCaseDetail
-from testcase.models import TestCase, CaseModule, SuitCaseMapping, TestSuite
+from testcase.models import TestCase, CaseModule, TestSuite, SuitCaseMapping
 from user.models import User
 from user.userUtils import user_dict
 from utils.consts import *
@@ -165,22 +166,59 @@ def init_suit_page(request):
 
 
 def new_suit_page(request):
-    """进行新建测试条件的方法"""
-    if request.method == "GET":
-        module_queryset = CaseModule.objects.all()
-        module_dict = dict(
-            [(m.id, m) for m in module_queryset]
-        )
-        case_queryset = TestCase.objects.all()
-        # 根据用例列表来进行分组，生成DICT
-        module_case_dict = {}
-        for _id in module_dict.keys():
-            case_list = [case for case in case_queryset if case.case_module == _id]
-            module_case_dict[module_dict.get(_id).name] = case_list
-            # 传输数据说明：
-            # module_case_list：NAME:LIST
+    """进行新建suit的方法"""
+    module_queryset = CaseModule.objects.all()
+    module_dict = dict(
+        [(m.id, m) for m in module_queryset]
+    )
+    case_queryset = TestCase.objects.all()
+    # 根据用例列表来进行分组，生成DICT
+    module_case_dict = {}
+    for _id in module_dict.keys():
+        case_list = [case for case in case_queryset if case.case_module == _id]
+        module_case_dict[module_dict.get(_id).name] = case_list
+        # 传输数据说明：
+        # module_case_list：NAME:LIST
+    print(request.GET)
+    if request.GET["success"]:
         return render(request, "pages/testcase/newSuit.html",
-                      {"module_case_dict": module_case_dict})
+                      {"module_case_dict": module_case_dict, "success": "yes"})
+    return render(request, "pages/testcase/newSuit.html",
+                  {"module_case_dict": module_case_dict})
+
+
+def new_suit(request):
+    if request.method == "POST":
+        """增加测试套件的方法"""
+        suitForm = form.SuitForm(request.POST)
+        if suitForm.is_valid():
+            data = suitForm.cleaned_data
+            suitName = data["suitName"]
+            setupId = data["setupId"]
+            teardownId = data["tearDownId"]
+            desc = data["desc"]
+            caseList = data["caseList"]
+            # 插入数据库
+            suit = TestSuite()
+            user = request.session[SESSION_USER_NAME]
+            suit.create_user = User.objects.filter(name=user)[0].id
+            suit.title = suitName
+            suit.desc = desc
+            suit.setup = setupId
+            suit.teardown = teardownId
+            suit.save()
+            # 获取ID
+            currrent_suit_id = suit.id
+            # 插入suit case映射表
+            case_list = str(caseList).split(";")[:-1]
+            for case_id in case_list:
+                suit_case_map = SuitCaseMapping()
+                suit_case_map.suit = currrent_suit_id
+                suit_case_map.case = case_id
+                suit_case_map.save()
+            return redirect("/testcase/newSuit?success=yes")
+        else:
+            return
 
 
 def del_case(request, case_id=None):

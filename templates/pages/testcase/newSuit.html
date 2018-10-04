@@ -24,6 +24,7 @@
 
     <!-- DataTables Responsive CSS -->
     <link href="{% static 'css/datatable/dataTables.responsive.css' %}s" rel="stylesheet">
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
 
 
     {#    <link href="{% static 'js/prettyCode/prettify.css' %}" rel="stylesheet" type="text/css">#}
@@ -349,6 +350,15 @@
     </nav>
     <div id="wrapper">
         <div id="page-wrapper">
+            {% if success == "yes" %}
+                <script type="text/javascript">
+                    swal({
+                        text: "新建测试套件成功!",
+                        timer: 1000,
+                        button: false
+                    });
+                </script>
+            {% endif %}
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">新增测试套件</h1>
@@ -368,7 +378,7 @@
                             新增
                         </div>
                         <div class="panel-body">
-                            <form role="form" action="{% url 'script:upload' %}" method="POST"
+                            <form role="form" method="POST" action="{% url "testcase:addSuit" %}"
                                   enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="form-group">
@@ -385,23 +395,28 @@
                                         <button type="button" class="btn btn-default" data-toggle="modal"
                                                 data-target="#scripts">新增代码
                                         </button>
+                                        <input type="text" id="setupId" name="setupId" style="display: none">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label>TearDown</label>
                                     <div class="inline">
-                                        <button type="button" class="btn btn-default" id="btTeardown">从已有脚本中选择</button>
+                                        <button type="button" class="btn btn-default" id="btTeardown"
+                                                data-toggle="modal"
+                                                data-target="#scripts">从已有脚本中选择
+                                        </button>
                                         <button type="button" class="btn btn-default">新增代码</button>
+                                        <input type="text" id="tearDownId" name="tearDownId" style="display: none">
                                     </div>
                                 </div>
-
-
                                 <div class="form-group">
                                     <label>描述</label>
                                     <textarea class="form-control" name="desc" id="desc" placeholder="请输入测试套件描述！!"
                                     ></textarea>
+                                    <textarea name="caseList" style="display: none;" id="caseList"></textarea>
+
                                 </div>
-                                <button type="submit" class="btn btn-default">提交</button>
+                                <button type="submit" class="btn btn-default" id="btSubmit">提交</button>
                             </form>
                         </div>
                     </div>
@@ -434,22 +449,13 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td><a href="#">0</a></td>
-                                        <td>1</td>
-                                        <td>2</td>
-                                        <td class="center">3</td>
-                                        <td class="center">4</td>
-                                        <td class="center">5</td>
-                                        <td class="center">6</td>
-                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                                 </button>
-                                <button type="button" class="btn btn-primary">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">
                                     确认
                                 </button>
                             </div>
@@ -525,6 +531,50 @@
 <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
 <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
 
+<script id="rowScript" type="text/x-jsrender">
+
+<tr>
+<td>
+<a href="#">
+<%:title%>
+</a>
+</td>
+<td style="display:none">
+<%:id%>
+</td>
+<td>
+<%:create_user%>
+</td>
+<td>
+<%:last_edit_user%>
+</td>
+<td>
+<%:last_run_time%>
+</td>
+<td>
+<%:run_count%>
+</td>
+<td>
+<%:script_type%>
+</td>
+<td>
+<%:desc%>
+</td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
 
 <script type="text/javascript">
     function display_script_info() {
@@ -534,13 +584,35 @@
             data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
             dataType: "json",
             success: function (data) {
-                console.log(data)
+                handleData(data)
             }
-        })
+        });
+    }
+
+    function handleData(data) {
+        {#处理返回的脚本列表信息#}
+        let types = data["types"];
+        let scripts = data["scripts"];
+        let dictScriptsType = {};
+        for (let i = 0; i < types.length; i++) {
+            let type = types[i];
+            dictScriptsType[type["id"]] = type["name"]
+        }
+        for (let i = 0; i < scripts.length; i++) {
+            let script = scripts[i];
+            let mType = script["script_type"];
+            script["script_type"] = dictScriptsType[mType];
+        }
+        {#    start to render template#}
+        let rowScript = $.templates("#rowScript");
+        let row = rowScript(scripts);
+        $("#tScripts tbody").empty();
+        $("#tScripts tbody").html(row)
     }
 
 
     $(document).ready(function () {
+        var clickedButton = "btSetup";
             $.views.settings.delimiters("<%", "%>");
             {#            $("#btPreEdit").click(function () {#}
             {#                editButtonClickEvent($(this));#}
@@ -566,7 +638,40 @@
         {#            为脚本选择按钮点击点击事件#}
 
         $("#btSetup").click(function () {
-            display_script_info()
+            clickedButton = "buttonSetup";
+            display_script_info();
+        });
+        $("#btTeardown").click(function () {
+            clickedButton = "buttonTeardown";
+            display_script_info();
+        });
+
+        {#为脚本选择的链接添加点击事件#}
+        $("#tScripts").on("click", "a", function () {
+            console.log(clickedButton);
+            let scriptId = $(this).parent().next().html().trim();
+            if (clickedButton === "buttonSetup") {
+                $("#setupId").val(scriptId);
+                console.log($("#setupId").val())
+            }
+            else {
+                $("#tearDownId").val(scriptId);
+                console.log($("#tearDownId").val())
+            }
+        });
+
+        {#    提交的时候提交所有选中的测试用例#}
+
+        $("#btSubmit").click(function () {
+            {#获取所有已经选中的节点#}
+            let selectedCaseNodes = $("a.list-group-item.active");
+            console.log(selectedCaseNodes.length);
+            let case_ids = "";
+            for (let i = 0; i < selectedCaseNodes.length; i++) {
+                case_ids += $(selectedCaseNodes[i]).attr("name");
+                case_ids += ";"
+            }
+            $("#caseList").val(case_ids);
         })
 
 

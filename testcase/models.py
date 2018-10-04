@@ -74,4 +74,3 @@ class SuitCaseMapping(models.Model):
     """
     suit = models.IntegerField()
     case = models.IntegerField()
-    desc = models.CharField(max_length=100, null=True)

@@ -82,5 +82,11 @@ def base_path():
     return BASE_DIR
 
 
+def serialize_model(model):
+    res = model.__dict__
+    res.pop("_state")
+    return res
+
+
 if __name__ == '__main__':
     print(first_letter_of_chinese("默认模组"))
