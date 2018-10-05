@@ -17,7 +17,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 # Create your views here.
 
 
-current_case_id = "current_case_id"
+
 
 
 def module_dict():
@@ -74,7 +74,7 @@ def init_case_list(request):
         # user_dict：用户ID:NAME 字典
         # first_case：第一个需要显示的case
         # 将当前操作的测试用例ID写入到session
-        request.session[current_case_id] = first_case.id
+        request.session[SESSION_CASE_ID] = first_case.id
         first_case_detail = TestCaseDetail(first_case)
         first_case = TestCaseData(first_case, users_dict, module_dict)
 
@@ -86,6 +86,7 @@ def init_case_list(request):
 
 def case_data(request):
     """用于异步请求测试用例的数据"""
+    global _case
     """请求需要测试用例的ID"""
     if request.method == "GET":
         case_id = request.GET.get("id")
@@ -100,13 +101,13 @@ def case_data(request):
         caseDetail = TestCaseDetail(case)
         data["caseDetail"] = caseDetail.__dict__
         # 将当前操作的测试用例ID写入到session
-        request.session[current_case_id] = case.id
+        request.session[SESSION_CASE_ID] = case.id
         # 返回数据
         return JsonResponse(data)
     if request.method == "POST":
         """此处进行测试用例的删除"""
         caseData = request.POST.get("caseData")
-        _case = TestCase.objects.filter(id=request.session[current_case_id])[0]
+        _case = TestCase.objects.filter(id=request.session[SESSION_CASE_ID])[0]
         caseData = json.loads(caseData)
         _case.title = caseData["title"]  # 更新前置条件
         pres = caseData["pres"]
@@ -124,7 +125,6 @@ def case_data(request):
         user_name = request.session[SESSION_USER_NAME]
         _case.last_edit_user = User.objects.filter(name=user_name)[0].id
     try:
-        print(_case.__dict__)
         _case.save()
     except ValueError as error:
         print(error.__str__())
@@ -143,13 +143,13 @@ def init_case_detail(request):
         """
         users_dict = user_dict()
         # 请求用例列表
-        first_case = TestCase.objects.filter(id=request.session[current_case_id])[0]
+        first_case = TestCase.objects.filter(id=request.session[SESSION_CASE_ID])[0]
         # 传输数据说明：
         # module_case_list：NAME:LIST
         # user_dict：用户ID:NAME 字典
         # first_case：第一个需要显示的case
         # 将当前操作的测试用例ID写入到session
-        request.session["current_case"] = first_case.id
+        request.session[SESSION_CASE_ID] = first_case.id
         first_case_detail = TestCaseDetail(first_case)
         first_case = TestCaseData(first_case, users_dict, module_dict())
         return render(request, "pages/testcase/modCase.html",
@@ -229,7 +229,7 @@ def del_case(request, case_id=None):
     if case_id:
         case_id = case_id
     else:
-        case_id = request.session[current_case_id]
+        case_id = request.session[SESSION_CASE_ID]
     # TestCase.objects.filter(id=case_id).delete()
     return redirect("/testcase/list/")
 

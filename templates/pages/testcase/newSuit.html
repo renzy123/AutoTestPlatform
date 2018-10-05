@@ -80,7 +80,7 @@
                                         data-target="#scripts" id="btSetup">从已有脚本中选择
                                 </button>
                                 <button type="button" class="btn btn-default" data-toggle="modal"
-                                        data-target="#scripts">新增代码
+                                        data-target="#code">新增代码
                                 </button>
                                 <input type="text" id="setupId" name="setupId" style="display: none">
                             </div>
@@ -92,7 +92,9 @@
                                         data-toggle="modal"
                                         data-target="#scripts">从已有脚本中选择
                                 </button>
-                                <button type="button" class="btn btn-default">新增代码</button>
+                                <button type="button" class="btn btn-default" data-toggle="modal"
+                                        data-target="#code">新增代码
+                                </button>
                                 <input type="text" id="tearDownId" name="tearDownId" style="display: none">
                             </div>
                         </div>
@@ -151,6 +153,35 @@
         </div>
 
 
+        <div class="modal fade" id="code" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: 800px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            请复制代码到此
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <textarea class="form-control" style="height: 200px" placeholder="请复制代码到此！">
+                        </textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">
+                            确认
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+
         <!-- /.col-lg-4 -->
         <div class="col-lg-7">
             <div class="panel panel-default">
@@ -188,7 +219,7 @@
                                 </div>
                             </div>
                         {% endfor %}
-                            </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,14 +228,14 @@
 {% endblock %}
 
 {% block scriptLinks %}
-<script src="{% static 'js/jsrender.min.js' %}"></script>
-<!-- DataTables JavaScript -->
-<script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
-<script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+    <!-- DataTables JavaScript -->
+    <script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
 {% endblock %}
 {% block script %}
-<script id="rowScript" type="text/x-jsrender">
+    <script id="rowScript" type="text/x-jsrender">
 
 <tr>
 <td>
@@ -247,109 +278,111 @@
 
 
 
-</script>
-
-<script type="text/javascript">
-    function display_script_info() {
-        $.ajax({
-            url: "{% url 'script:list' %}",
-            type: "post",
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
-            dataType: "json",
-            success: function (data) {
-                handleData(data)
-            }
-        });
-    }
-
-    function handleData(data) {
-        {#处理返回的脚本列表信息#}
-        let types = data["types"];
-        let scripts = data["scripts"];
-        let dictScriptsType = {};
-        for (let i = 0; i < types.length; i++) {
-            let type = types[i];
-            dictScriptsType[type["id"]] = type["name"]
-        }
-        for (let i = 0; i < scripts.length; i++) {
-            let script = scripts[i];
-            let mType = script["script_type"];
-            script["script_type"] = dictScriptsType[mType];
-        }
-        {#    start to render template#}
-        let rowScript = $.templates("#rowScript");
-        let row = rowScript(scripts);
-        $("#tScripts tbody").empty();
-        $("#tScripts tbody").html(row)
-    }
 
 
-    $(document).ready(function () {
-        var clickedButton = "btSetup";
-            $.views.settings.delimiters("<%", "%>");
-            {#            $("#btPreEdit").click(function () {#}
-            {#                editButtonClickEvent($(this));#}
-            {#            });#}
-            {#            $("#btStepEdit").click(function () {#}
-            {#                editButtonClickEvent($(this));#}
-            {#            });#}
-            $("a.list-group-item:first").addClass("active");
-            {#为左侧的导航列表添加点击事件#}
-            $("a.list-group-item").click(function () {
-                if ($(this).hasClass("active")) {
-                    $(this).removeClass("active")
-                }
-                else {
-                    $(this).addClass("active");
+    </script>
+
+    <script type="text/javascript">
+        function display_script_info() {
+            $.ajax({
+                url: "{% url 'script:list' %}",
+                type: "post",
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    handleData(data)
                 }
             });
-
-        $('#tScripts').DataTable({
-            responsive: true
-        });
-
-        {#            为脚本选择按钮点击点击事件#}
-
-        $("#btSetup").click(function () {
-            clickedButton = "buttonSetup";
-            display_script_info();
-        });
-        $("#btTeardown").click(function () {
-            clickedButton = "buttonTeardown";
-            display_script_info();
-        });
-
-        {#为脚本选择的链接添加点击事件#}
-        $("#tScripts").on("click", "a", function () {
-            console.log(clickedButton);
-            let scriptId = $(this).parent().next().html().trim();
-            if (clickedButton === "buttonSetup") {
-                $("#setupId").val(scriptId);
-                console.log($("#setupId").val())
-            }
-            else {
-                $("#tearDownId").val(scriptId);
-                console.log($("#tearDownId").val())
-            }
-        });
-
-        {#    提交的时候提交所有选中的测试用例#}
-
-        $("#btSubmit").click(function () {
-            {#获取所有已经选中的节点#}
-            let selectedCaseNodes = $("a.list-group-item.active");
-            console.log(selectedCaseNodes.length);
-            let case_ids = "";
-            for (let i = 0; i < selectedCaseNodes.length; i++) {
-                case_ids += $(selectedCaseNodes[i]).attr("name");
-                case_ids += ";"
-            }
-            $("#caseList").val(case_ids);
-        })
-
-
         }
-    )
-</script>
+
+        function handleData(data) {
+            {#处理返回的脚本列表信息#}
+            let types = data["types"];
+            let scripts = data["scripts"];
+            let dictScriptsType = {};
+            for (let i = 0; i < types.length; i++) {
+                let type = types[i];
+                dictScriptsType[type["id"]] = type["name"]
+            }
+            for (let i = 0; i < scripts.length; i++) {
+                let script = scripts[i];
+                let mType = script["script_type"];
+                script["script_type"] = dictScriptsType[mType];
+            }
+            {#    start to render template#}
+            let rowScript = $.templates("#rowScript");
+            let row = rowScript(scripts);
+            $("#tScripts tbody").empty();
+            $("#tScripts tbody").html(row)
+        }
+
+
+        $(document).ready(function () {
+                var clickedButton = "btSetup";
+                $.views.settings.delimiters("<%", "%>");
+                {#            $("#btPreEdit").click(function () {#}
+                {#                editButtonClickEvent($(this));#}
+                {#            });#}
+                {#            $("#btStepEdit").click(function () {#}
+                {#                editButtonClickEvent($(this));#}
+                {#            });#}
+                $("a.list-group-item:first").addClass("active");
+                {#为左侧的导航列表添加点击事件#}
+                $("a.list-group-item").click(function () {
+                    if ($(this).hasClass("active")) {
+                        $(this).removeClass("active")
+                    }
+                    else {
+                        $(this).addClass("active");
+                    }
+                });
+
+                $('#tScripts').DataTable({
+                    responsive: true
+                });
+
+                {#            为脚本选择按钮点击点击事件#}
+
+                $("#btSetup").click(function () {
+                    clickedButton = "buttonSetup";
+                    display_script_info();
+                });
+                $("#btTeardown").click(function () {
+                    clickedButton = "buttonTeardown";
+                    display_script_info();
+                });
+
+                {#为脚本选择的链接添加点击事件#}
+                $("#tScripts").on("click", "a", function () {
+                    console.log(clickedButton);
+                    let scriptId = $(this).parent().next().html().trim();
+                    if (clickedButton === "buttonSetup") {
+                        $("#setupId").val(scriptId);
+                        console.log($("#setupId").val())
+                    }
+                    else {
+                        $("#tearDownId").val(scriptId);
+                        console.log($("#tearDownId").val())
+                    }
+                });
+
+                {#    提交的时候提交所有选中的测试用例#}
+
+                $("#btSubmit").click(function () {
+                    {#获取所有已经选中的节点#}
+                    let selectedCaseNodes = $("a.list-group-item.active");
+                    console.log(selectedCaseNodes.length);
+                    let case_ids = "";
+                    for (let i = 0; i < selectedCaseNodes.length; i++) {
+                        case_ids += $(selectedCaseNodes[i]).attr("name");
+                        case_ids += ";"
+                    }
+                    $("#caseList").val(case_ids);
+                })
+
+
+            }
+        )
+    </script>
 {% endblock %}
 

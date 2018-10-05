@@ -2,6 +2,7 @@ import time
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.datastructures import MultiValueDictKeyError
 
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
 from script.dataModels import ScriptData
@@ -42,10 +43,16 @@ def init_upload_page(request):
         # 传输数据说明：
         # module_case_list：NAME:LIST
         # user_dict：用户ID:NAME 字典
-        # first_case：第一个需要显示的case
+        # selected_case：需要选中的case
+        selected_case = "no_case"
+        try:
+            current_case = request.session[SESSION_CASE_ID]
+            selected_case = TestCase.objects.filter(id=current_case)[0].title
+        except MultiValueDictKeyError:
+            pass
         # 将当前操作的测试用例ID写入到session
         return render(request, "pages/script/upload.html",
-                      {"module_case_dict": module_case_dict, "types": script_types})
+                      {"module_case_dict": module_case_dict, "types": script_types, "selected_case": selected_case})
     if request.method == "POST":
         """请求方式为POST，即为提交脚本数据"""
         print(request.FILES)
@@ -82,6 +89,24 @@ def init_upload_page(request):
                 return JsonResponse(result_to_json(result))
         else:
             print(upload_form.errors)
+
+
+def script_of_case(request):
+    """在CASE列表页异步请求脚本的信息的请求"""
+    result = Script.objects.filter(related_case=request.session[SESSION_CASE_ID])
+    if result.count() == 0:
+        return JsonResponse({"res": "no"})
+    script = result[0]
+    data = {"res": "yes", "id": script.id, "title": script.title, "code": _read_scripts(script.path)}
+    return JsonResponse(data)
+
+
+def _read_scripts(path):
+    """
+    读取测试用例的代码，用以进行展示
+    """
+    with open(path) as f:
+        return f.readlines()
 
 
 def init_scripts_list(request):
