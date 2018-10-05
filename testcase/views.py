@@ -12,6 +12,7 @@ from testcase.models import TestCase, CaseModule, TestSuite, SuitCaseMapping
 from user.models import User
 from user.userUtils import user_dict
 from utils.consts import *
+from django.utils.datastructures import MultiValueDictKeyError
 
 # Create your views here.
 
@@ -179,14 +180,14 @@ def new_suit_page(request):
         module_case_dict[module_dict.get(_id).name] = case_list
         # 传输数据说明：
         # module_case_list：NAME:LIST
-    print(request.GET)
-    if request.GET["success"]:
-        return render(request, "pages/testcase/newSuit.html",
-                      {"module_case_dict": module_case_dict, "success": "yes"})
+    try:
+        if request.GET["success"]:
+            return render(request, "pages/testcase/newSuit.html",
+                          {"module_case_dict": module_case_dict, "success": "yes"})
+    except MultiValueDictKeyError:
+        pass
     return render(request, "pages/testcase/newSuit.html",
                   {"module_case_dict": module_case_dict})
-
-
 def new_suit(request):
     if request.method == "POST":
         """增加测试套件的方法"""

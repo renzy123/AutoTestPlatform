@@ -1,33 +1,20 @@
+{% extends "navs.html" %}
 <!DOCTYPE html>
 <html lang="en">
 {% load staticfiles %}
 {% load customTags %}
-<head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Test Automation Home</title>
-
-
-    <!-- Bootstrap Core CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"/>
-    <!-- MetisMenu CSS -->
-    <link href="{% static 'css/metisMenu.min.css' %}" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-    <!-- Custom Fonts -->
-    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+{% block title %}
+    新测试套件
+{% endblock %}
+{% block cssLink %}
     <!-- DataTables CSS -->
     <link href="{% static 'css/datatable/dataTables.bootstrap.min.css' %}s" rel="stylesheet">
 
     <!-- DataTables Responsive CSS -->
     <link href="{% static 'css/datatable/dataTables.responsive.css' %}s" rel="stylesheet">
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
-
-
-    {#    <link href="{% static 'js/prettyCode/prettify.css' %}" rel="stylesheet" type="text/css">#}
+{% endblock %}
+{% block css %}
     <style type="text/css">
         .textarea {
             resize: none;
@@ -48,489 +35,175 @@
             border: none !important;
         }
     </style>
-</head>
-<body>
-<div id="wrapper">
-    <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Test Automation</a>
+{% endblock %}
+{% block mainbody %}
+    {% if success == "yes" %}
+        <script type="text/javascript">
+            swal({
+                text: "新建测试套件成功!",
+                timer: 1000,
+                button: false
+            });
+        </script>
+    {% endif %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">新增测试套件</h1>
         </div>
-        <!-- /.navbar-header -->
-
-        <ul class="nav navbar-top-links navbar-right">
-            <!-- /.dropdown -->
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-tasks">
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 1</strong>
-                                    <span class="pull-right text-muted">40% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                        <span class="sr-only">40% Complete (success)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 2</strong>
-                                    <span class="pull-right text-muted">20% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 20%">
-                                        <span class="sr-only">20% Complete</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 3</strong>
-                                    <span class="pull-right text-muted">60% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                        <span class="sr-only">60% Complete (warning)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 4</strong>
-                                    <span class="pull-right text-muted">80% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 80%">
-                                        <span class="sr-only">80% Complete (danger)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a class="text-center" href="#">
-                            <strong>See All Tasks</strong>
-                            <i class="fa fa-angle-right"></i>
-                        </a>
-                    </li>
-                </ul>
-                <!-- /.dropdown-tasks -->
-            </li>
-            <!-- /.dropdown -->
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-alerts">
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-comment fa-fw"></i> New Comment
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                <span class="pull-right text-muted small">12 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-envelope fa-fw"></i> Message Sent
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-tasks fa-fw"></i> New Task
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a class="text-center" href="#">
-                            <strong>See All Alerts</strong>
-                            <i class="fa fa-angle-right"></i>
-                        </a>
-                    </li>
-                </ul>
-                <!-- /.dropdown-alerts -->
-            </li>
-            <!-- /.dropdown -->
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#"><i class="fa fa-user fa-fw"></i> 用户信息</a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-gear fa-fw"></i> 设置</a>
-                    </li>
-                    <li class="divider"></li>
-                    <li><a href="{% url  "user:logout" %}"><i class="fa fa-sign-out fa-fw"></i> 注销</a>
-                    </li>
-                </ul>
-                <!-- /.dropdown-user -->
-            </li>
-            <!-- /.dropdown -->
-        </ul>
-        <!-- /.navbar-top-links -->
-
-        <div class="navbar-default sidebar" role="navigation">
-            <div class="sidebar-nav navbar-collapse">
-                <ul class="nav" id="side-menu">
-                    <li class="sidebar-search">
-                        <div class="input-group custom-search-form">
-                            <input type="text" class="form-control" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                        <!-- /input-group -->
-                    </li>
-                    <li>
-                        <a href="{% url "home" %}"><i class="fa fa-dashboard fa-fw"></i> 看板</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 产品<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{% url "product:info" %}">产品一览</a>
-                            </li>
-                            <li>
-                                {#                                TODO 增加产品管理相关功能#}
-                                <a href="#">产品管理</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-
-                    <li>
-                        <a href="{% url "testcase:list" %}"><i class="fa fa-edit fa-fw"></i> 测试用例</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 脚本管理<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{% url "script:upload" %}">新增套件</a>
-                            </li>
-                            <li>
-                                {#                                TODO 增加产品管理相关功能#}
-                                <a href="#">脚本一览</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-wrench fa-fw"></i> 执行<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="pages/product/detail.html">Panels and Wells</a>
-                            </li>
-                            <li>
-                                <a href="./pages/buttons.html">Buttons</a>
-                            </li>
-                            <li>
-                                <a href="./pages/notifications.html">Notifications</a>
-                            </li>
-                            <li>
-                                <a href="./pages/typography.html">Typography</a>
-                            </li>
-                            <li>
-                                <a href="./pages/icons.html"> Icons</a>
-                            </li>
-                            <li>
-                                <a href="./pages/grid.html">Grid</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown<span
-                                class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="#">Second Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Second Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level <span class="fa arrow"></span></a>
-                                <ul class="nav nav-third-level">
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                </ul>
-                                <!-- /.nav-third-level -->
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-files-o fa-fw"></i> Sample Pages<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="./pages/blank.html">Blank Page</a>
-                            </li>
-                            <li>
-                                <a href="login.html">Login Page</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                </ul>
-            </div>
-            <!-- /.sidebar-collapse -->
-        </div>
-        <!-- /.navbar-static-side -->
-    </nav>
-    <div id="wrapper">
-        <div id="page-wrapper">
-            {% if success == "yes" %}
-                <script type="text/javascript">
-                    swal({
-                        text: "新建测试套件成功!",
-                        timer: 1000,
-                        button: false
-                    });
-                </script>
-            {% endif %}
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">新增测试套件</h1>
+        <!-- /.col-lg-12 -->
+    </div>
+    <div class="alert alert-info alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        请输入测试条件名，并从右侧的测试用例列表中，添加测试用例！
+        同时请指定Setup和TearDown!
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    新增
                 </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <div class="alert alert-info alert-dismissable">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                请输入测试条件名，并从右侧的测试用例列表中，添加测试用例！
-                同时请指定Setup和TearDown!
-            </div>
-            <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-5">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            新增
+                <div class="panel-body">
+                    <form role="form" method="POST" action="{% url "testcase:addSuit" %}"
+                          enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label>请输入名称</label>
+                            <input class="form-control" type="text" name="suitName" id="suitName"
+                                   placeholder="请输入测试套件名称">
                         </div>
-                        <div class="panel-body">
-                            <form role="form" method="POST" action="{% url "testcase:addSuit" %}"
-                                  enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label>请输入名称</label>
-                                    <input class="form-control" type="text" name="suitName" id="suitName"
-                                           placeholder="请输入测试套件名称">
-                                </div>
-                                <div class="form-group">
-                                    <label>setup</label>
-                                    <div class="inline">
-                                        <button type="button" class="btn btn-default" data-toggle="modal"
-                                                data-target="#scripts" id="btSetup">从已有脚本中选择
-                                        </button>
-                                        <button type="button" class="btn btn-default" data-toggle="modal"
-                                                data-target="#scripts">新增代码
-                                        </button>
-                                        <input type="text" id="setupId" name="setupId" style="display: none">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>TearDown</label>
-                                    <div class="inline">
-                                        <button type="button" class="btn btn-default" id="btTeardown"
-                                                data-toggle="modal"
-                                                data-target="#scripts">从已有脚本中选择
-                                        </button>
-                                        <button type="button" class="btn btn-default">新增代码</button>
-                                        <input type="text" id="tearDownId" name="tearDownId" style="display: none">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>描述</label>
-                                    <textarea class="form-control" name="desc" id="desc" placeholder="请输入测试套件描述！!"
-                                    ></textarea>
-                                    <textarea name="caseList" style="display: none;" id="caseList"></textarea>
+                        <div class="form-group">
+                            <label>setup</label>
+                            <div class="inline">
+                                <button type="button" class="btn btn-default" data-toggle="modal"
+                                        data-target="#scripts" id="btSetup">从已有脚本中选择
+                                </button>
+                                <button type="button" class="btn btn-default" data-toggle="modal"
+                                        data-target="#scripts">新增代码
+                                </button>
+                                <input type="text" id="setupId" name="setupId" style="display: none">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>TearDown</label>
+                            <div class="inline">
+                                <button type="button" class="btn btn-default" id="btTeardown"
+                                        data-toggle="modal"
+                                        data-target="#scripts">从已有脚本中选择
+                                </button>
+                                <button type="button" class="btn btn-default">新增代码</button>
+                                <input type="text" id="tearDownId" name="tearDownId" style="display: none">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="desc" id="desc" placeholder="请输入测试套件描述！!"
+                            ></textarea>
+                            <textarea name="caseList" style="display: none;" id="caseList"></textarea>
 
-                                </div>
-                                <button type="submit" class="btn btn-default" id="btSubmit">提交</button>
-                            </form>
                         </div>
+                        <button type="submit" class="btn btn-default" id="btSubmit">提交</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="scripts" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: 800px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            请选择脚本
+                        </h4>
                     </div>
+                    <div class="modal-body">
+                        <table width="100%" class="table table-striped table-bordered table-hover"
+                               id="tScripts">
+                            <thead>
+                            <tr>
+                                <th>脚本名</th>
+                                <th>创建者</th>
+                                <th>最后修改者</th>
+                                <th>最后运行时间</th>
+                                <th>运行次数</th>
+                                <th>脚本类型</th>
+                                <th>说明</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">
+                            确认
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+
+        <!-- /.col-lg-4 -->
+        <div class="col-lg-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-list"></span>
+                    请选择测试用例
                 </div>
-                <div class="modal fade" id="scripts" tabindex="-1" role="dialog"
-                     aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" style="width: 800px">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal"
-                                        aria-hidden="true">
-                                    &times;
-                                </button>
-                                <h4 class="modal-title" id="myModalLabel">
-                                    请选择脚本
-                                </h4>
-                            </div>
-                            <div class="modal-body">
-                                <table width="100%" class="table table-striped table-bordered table-hover"
-                                       id="tScripts">
-                                    <thead>
-                                    <tr>
-                                        <th>脚本名</th>
-                                        <th>创建者</th>
-                                        <th>最后修改者</th>
-                                        <th>最后运行时间</th>
-                                        <th>运行次数</th>
-                                        <th>脚本类型</th>
-                                        <th>说明</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                                </button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">
-                                    确认
-                                </button>
-                            </div>
-                        </div><!-- /.modal-content -->
-                    </div><!-- /.modal -->
-                </div>
+                <!-- .panel-heading -->
+                <div class="panel-body">
+                    <div class="panel-group" id="listPanel">
+                        {% for case_module,case_list in module_case_dict.items %}
+                            {#  生成标题#}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#listPanel"
+                                           href="#group{{ case_module | timestamp }}">
+                                            {{ case_module }}</a>
+                                    </h4>
+                                </div>
+                                <div id="group{{ case_module | timestamp }}"
+                                     class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <div class="list-group">
+                                            {#  生成测试用例列表#}
+                                            {% for case in case_list %}
+                                                <a class="list-group-item" href="#"
+                                                   name="{{ case.id }}">{{ case.title }}</a>
 
-
-                <!-- /.col-lg-4 -->
-                <div class="col-lg-7">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <span class="fa fa-list"></span>
-                            请选择测试用例
-                        </div>
-                        <!-- .panel-heading -->
-                        <div class="panel-body">
-                            <div class="panel-group" id="listPanel">
-                                {% for case_module,case_list in module_case_dict.items %}
-                                    {#  生成标题#}
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#listPanel"
-                                                   href="#group{{ case_module | timestamp }}">
-                                                    {{ case_module }}</a>
-                                            </h4>
-                                        </div>
-                                        <div id="group{{ case_module | timestamp }}"
-                                             class="panel-collapse collapse in">
-                                            <div class="panel-body">
-                                                <div class="list-group">
-                                                    {#  生成测试用例列表#}
-                                                    {% for case in case_list %}
-                                                        <a class="list-group-item" href="#"
-                                                           name="{{ case.id }}">{{ case.title }}</a>
-
-                                                    {% empty %}
-                                                        <p>该模块下无测试用例</p>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
+                                            {% empty %}
+                                                <p>该模块下无测试用例</p>
+                                            {% endfor %}
                                         </div>
                                     </div>
-                                {% endfor %}
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        {% endfor %}
+                            </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!-- /#wrapper -->
 
-<!-- jQuery -->
-<script src="{% static 'js/jquery.js' %}"></script>
+{% endblock %}
 
-<!-- Bootstrap Core JavaScript -->
-<script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-<!-- Metis Menu Plugin JavaScript -->
-<script src="{% static 'js/metisMenu.min.js' %}"></script>
-
-<!-- Custom Theme JavaScript -->
-<script src="{% static 'js/custom.min.js' %}"></script>
-
-{#<script src="{% static 'js/prettyCode/run_prettify.js' %}"></script>#}
-
+{% block scriptLinks %}
 <script src="{% static 'js/jsrender.min.js' %}"></script>
 <!-- DataTables JavaScript -->
 <script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
 <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
-
+{% endblock %}
+{% block script %}
 <script id="rowScript" type="text/x-jsrender">
 
 <tr>
@@ -678,7 +351,5 @@
         }
     )
 </script>
+{% endblock %}
 
-</body>
-
-</html>

@@ -1,27 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "navs.html" %}
 {% load staticfiles %}
 {% load customTags %}
-<head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Test Automation Home</title>
-
-
-    <!-- Bootstrap Core CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"/>
-    <!-- MetisMenu CSS -->
-    <link href="{% static 'css/metisMenu.min.css' %}" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
-    <!-- Custom Fonts -->
-    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
-
-
-    {#    <link href="{% static 'js/prettyCode/prettify.css' %}" rel="stylesheet" type="text/css">#}
+{% block title %}
+    修改测试用例
+{% endblock %}
+{% block css %}
     <style type="text/css">
         .textarea {
             resize: none;
@@ -42,405 +25,114 @@
             border: none !important;
         }
     </style>
-</head>
-
-<body>
-
-<div id="wrapper">
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Test Automation</a>
+{% endblock %}
+{% block mainbody %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">用例详情</h1>
         </div>
-        <!-- /.navbar-header -->
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-folder-open"></span>
+                    用例修改
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#home" data-toggle="tab">用例信息</a>
+                        </li>
+                        <li>
+                            <a href="#profile" data-toggle="tab">操作记录</a>
+                        </li>
+                        <li>
+                            <a href="#messages" data-toggle="tab">脚本信息</a>
+                        </li>
+                    </ul>
 
-        <ul class="nav navbar-top-links navbar-right">
-            <!-- /.dropdown -->
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-tasks">
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 1</strong>
-                                    <span class="pull-right text-muted">40% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                        <span class="sr-only">40% Complete (success)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 2</strong>
-                                    <span class="pull-right text-muted">20% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 20%">
-                                        <span class="sr-only">20% Complete</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 3</strong>
-                                    <span class="pull-right text-muted">60% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                        <span class="sr-only">60% Complete (warning)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <p>
-                                    <strong>Task 4</strong>
-                                    <span class="pull-right text-muted">80% Complete</span>
-                                </p>
-                                <div class="progress progress-striped active">
-                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 80%">
-                                        <span class="sr-only">80% Complete (danger)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a class="text-center" href="#">
-                            <strong>See All Tasks</strong>
-                            <i class="fa fa-angle-right"></i>
-                        </a>
-                    </li>
-                </ul>
-                <!-- /.dropdown-tasks -->
-            </li>
-            <!-- /.dropdown -->
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-alerts">
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-comment fa-fw"></i> New Comment
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                <span class="pull-right text-muted small">12 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-envelope fa-fw"></i> Message Sent
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-tasks fa-fw"></i> New Task
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="#">
-                            <div>
-                                <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                <span class="pull-right text-muted small">4 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a class="text-center" href="#">
-                            <strong>See All Alerts</strong>
-                            <i class="fa fa-angle-right"></i>
-                        </a>
-                    </li>
-                </ul>
-                <!-- /.dropdown-alerts -->
-            </li>
-            <!-- /.dropdown -->
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#"><i class="fa fa-user fa-fw"></i> 用户信息</a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-gear fa-fw"></i> 设置</a>
-                    </li>
-                    <li class="divider"></li>
-                    <li><a href="{% url  "user:logout" %}"><i class="fa fa-sign-out fa-fw"></i> 注销</a>
-                    </li>
-                </ul>
-                <!-- /.dropdown-user -->
-            </li>
-            <!-- /.dropdown -->
-        </ul>
-        <!-- /.navbar-top-links -->
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade" id="profile">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-lg-12" id="divProductInfo">
+                                    <div class="panel panel-success noborder">
+                                        <div class="panel-heading">
+                                            <button class="btn btn-default btn-xs disabled"
+                                                    id="btCaseId">{{ first_case.id }}</button>
+                                            <label class="header" id="lbTitle"
+                                                   style="margin-left: 10px;">{{ first_case.title }}</label>
+                                        </div>
+                                        <div class="panel-body">
 
-        <div class="navbar-default sidebar" role="navigation">
-            <div class="sidebar-nav navbar-collapse">
-                <ul class="nav" id="side-menu">
-                    <li class="sidebar-search">
-                        <div class="input-group custom-search-form">
-                            <input type="text" class="form-control" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                        <!-- /input-group -->
-                    </li>
-                    <li>
-                        <a href="{% url "home" %}"><i class="fa fa-dashboard fa-fw"></i> 看板</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 产品<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{% url "product:info" %}">产品一览</a>
-                            </li>
-                            <li>
-                                {#                                TODO 增加产品管理相关功能#}
-                                <a href="#">产品管理</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="{% url "product:info" %}"><i class="fa fa-table fa-fw"></i> 产品</a>
-                    </li>
-                    <li>
-                        <a href="./pages/forms.html"><i class="fa fa-edit fa-fw"></i> 测试用例</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-wrench fa-fw"></i> 执行<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="pages/product/detail.html">Panels and Wells</a>
-                            </li>
-                            <li>
-                                <a href="./pages/buttons.html">Buttons</a>
-                            </li>
-                            <li>
-                                <a href="./pages/notifications.html">Notifications</a>
-                            </li>
-                            <li>
-                                <a href="./pages/typography.html">Typography</a>
-                            </li>
-                            <li>
-                                <a href="./pages/icons.html"> Icons</a>
-                            </li>
-                            <li>
-                                <a href="./pages/grid.html">Grid</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown<span
-                                class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="#">Second Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Second Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level <span class="fa arrow"></span></a>
-                                <ul class="nav nav-third-level">
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                </ul>
-                                <!-- /.nav-third-level -->
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-files-o fa-fw"></i> Sample Pages<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="./pages/blank.html">Blank Page</a>
-                            </li>
-                            <li>
-                                <a href="login.html">Login Page</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                </ul>
-            </div>
-            <!-- /.sidebar-collapse -->
-        </div>
-        <!-- /.navbar-static-side -->
-    </nav>
-    <div id="page-wrapper">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">用例详情</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <!-- /.row -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <span class="fa fa-folder-open"></span>
-                        用例修改
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <!-- Nav tabs -->
-                        <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="#home" data-toggle="tab">用例信息</a>
-                            </li>
-                            <li>
-                                <a href="#profile" data-toggle="tab">操作记录</a>
-                            </li>
-                            <li>
-                                <a href="#messages" data-toggle="tab">脚本信息</a>
-                            </li>
-                        </ul>
-
-                        <!-- Tab panes -->
-                        <div class="tab-content">
-                            <div class="tab-pane fade" id="profile">
-                                <div class="row" style="margin-top: 10px;">
-                                    <div class="col-lg-12" id="divProductInfo">
-                                        <div class="panel panel-success noborder">
-                                            <div class="panel-heading">
-                                                <button class="btn btn-default btn-xs disabled"
-                                                        id="btCaseId">{{ first_case.id }}</button>
-                                                <label class="header" id="lbTitle"
-                                                       style="margin-left: 10px;">{{ first_case.title }}</label>
-                                            </div>
-                                            <div class="panel-body">
-
-                                                <div class="row col-lg-12 text-left">
-                                                    <hr/>
-                                                    <div class="col-lg-12 text-left">
-                                                        <label class="header">基本信息</label>
-                                                    </div>
-                                                    <div class="row col-lg-8 text-left">
-                                                        <table class="table" style="margin-left: 30px;margin-top: 30px">
-                                                            <tr>
-                                                                <td class="col-lg-3">
+                                            <div class="row col-lg-12 text-left">
+                                                <hr/>
+                                                <div class="col-lg-12 text-left">
+                                                    <label class="header">基本信息</label>
+                                                </div>
+                                                <div class="row col-lg-8 text-left">
+                                                    <table class="table" style="margin-left: 30px;margin-top: 30px">
+                                                        <tr>
+                                                            <td class="col-lg-3">
 																						<span class="fa fa-user"
                                                                                               style="margin-left: 30px;"
                                                                                         >&nbsp;&nbsp;由谁创建
 																						</span>
-                                                                </td>
-                                                                <td class="col-lg-5" id="createUser">
-                                                                    {{ first_case.create_user }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
+                                                            </td>
+                                                            <td class="col-lg-5" id="createUser">
+                                                                {{ first_case.create_user }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
 																						<span class="fa fa-calendar-times-o"
                                                                                               style="margin-left: 30px;"
                                                                                         >&nbsp;&nbsp;创建时间
 																						</span>
-                                                                </td>
-                                                                <td id="createTime">
-                                                                    {{ first_case.create_time }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
+                                                            </td>
+                                                            <td id="createTime">
+                                                                {{ first_case.create_time }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
 																						<span class="fa fa-user"
                                                                                               style="margin-left: 30px;">&nbsp;&nbsp;最后编辑者
 																						</span>
-                                                                </td>
-                                                                <td id="lastEditer">{{ first_case.last_edit_user }}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
+                                                            </td>
+                                                            <td id="lastEditer">{{ first_case.last_edit_user }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
 																						<span class="fa fa-calendar-times-o"
                                                                                               style="margin-left: 30px;">&nbsp;&nbsp;编辑时间
 																						</span>
-                                                                </td>
-                                                                <td id="lastEditTime">{{ first_case.last_edit_time }}</td>
-                                                            </tr>
-                                                        </table>
-                                                    </div>
+                                                            </td>
+                                                            <td id="lastEditTime">{{ first_case.last_edit_time }}</td>
+                                                        </tr>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="messages">
-                                <div class="row">
-                                    <div class="row" style="margin-top: 10px;">
-                                        <div class="col-lg-12" id="divProductInfo">
-                                            <div class="panel panel-success">
-                                                <div class="panel-heading">
-                                                    <button class="btn btn-default btn-xs disabled">ID</button>
-                                                    <label class="header" style="margin-left: 10px;">脚本1</label>
-                                                </div>
-                                                <div class="panel-body">
+                        </div>
+                        <div class="tab-pane fade" id="messages">
+                            <div class="row">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12" id="divProductInfo">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                <button class="btn btn-default btn-xs disabled">ID</button>
+                                                <label class="header" style="margin-left: 10px;">脚本1</label>
+                                            </div>
+                                            <div class="panel-body">
 																	<pre class="prettyprint lang-python">
 			or product in products:
             product_name = product.name
@@ -457,208 +149,188 @@
         else:
             return render(request, "pages/product/productList.html", {"products": data_list})
 																	</pre>
-                                                </div>
-                                                <div class="panel-footer">
-                                                    End
-                                                </div>
+                                            </div>
+                                            <div class="panel-footer">
+                                                End
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade in active" id="home">
-                                <div class="row" style="margin-top: 10px;">
-                                    <div class="col-lg-12">
-                                        <div class="panel panel-success noborder">
-                                            <div class="panel-heading">
-                                                <button class="btn btn-default btn-xs disabled"
-                                                        id="detailId">{{ first_case.id }}</button>
-                                                <label class="header"
-                                                       style="margin-left: 10px;"
-                                                       id="detailTitle"
-                                                       contenteditable="true">{{ first_case.title }}</label>
-                                                <button class="btn btn-danger btn-outline" style="margin-left: 100px "
-                                                        id="btnDelCase">删除
-                                                </button>
-                                            </div>
+                        </div>
+                        <div class="tab-pane fade in active" id="home">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-success noborder">
+                                        <div class="panel-heading">
+                                            <button class="btn btn-default btn-xs disabled"
+                                                    id="detailId">{{ first_case.id }}</button>
+                                            <label class="header"
+                                                   style="margin-left: 10px;"
+                                                   id="detailTitle"
+                                                   contenteditable="true">{{ first_case.title }}</label>
+                                            <button class="btn btn-danger btn-outline" style="margin-left: 100px "
+                                                    id="btnDelCase">删除
+                                            </button>
+                                        </div>
 
 
-                                            <div class="panel-body">
-                                                <div class="row" style="margin-top: 10px;">
-                                                    <div class="panel-group" id="casePanel" style="border:none">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <div class="row">
-                                                                    <div class="col-lg-4">
-                                                                        <a class="panel-title btn btn-default btn-outline"
-                                                                           style="border: none;" data-toggle="collapse"
-                                                                           data-parent="#casePanel"
-                                                                           href="#preCondition">前置条件</a>
-                                                                    </div>
-
+                                        <div class="panel-body">
+                                            <div class="row" style="margin-top: 10px;">
+                                                <div class="panel-group" id="casePanel" style="border:none">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-lg-4">
+                                                                    <a class="panel-title btn btn-default btn-outline"
+                                                                       style="border: none;" data-toggle="collapse"
+                                                                       data-parent="#casePanel"
+                                                                       href="#preCondition">前置条件</a>
                                                                 </div>
-                                                            </div>
-                                                            <div id="preCondition" class="panel-collapse collapse in">
-                                                                <div class="panel-body">
 
-                                                                    <table class="table borderless text-left"
-                                                                           style="margin-top: 5px;margin-bottom: 5px; width: 50%;margin-left: 5%"
-                                                                           id="tPre">
-                                                                        <tbody>
-                                                                        {% for pre in first_case_detail.pres %}
-                                                                            <tr>
-                                                                                <td>
-                                                                                    <div class="input-group">
+                                                            </div>
+                                                        </div>
+                                                        <div id="preCondition" class="panel-collapse collapse in">
+                                                            <div class="panel-body">
+
+                                                                <table class="table borderless text-left"
+                                                                       style="margin-top: 5px;margin-bottom: 5px; width: 50%;margin-left: 5%"
+                                                                       id="tPre">
+                                                                    <tbody>
+                                                                    {% for pre in first_case_detail.pres %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="input-group">
                                                                                         <textarea
                                                                                                 class="form-control textarea text-left"
                                                                                                 rows="1"> {{ pre }}</textarea>
-                                                                                        <span class="input-group-addon btn btn-danger">删除</span>
-                                                                                    </div>
+                                                                                    <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                </div>
 
-                                                                                </td>
-                                                                            </tr>
-                                                                        {% empty %}
-                                                                            <tr>
-                                                                                <td>
-                                                                                    <div class="input-group">
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% empty %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="input-group">
                                                                                         <textarea
                                                                                                 class="form-control textarea text-left"
                                                                                                 rows="1"
                                                                                                 placeholder="请输入前置条件！"></textarea>
-                                                                                        <span class="input-group-addon btn btn-danger">删除</span>
-                                                                                    </div>
+                                                                                    <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                </div>
 
-                                                                                </td>
-                                                                            </tr>
-
-                                                                        {% endfor %}
-                                                                        <tr>
-                                                                            <td>
-                                                                                <button class="btn btn-success"
-                                                                                        id="btNewPre">新增
-                                                                                </button>
                                                                             </td>
                                                                         </tr>
-                                                                        </tbody>
-                                                                    </table>
 
+                                                                    {% endfor %}
+                                                                    <tr>
+                                                                        <td>
+                                                                            <button class="btn btn-success"
+                                                                                    id="btNewPre">新增
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel panel-default ">
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-lg-4">
+                                                                    <a class="panel-title btn btn-default btn-outline"
+                                                                       style="border: none;" data-toggle="collapse"
+                                                                       data-parent="#casePanel"
+                                                                       href="#steps">测试步骤</a>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="panel panel-default ">
-                                                            <div class="panel-heading">
-                                                                <div class="row">
-                                                                    <div class="col-lg-4">
-                                                                        <a class="panel-title btn btn-default btn-outline"
-                                                                           style="border: none;" data-toggle="collapse"
-                                                                           data-parent="#casePanel"
-                                                                           href="#steps">测试步骤</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div id="steps" class="panel-collapse collapse">
-                                                                <div class="panel-body">
-                                                                    <table class="table borderless "
-                                                                           style="margin-top: 5px;margin-bottom: 5px; width: 90%;margin-left: 5%"
-                                                                           id="tSteps">
-                                                                        <thead>
+                                                        <div id="steps" class="panel-collapse collapse">
+                                                            <div class="panel-body">
+                                                                <table class="table borderless "
+                                                                       style="margin-top: 5px;margin-bottom: 5px; width: 90%;margin-left: 5%"
+                                                                       id="tSteps">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th class="col-lg-4">测试步骤
+                                                                        </th>
+                                                                        <th class="col-lg-5">期望结果
+                                                                        </th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    {% for i in first_case_detail.steps|times %}
                                                                         <tr>
-                                                                            <th class="col-lg-4">测试步骤
-                                                                            </th>
-                                                                            <th class="col-lg-5">期望结果
-                                                                            </th>
-                                                                        </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                        {% for i in first_case_detail.steps|times %}
-                                                                            <tr>
-                                                                                <td>
+                                                                            <td>
                                                                                     <textarea
                                                                                             class="textarea form-control"
                                                                                             rows="1">{{ first_case_detail.steps|item:i }}</textarea>
-                                                                                </td>
-                                                                                <td>
-                                                                                    <div class="input-group">
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="input-group">
                                                                                         <textarea
                                                                                                 class="form-control textarea text-left"
                                                                                                 rows="1"> {{ first_case_detail.expects|item:i }}</textarea>
-                                                                                        <span class="input-group-addon btn btn-danger">删除</span>
-                                                                                    </div>
-                                                                            </tr>
-                                                                        {% endfor %}
-                                                                        <tr>
-                                                                            <td>
-                                                                                <button class="btn btn-success"
-                                                                                        id="btNewStep">新增
-                                                                                </button>
-                                                                            </td>
+                                                                                    <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                </div>
                                                                         </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                                    {% endfor %}
+                                                                    <tr>
+                                                                        <td>
+                                                                            <button class="btn btn-success"
+                                                                                    id="btNewStep">新增
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <table class="table borderless" style="width: 20%">
-                                                    <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <button class="btn btn-success" id="btnSubmit">提交</button>
-                                                        </td>
-                                                        <td>
-                                                            <button class="btn btn-info" id="btnReset">重置</button>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
                                         </div>
-                                    </div>
+                                        <div>
+                                            <table class="table borderless" style="width: 20%">
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <button class="btn btn-success" id="btnSubmit">提交</button>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-info" id="btnReset">重置</button>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
 
+                                    </div>
                                 </div>
 
                             </div>
+
                         </div>
-                        <!-- /.panel-body -->
                     </div>
-                    <!-- /.panel -->
+                    <!-- /.panel-body -->
                 </div>
-                <!-- /.col-lg-6 -->
+                <!-- /.panel -->
             </div>
+            <!-- /.col-lg-6 -->
         </div>
     </div>
 
-
-</div>
-<!-- /#wrapper -->
-
-<!-- jQuery -->
-<script src="{% static 'js/jquery.js' %}"></script>
-
-<!-- Bootstrap Core JavaScript -->
-<script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-<!-- Metis Menu Plugin JavaScript -->
-<script src="{% static 'js/metisMenu.min.js' %}"></script>
-
-<!-- Custom Theme JavaScript -->
-<script src="{% static 'js/custom.min.js' %}"></script>
-
-{#<script src="{% static 'js/prettyCode/run_prettify.js' %}"></script>#}
-
-<script src="{% static 'js/jsrender.min.js' %}"></script>
-
-
-<!-- bootbox javascript-->
-
-<script src="{% static 'js/sweetalert.min.js' %}"></script>
-
-
-<script id="stepTemplate" type="text/x-jsrender">
+{% endblock %}
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+    <!-- sweetalert javascript-->
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script id="stepTemplate" type="text/x-jsrender">
 <tr>
                                                                                 <td>
                                                                                     <textarea
@@ -674,9 +346,12 @@
                                                                                     </div>
                                                                             </tr>
 
-</script>
 
-<script id="preTemplate" type="text/x-jsrender">
+
+
+    </script>
+
+    <script id="preTemplate" type="text/x-jsrender">
 
 <tr>
 <td>
@@ -688,169 +363,168 @@
 </tr>
 
 
-</script>
 
 
-<script type="text/javascript">
+
+    </script>
 
 
-    function updateCase() {
-        {#        为更新步骤和期望#}
-        let caseDetail = caseData();
-        {#判断步骤和期望在数量上是否保持一致，否则需要重新修改#}
-        console.log(caseDetail);
-        if (caseDetail.steps.length !== caseDetail.expects.length) {
-            swal({
-                text: "请检查输入,步骤和期望请保持一致！",
-                timer: 3000,
-                showConfirmButton: false
-            });
-            return
-        }
-        $.ajax({
-            url: "{% url 'testcase:detail' %}",
-            type: "post",
-            data: {'caseData': JSON.stringify(caseDetail), csrfmiddlewaretoken: '{{ csrf_token }}'},
-            dataType: "json",
-            success: function (data) {
-                if (data.result_code === "2") {
-                    swal({
-                        text: data.result_reason,
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
+    <script type="text/javascript">
+
+
+        function updateCase() {
+            {#        为更新步骤和期望#}
+            let caseDetail = caseData();
+            {#判断步骤和期望在数量上是否保持一致，否则需要重新修改#}
+            console.log(caseDetail);
+            if (caseDetail.steps.length !== caseDetail.expects.length) {
+                swal({
+                    text: "请检查输入,步骤和期望请保持一致！",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return
+            }
+            $.ajax({
+                url: "{% url 'testcase:detail' %}",
+                type: "post",
+                data: {'caseData': JSON.stringify(caseDetail), csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    if (data.result_code === "2") {
+                        swal({
+                            text: data.result_reason,
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                    else {
+                        {#window.location.href="{% url "testcase:list" %}"#}
+                    }
                 }
-                else {
-                    {#window.location.href="{% url "testcase:list" %}"#}
+            })
+        }
+
+
+        function caseData() {
+            {#     用于修改测试用例,从所有textArea中获取测试用例的当前值，封装成为一个json对象，传输到View中进行处理#}
+            let title = $("#detailTitle").html();
+            let all_pres = $("div#preCondition textarea");
+            let pre_list = [];
+            for (let i = 0; i < all_pres.length; i++) {
+                pre_list.push(all_pres[i].value.trim());
+            }
+            let row_steps_expects = $("table#tSteps tbody tr");
+            let steps = [];
+            let expects = [];
+            {#     取出所有的步骤#}
+            for (let i = 0; i < row_steps_expects.length - 1; i++) {
+                {#     取出单行中的步骤和期望#}
+                {#            console.log($(row_steps_expects[i])[0].innerHTML);#}
+                let step_val = $(row_steps_expects[i]).find("textarea:first").val().trim();
+                if (step_val !== "") {
+                    steps.push(step_val)
+                }
+                let expect_val = $(row_steps_expects[i]).find("textarea:last").val().trim();
+                if (expect_val !== "") {
+                    steps.push(expect_val)
                 }
             }
-        })
-    }
 
-
-    function caseData() {
-        {#     用于修改测试用例,从所有textArea中获取测试用例的当前值，封装成为一个json对象，传输到View中进行处理#}
-        let title = $("#detailTitle").html();
-        let all_pres = $("div#preCondition textarea");
-        let pre_list = [];
-        for (let i = 0; i < all_pres.length; i++) {
-            pre_list.push(all_pres[i].value.trim());
-        }
-        let row_steps_expects = $("table#tSteps tbody tr");
-        let steps = [];
-        let expects = [];
-        {#     取出所有的步骤#}
-        for (let i = 0; i < row_steps_expects.length - 1; i++) {
-            {#     取出单行中的步骤和期望#}
-            {#            console.log($(row_steps_expects[i])[0].innerHTML);#}
-            let step_val = $(row_steps_expects[i]).find("textarea:first").val().trim();
-            if (step_val !== "") {
-                steps.push(step_val)
-            }
-            let expect_val = $(row_steps_expects[i]).find("textarea:last").val().trim();
-            if (expect_val !== "") {
-                steps.push(expect_val)
-            }
+            let caseDetail = {};
+            caseDetail["title"] = title;
+            caseDetail["pres"] = pre_list;
+            caseDetail["steps"] = steps;
+            caseDetail["expects"] = expects;
+            return caseDetail
         }
 
-        let caseDetail = {};
-        caseDetail["title"] = title;
-        caseDetail["pres"] = pre_list;
-        caseDetail["steps"] = steps;
-        caseDetail["expects"] = expects;
-        return caseDetail
-    }
 
-
-
-    function is_case_exists(title) {
-        {#判断测试用例是否存在#}
-        $.ajax({
-            url: "{% url "testcase:isCaseExists" %}",
-            type: "get",
-            data: {'title': title, csrfmiddlewaretoken: '{{ csrf_token }}'},
-            dataType: "json",
-            success: function (data) {
-                return data.result;
-            }
-        })
-    }
-
-    function is_title_valid(title) {
-        {#        判断输入的测试用例标题是否合法#}
-        if (title === "") {
-            return "标题不能为空，请重新输入！"
+        function is_case_exists(title) {
+            {#判断测试用例是否存在#}
+            $.ajax({
+                url: "{% url "testcase:isCaseExists" %}",
+                type: "get",
+                data: {'title': title, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    return data.result;
+                }
+            })
         }
-        else {
-            let result = is_case_exists(title);
-            if (result === "true") {
-                return "该测试用例标题已存在，请重新输入！"
+
+        function is_title_valid(title) {
+            {#        判断输入的测试用例标题是否合法#}
+            if (title === "") {
+                return "标题不能为空，请重新输入！"
             }
             else {
-                return true
+                let result = is_case_exists(title);
+                if (result === "true") {
+                    return "该测试用例标题已存在，请重新输入！"
+                }
+                else {
+                    return true
+                }
             }
         }
-    }
 
-    $(document).ready(function () {
-            $.views.settings.delimiters("<%", "%>");
+        $(document).ready(function () {
+                $.views.settings.delimiters("<%", "%>");
 
-            $("#btNewPre").click(function () {
-                {# 新增前置条件行#}
-                let pre_template = $.templates("#preTemplate");
-                $(this).parent().parent().before(pre_template)
-            });
+                $("#btNewPre").click(function () {
+                    {# 新增前置条件行#}
+                    let pre_template = $.templates("#preTemplate");
+                    $(this).parent().parent().before(pre_template)
+                });
 
-            {#            为新增步骤按钮添加回调函数#}
-            $("#btNewStep").click(function () {
-                let step_template = $.templates("#stepTemplate");
-                $(this).parent().parent().before(step_template())
-            });
+                {#            为新增步骤按钮添加回调函数#}
+                $("#btNewStep").click(function () {
+                    let step_template = $.templates("#stepTemplate");
+                    $(this).parent().parent().before(step_template())
+                });
 
-            {#            为删除按钮添加回调函数#}
-            $("table").on("click", ".btn-danger", function () {
-                let row = $(this).parent().parent().parent();
-                row.remove();
-            });
+                {#            为删除按钮添加回调函数#}
+                $("table").on("click", ".btn-danger", function () {
+                    let row = $(this).parent().parent().parent();
+                    row.remove();
+                });
 
-            $("#btnDelCase").click(function () {
-                {#                删除测试用例#}
-                swal({
-                    title: "确认?",
-                    text: "一旦删除，该测试用例将从完全被删除!",
-                    buttons: ["取消", "确认"],
-                    dangerMode: true,
-                })
-                    .then((willDelete) => {
-                        if (willDelete) {
-                            window.location.href = "{% url "testcase:delCase" %}";
-                        }
-                    });
-
-            });
-        $("#detailTitle").change(function () {
-                {# 为标题按钮添加失去焦点事件#}
-            let result = is_title_valid($(this).html());
-            if (result !== true) {
-                swal(result)
-                        .then(() => {
-                            $("#detailTitle")[0].focus();
+                $("#btnDelCase").click(function () {
+                    {#                删除测试用例#}
+                    swal({
+                        title: "确认?",
+                        text: "一旦删除，该测试用例将从完全被删除!",
+                        buttons: ["取消", "确认"],
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                window.location.href = "{% url "testcase:delCase" %}";
+                            }
                         });
-                }
-            });
-            {#为重置按钮添加点击事件#}
-            $("#btnReset").click(function () {
-                location.reload();
-            });
-            {#为提交按钮添加点击事件#}
-            $("#btnSubmit").click(function () {
-                updateCase();
-            });
 
-        }
-    );
-</script>
+                });
+                $("#detailTitle").change(function () {
+                    {# 为标题按钮添加失去焦点事件#}
+                    let result = is_title_valid($(this).html());
+                    if (result !== true) {
+                        swal(result)
+                            .then(() => {
+                                $("#detailTitle")[0].focus();
+                            });
+                    }
+                });
+                {#为重置按钮添加点击事件#}
+                $("#btnReset").click(function () {
+                    location.reload();
+                });
+                {#为提交按钮添加点击事件#}
+                $("#btnSubmit").click(function () {
+                    updateCase();
+                });
 
-</body>
-
-</html>
+            }
+        );
+    </script>
+{% endblock %}
