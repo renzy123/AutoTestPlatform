@@ -4,6 +4,8 @@
 
 
 
+
+
 class TestCaseData:
     """
     用于页面传输的数据模型，包含了TestCase所定义的字段
@@ -40,5 +42,5 @@ class TestCaseDetail:
         self.steps = list(str(steps).split())
         self.expects = list(str(expects).split())
 
-    def __str__(self):
-        return str("前置条件为：\r" + str(self.pres) + "\r步骤为\r" + str(self.steps) + "\r期望结果为：" + self.expects.__str__())
+        # def __str__(self):
+        #     return str("前置条件为：\r" + str(self.pres) + "\r步骤为\r" + str(self.steps) + "\r期望结果为：" + self.expects.__str__())

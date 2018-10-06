@@ -1,0 +1,530 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    修改测试用例
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .textarea {
+            resize: none;
+            overflow-y: hidden;
+        }
+
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+    </style>
+{% endblock %}
+{% block mainbody %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">用例详情</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-folder-open"></span>
+                    用例修改
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#home" data-toggle="tab">用例信息</a>
+                        </li>
+                        <li>
+                            <a href="#profile" data-toggle="tab">操作记录</a>
+                        </li>
+                        <li>
+                            <a href="#messages" data-toggle="tab">脚本信息</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade" id="profile">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-lg-12" id="divProductInfo">
+                                    <div class="panel panel-success noborder">
+                                        <div class="panel-heading">
+                                            <button class="btn btn-default btn-xs disabled"
+                                                    id="btCaseId">{{ first_case.id }}</button>
+                                            <label class="header" id="lbTitle"
+                                                   style="margin-left: 10px;">{{ first_case.title }}</label>
+                                        </div>
+                                        <div class="panel-body">
+
+                                            <div class="row col-lg-12 text-left">
+                                                <hr/>
+                                                <div class="col-lg-12 text-left">
+                                                    <label class="header">基本信息</label>
+                                                </div>
+                                                <div class="row col-lg-8 text-left">
+                                                    <table class="table" style="margin-left: 30px;margin-top: 30px">
+                                                        <tr>
+                                                            <td class="col-lg-3">
+																						<span class="fa fa-user"
+                                                                                              style="margin-left: 30px;"
+                                                                                        >&nbsp;&nbsp;由谁创建
+																						</span>
+                                                            </td>
+                                                            <td class="col-lg-5" id="createUser">
+                                                                {{ first_case.create_user }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-calendar-times-o"
+                                                                                              style="margin-left: 30px;"
+                                                                                        >&nbsp;&nbsp;创建时间
+																						</span>
+                                                            </td>
+                                                            <td id="createTime">
+                                                                {{ first_case.create_time }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-user"
+                                                                                              style="margin-left: 30px;">&nbsp;&nbsp;最后编辑者
+																						</span>
+                                                            </td>
+                                                            <td id="lastEditer">{{ first_case.last_edit_user }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-calendar-times-o"
+                                                                                              style="margin-left: 30px;">&nbsp;&nbsp;编辑时间
+																						</span>
+                                                            </td>
+                                                            <td id="lastEditTime">{{ first_case.last_edit_time }}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="messages">
+                            <div class="row">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12" id="divProductInfo">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                <button class="btn btn-default btn-xs disabled">ID</button>
+                                                <label class="header" style="margin-left: 10px;">脚本1</label>
+                                            </div>
+                                            <div class="panel-body">
+																	<pre class="prettyprint lang-python">
+			or product in products:
+            product_name = product.name
+            product_create_time = product.createTime
+            product_create_user = product.createUser
+            product_incharge_user = product.inChargeUser
+            product_status = product.status
+            product_data = ProductData(product.id, name=product_name, create_user=user_dict.get(product_create_user),
+                                       incharge_user=user_dict.get(product_incharge_user),
+                                       create_time=str(product_create_time),
+                                       status=status_dict.get(product_status), manager=product.manager,
+                                       desc=product.desc)
+            data_list.append(product_data)
+        else:
+            return render(request, "pages/product/productList.html", {"products": data_list})
+																	</pre>
+                                            </div>
+                                            <div class="panel-footer">
+                                                End
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade in active" id="home">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-success noborder">
+                                        <div class="panel-heading">
+                                            <button class="btn btn-default btn-xs disabled"
+                                                    id="detailId">{{ first_case.id }}</button>
+                                            <label class="header"
+                                                   style="margin-left: 10px;"
+                                                   id="detailTitle"
+                                                   contenteditable="true">{{ first_case.title }}</label>
+                                            <button class="btn btn-danger btn-outline" style="margin-left: 100px "
+                                                    id="btnDelCase">删除
+                                            </button>
+                                        </div>
+
+
+                                        <div class="panel-body">
+                                            <div class="row" style="margin-top: 10px;">
+                                                <div class="panel-group" id="casePanel" style="border:none">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-lg-4">
+                                                                    <a class="panel-title btn btn-default btn-outline"
+                                                                       style="border: none;" data-toggle="collapse"
+                                                                       data-parent="#casePanel"
+                                                                       href="#preCondition">前置条件</a>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div id="preCondition" class="panel-collapse collapse in">
+                                                            <div class="panel-body">
+
+                                                                <table class="table borderless text-left"
+                                                                       style="margin-top: 5px;margin-bottom: 5px; width: 50%;margin-left: 5%"
+                                                                       id="tPre">
+                                                                    <tbody>
+                                                                    {% for pre in first_case_detail.pres %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="input-group">
+                                                                                        <textarea
+                                                                                                class="form-control textarea text-left"
+                                                                                                rows="1"> {{ pre }}</textarea>
+                                                                                    <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                </div>
+
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% empty %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="input-group">
+                                                                                        <textarea
+                                                                                                class="form-control textarea text-left"
+                                                                                                rows="1"
+                                                                                                placeholder="请输入前置条件！"></textarea>
+                                                                                    <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                </div>
+
+                                                                            </td>
+                                                                        </tr>
+
+                                                                    {% endfor %}
+                                                                    <tr>
+                                                                        <td>
+                                                                            <button class="btn btn-success"
+                                                                                    id="btNewPre">新增
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel panel-default ">
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-lg-4">
+                                                                    <a class="panel-title btn btn-default btn-outline"
+                                                                       style="border: none;" data-toggle="collapse"
+                                                                       data-parent="#casePanel"
+                                                                       href="#steps">测试步骤</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="steps" class="panel-collapse collapse">
+                                                            <div class="panel-body">
+                                                                <table class="table borderless "
+                                                                       style="margin-top: 5px;margin-bottom: 5px; width: 90%;margin-left: 5%"
+                                                                       id="tSteps">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th class="col-lg-4">测试步骤
+                                                                        </th>
+                                                                        <th class="col-lg-5">期望结果
+                                                                        </th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    {% for i in first_case_detail.steps|times %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                    <textarea
+                                                                                            class="textarea form-control"
+                                                                                            rows="1">{{ first_case_detail.steps|item:i }}</textarea>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="input-group">
+                                                                                        <textarea
+                                                                                                class="form-control textarea text-left"
+                                                                                                rows="1"> {{ first_case_detail.expects|item:i }}</textarea>
+                                                                                    <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                </div>
+                                                                        </tr>
+                                                                    {% endfor %}
+                                                                    <tr>
+                                                                        <td>
+                                                                            <button class="btn btn-success"
+                                                                                    id="btNewStep">新增
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <table class="table borderless" style="width: 20%">
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <button class="btn btn-success" id="btnSubmit">提交</button>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-info" id="btnReset">重置</button>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-6 -->
+        </div>
+    </div>
+
+{% endblock %}
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+    <!-- sweetalert javascript-->
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script id="stepTemplate" type="text/x-jsrender">
+<tr>
+                                                                                <td>
+                                                                                    <textarea
+                                                                                            class="textarea form-control"
+                                                                                            rows="1" placeholder="请输入步骤!"></textarea>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <div class="input-group">
+                                                                                        <textarea
+                                                                                                class="form-control textarea text-left"
+                                                                                                rows="1" placeholder="请输入期望结果!"></textarea>
+                                                                                        <span class="input-group-addon btn btn-danger">删除</span>
+                                                                                    </div>
+                                                                            </tr>
+
+
+
+
+    </script>
+
+    <script id="preTemplate" type="text/x-jsrender">
+
+<tr>
+<td>
+<div class="input-group">
+<textarea  class="form-control textarea text-left" rows="1" placeholder="请输入前置条件!"></textarea>
+<span class="input-group-addon btn btn-danger">删除</span>
+</div>
+</td>
+</tr>
+
+
+
+
+
+    </script>
+
+
+    <script type="text/javascript">
+
+
+        function updateCase() {
+            {#        为更新步骤和期望#}
+            let caseDetail = caseData();
+            {#判断步骤和期望在数量上是否保持一致，否则需要重新修改#}
+            console.log(caseDetail);
+            if (caseDetail.steps.length !== caseDetail.expects.length) {
+                swal({
+                    text: "请检查输入,步骤和期望请保持一致！",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return
+            }
+            $.ajax({
+                url: "{% url 'testcase:detail' %}",
+                type: "post",
+                data: {'caseData': JSON.stringify(caseDetail), csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    if (data.result_code === "2") {
+                        swal({
+                            text: data.result_reason,
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    }
+                    else {
+                        {#window.location.href="{% url "testcase:list" %}"#}
+                    }
+                }
+            })
+        }
+
+
+        function caseData() {
+            {#     用于修改测试用例,从所有textArea中获取测试用例的当前值，封装成为一个json对象，传输到View中进行处理#}
+            let title = $("#detailTitle").html();
+            let all_pres = $("div#preCondition textarea");
+            let pre_list = [];
+            for (let i = 0; i < all_pres.length; i++) {
+                pre_list.push(all_pres[i].value.trim());
+            }
+            let row_steps_expects = $("table#tSteps tbody tr");
+            let steps = [];
+            let expects = [];
+            {#     取出所有的步骤#}
+            for (let i = 0; i < row_steps_expects.length - 1; i++) {
+                {#     取出单行中的步骤和期望#}
+                {#            console.log($(row_steps_expects[i])[0].innerHTML);#}
+                let step_val = $(row_steps_expects[i]).find("textarea:first").val().trim();
+                if (step_val !== "") {
+                    steps.push(step_val)
+                }
+                let expect_val = $(row_steps_expects[i]).find("textarea:last").val().trim();
+                if (expect_val !== "") {
+                    steps.push(expect_val)
+                }
+            }
+
+            let caseDetail = {};
+            caseDetail["title"] = title;
+            caseDetail["pres"] = pre_list;
+            caseDetail["steps"] = steps;
+            caseDetail["expects"] = expects;
+            return caseDetail
+        }
+
+
+        function is_case_exists(title) {
+            {#判断测试用例是否存在#}
+            $.ajax({
+                url: "{% url "testcase:isCaseExists" %}",
+                type: "get",
+                data: {'title': title, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    return data.result;
+                }
+            })
+        }
+
+        function is_title_valid(title) {
+            {#        判断输入的测试用例标题是否合法#}
+            if (title === "") {
+                return "标题不能为空，请重新输入！"
+            }
+            else {
+                let result = is_case_exists(title);
+                if (result === "true") {
+                    return "该测试用例标题已存在，请重新输入！"
+                }
+                else {
+                    return true
+                }
+            }
+        }
+
+        $(document).ready(function () {
+                $.views.settings.delimiters("<%", "%>");
+
+                $("#btNewPre").click(function () {
+                    {# 新增前置条件行#}
+                    let pre_template = $.templates("#preTemplate");
+                    $(this).parent().parent().before(pre_template)
+                });
+
+                {#            为新增步骤按钮添加回调函数#}
+                $("#btNewStep").click(function () {
+                    let step_template = $.templates("#stepTemplate");
+                    $(this).parent().parent().before(step_template())
+                });
+
+                {#            为删除按钮添加回调函数#}
+                $("table").on("click", ".btn-danger", function () {
+                    let row = $(this).parent().parent().parent();
+                    row.remove();
+                });
+
+                $("#btnDelCase").click(function () {
+                    {#                删除测试用例#}
+                    swal({
+                        title: "确认?",
+                        text: "一旦删除，该测试用例将从完全被删除!",
+                        buttons: ["取消", "确认"],
+                        dangerMode: true,
+                    })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                window.location.href = "{% url "testcase:delCase" %}";
+                            }
+                        });
+
+                });
+                $("#detailTitle").change(function () {
+                    {# 为标题按钮添加失去焦点事件#}
+                    let result = is_title_valid($(this).html());
+                    if (result !== true) {
+                        swal(result)
+                            .then(() => {
+                                $("#detailTitle")[0].focus();
+                            });
+                    }
+                });
+                {#为重置按钮添加点击事件#}
+                $("#btnReset").click(function () {
+                    location.reload();
+                });
+                {#为提交按钮添加点击事件#}
+                $("#btnSubmit").click(function () {
+                    updateCase();
+                });
+
+            }
+        );
+    </script>
+{% endblock %}

@@ -3,7 +3,6 @@
 # 表单验证类
 
 from django.forms import *
-from user.models import User
 
 
 class LoginForm(Form):

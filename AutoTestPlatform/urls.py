@@ -27,5 +27,7 @@ urlpatterns = [
     # 添加product应用的URL列表
     path("product/", include(("product.urls", "product"), namespace="product")),
     # 添加testcase应用的URL列表
-    path("testcase/", include(("testcase.urls", "testcase"), namespace="testcase"))
+    path("testcase/", include(("testcase.urls", "testcase"), namespace="testcase")),
+    # 添加script应用的URL列表
+    path("script/", include(("script.urls", "script"), namespace="script")),
 ]

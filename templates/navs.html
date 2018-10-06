@@ -6,10 +6,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>{% block title %}{% endblock %}</title>
+
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"/>
@@ -21,13 +20,13 @@
     <link href="{% static 'css/morris.css' %}" rel="stylesheet">
     <!-- Custom Fonts -->
     <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    {% block cssLink %}
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    {% endblock %}
+    {% block css %}
+
+    {% endblock %}
+
 
 </head>
 
@@ -227,86 +226,64 @@
                         <!-- /input-group -->
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-dashboard fa-fw"></i> 看板</a>
+                        <a href="{% url "home" %}"><i class="fa fa-dashboard fa-fw"></i> 看板</a>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 暂无<span class="fa arrow"></span></a>
+                        <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> 产品<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="./pages/morris.html">Morris.js Charts</a>
+                                <a href="{% url "product:info" %}">产品一览</a>
+                            </li>
+                            <li>
+                                {#                                TODO 增加产品管理相关功能#}
+                                <a href="#">产品管理</a>
                             </li>
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>
                     <li>
-                        <a href="{% url "product:info" %}"><i class="fa fa-table fa-fw"></i> 产品</a>
+                        <a href="#"><i class="fa fa-list-ul  fa-fw"></i> 测试用例<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{% url "testcase:list" %}"><i class="fa fa-edit fa-fw"></i>用例列表</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-list-ul  fa-fw"></i>测试套件<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="{% url "testcase:list" %}"><i class="fa fa-edit fa-fw"></i>列表</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url "testcase:newSuit" %}"><i class="fa fa-chain fa-fw"></i>新增</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <!-- /.nav-second-level -->
                     </li>
+
+
                     <li>
-                        <a href="./pages/forms.html"><i class="fa fa-edit fa-fw"></i> 测试用例</a>
+                        <a href="#"><i class="fa fa-th   fa-fw"></i> 脚本管理<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{% url "script:upload" %}">上传脚本</a>
+                            </li>
+                            <li>
+                                {#                                TODO 增加产品管理相关功能#}
+                                <a href="#">脚本一览</a>
+                            </li>
+                        </ul>
+                        <!-- /.nav-second-level -->
                     </li>
                     <li>
                         <a href="#"><i class="fa fa-wrench fa-fw"></i> 执行<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="./pages/panels-wells.html">Panels and Wells</a>
-                            </li>
-                            <li>
-                                <a href="./pages/buttons.html">Buttons</a>
-                            </li>
-                            <li>
-                                <a href="./pages/notifications.html">Notifications</a>
-                            </li>
-                            <li>
-                                <a href="./pages/typography.html">Typography</a>
-                            </li>
-                            <li>
-                                <a href="./pages/icons.html"> Icons</a>
+                                <a href="pages/product/detail.html">Panels and Wells</a>
                             </li>
                             <li>
                                 <a href="./pages/grid.html">Grid</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown<span
-                                class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="#">Second Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Second Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level <span class="fa arrow"></span></a>
-                                <ul class="nav nav-third-level">
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Item</a>
-                                    </li>
-                                </ul>
-                                <!-- /.nav-third-level -->
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-files-o fa-fw"></i> Sample Pages<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="./pages/blank.html">Blank Page</a>
-                            </li>
-                            <li>
-                                <a href="login.html">Login Page</a>
                             </li>
                         </ul>
                         <!-- /.nav-second-level -->
@@ -319,92 +296,9 @@
     </nav>
 
     <div id="page-wrapper">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Morris.js Charts</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <!-- /.row -->
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Area Chart Example
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="morris-area-chart"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-6 -->
-            <div class="col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Bar Chart Example
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="morris-bar-chart"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-6 -->
-            <div class="col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Line Chart Example
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="morris-line-chart"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-6 -->
-            <div class="col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Donut Chart Example
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div id="morris-donut-chart"></div>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-6 -->
-            <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Morris.js Usage
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <p>Morris.js is a jQuery based charting plugin created by Olly Smith. In SB Admin, we are using
-                            the most recent version of Morris.js which includes the resize function, which makes the
-                            charts fully responsive. The documentation for Morris.js is available on their website, <a
-                                    target="_blank" href="http://morrisjs.github.io/morris.js/">http://morrisjs.github.io/morris.js/</a>.
-                        </p>
-                        <a target="_blank" class="btn btn-default btn-lg btn-block"
-                           href="http://morrisjs.github.io/morris.js/">View Morris.js Documentation</a>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-6 -->
-        </div>
-        <!-- /.row -->
+        {% block mainbody %}
+
+        {% endblock %}
     </div>
     <!-- /#page-wrapper -->
 
@@ -413,21 +307,17 @@
 
 <!-- jQuery -->
 <script src="{% static 'js/jquery.js' %}"></script>
-
 <!-- Bootstrap Core JavaScript -->
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
 <!-- Metis Menu Plugin JavaScript -->
 <script src="{% static 'js/metisMenu.min.js' %}"></script>
-
-<!-- Morris Charts JavaScript -->
-<script src="{% static 'js/raphael.min.js' %}"></script>
-<script src="{% static 'js/morris.min.js' %}"></script>
-<script src="{% static 'data/morris-data.js' %}"></script>
-
 <!-- Custom Theme JavaScript -->
 <script src="{% static 'js/custom.min.js' %}"></script>
+{% block scriptLinks %}
+
+{% endblock %}
+{% block script %}{% endblock %}
 
 </body>
-
 </html>

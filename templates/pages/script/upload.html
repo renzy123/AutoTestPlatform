@@ -1,0 +1,157 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    上传脚本
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .textarea {
+            resize: none;
+            overflow-y: hidden;
+        }
+
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+    </style>
+{% endblock %}
+{% block mainbody %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">上传脚本</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <div class="alert alert-info alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        请选择相应的脚本类型，并从右侧的测试用例列表中，选择对应的测试用例！
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    上传脚本
+                </div>
+                <div class="panel-body">
+                    <form role="form" action="{% url 'script:upload' %}" method="POST"
+                          enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label>请选择脚本类型</label>
+                            <select class="form-control" id="scriptType" name="scriptType">
+                                {% for t in types %}
+                                    <option value="{{ t.id }}">{{ t.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>请从右侧选择对应的测试用例</label>
+                            <input class="form-control" type="text" name="case" id="case" placeholder="请选择测试用例!"
+                                   readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>请选择文件</label>
+                            <input type="file" style="display: none;" id="scriptFile"
+                                   name="scriptFile"/>
+                            <div class="input-group">
+                                <input id="photoCover" class="form-control" type="text"
+                                       style="height:30px;">
+                                <span class="input-group-addon">
+                                    													<a href="#" id="caseFile"
+                                                                                           onclick="$('input[id=scriptFile]').click();">Browse</a>
+                                    												</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>脚本描述</label>
+                            <textarea class="form-control" name="desc" id="desc" placeholder="请输入脚本描述！!"
+                            ></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-default">提交</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- /.col-lg-4 -->
+        <div class="col-lg-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-list"></span>
+                    用例列表
+                </div>
+                <!-- .panel-heading -->
+                <div class="panel-body">
+                    <div class="panel-group" id="listPanel">
+                        {% for case_module,case_list in module_case_dict.items %}
+                            {#  生成标题#}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#listPanel"
+                                           href="#group{{ case_module | timestamp }}">
+                                            {{ case_module }}</a>
+                                    </h4>
+                                </div>
+                                <div id="group{{ case_module | timestamp }}" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <div class="list-group">
+                                            {#  生成测试用例列表#}
+                                            {% for case in case_list %}
+                                                {% ifequal case.title selected_case %}
+                                                    <a class="list-group-item active" href="#"
+                                                       name="{{ case.id }}">{{ case.title }}</a>
+                                                {% else %}
+                                                    <a class="list-group-item" href="#"
+                                                       name="{{ case.id }}">{{ case.title }}</a>
+                                                {% endifequal %}
+                                            {% empty %}
+                                                <p>该模块下无测试用例</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+
+        $('input[id=scriptFile]').change(function () {
+            $('#photoCover').val($(this).val());
+        });
+
+        $(document).ready(function () {
+                $.views.settings.delimiters("<%", "%>");
+                $("#case").val($(".list-group-item.active").html());
+                {#为左侧的导航列表添加点击事件#}
+                $("a.list-group-item").click(function () {
+                    $("a.list-group-item").removeClass("active");
+                    $(this).addClass("active");
+                    $("#case").val($(this).html());
+                });
+            }
+        )
+    </script>
+{% endblock %}
+

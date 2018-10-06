@@ -4,9 +4,13 @@
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+import utils.decorators as dec
+from product.models import Product
+from script.models import Script
+from testcase.models import TestCase
 from user.form import LoginForm
 from user.models import User
-import utils.decorators as dec
+from utils.consts import *
 
 
 def login(request):
@@ -35,7 +39,7 @@ def login(request):
                 return render(request, "login.html", {"error_msg": "用户名或者密码错误，请重新输入！"})
             user = res_set[0]
             if str(user.password) == pwd:
-                request.session["user"] = user.name
+                request.session[SESSION_USER_NAME] = user.name
                 if remember:
                     pass
                 # TODO 需要添加记住我功能
@@ -47,11 +51,14 @@ def login(request):
 
 @dec.dec_is_login
 def logout(request):
-    del request.session["user"]
+    del request.session[SESSION_USER_NAME]
     return redirect(login)
-
 
 
 def init_home(request):
     """初始化home页面"""
-    return render(request, "home.html")
+    product_count = Product.objects.all().count()
+    case_count = TestCase.objects.all().count()
+    script_count = Script.objects.all().count()
+    return render(request, "home.html",
+                  {"count_product": product_count, "count_case": case_count, "count_script": script_count})
