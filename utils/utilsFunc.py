@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # 工具方法模组
 import os
+from utils.consts import *
 
 
 def first_letter_of_chinese(string):
@@ -90,3 +91,12 @@ def serialize_model(model):
 
 if __name__ == '__main__':
     print(first_letter_of_chinese("默认模组"))
+
+
+def read_scripts(path):
+    """
+    读取测试用例的代码，用以进行展示
+    """
+    abs_path = os.path.join(SCRIPT_DIR, path)
+    with open(abs_path, encoding="utf-8") as f:
+        return f.readlines()

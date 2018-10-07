@@ -44,3 +44,7 @@ class TestCaseDetail:
 
         # def __str__(self):
         #     return str("前置条件为：\r" + str(self.pres) + "\r步骤为\r" + str(self.steps) + "\r期望结果为：" + self.expects.__str__())
+
+
+class SuitDetail:
+    """用于获取测试套件的所有详细信息"""

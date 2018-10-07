@@ -97,16 +97,8 @@ def script_of_case(request):
     if result.count() == 0:
         return JsonResponse({"res": "no"})
     script = result[0]
-    data = {"res": "yes", "id": script.id, "title": script.title, "code": _read_scripts(script.path)}
+    data = {"res": "yes", "id": script.id, "title": script.title, "code": read_scripts(script.path)}
     return JsonResponse(data)
-
-
-def _read_scripts(path):
-    """
-    读取测试用例的代码，用以进行展示
-    """
-    with open(path) as f:
-        return f.readlines()
 
 
 def init_scripts_list(request):
@@ -173,4 +165,4 @@ def _create_script_file(file, s_type):
     except ValueError:
         return False
     else:
-        return title + ".py", new_file_path
+        return title + ".py", os.path.join(s_type, file_name)

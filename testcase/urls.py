@@ -12,5 +12,6 @@ urlpatterns = [
     path('suitList/', views.init_suit_page, name="suitList"),
     path('newSuit/', views.new_suit_page, name="newSuit"),
     path('addSuit/', views.new_suit, name="addSuit"),
+    path('suitDetail/', views.suit_info, name="suitDetail"),
 
 ]

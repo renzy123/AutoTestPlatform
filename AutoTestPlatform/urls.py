@@ -30,4 +30,6 @@ urlpatterns = [
     path("testcase/", include(("testcase.urls", "testcase"), namespace="testcase")),
     # 添加script应用的URL列表
     path("script/", include(("script.urls", "script"), namespace="script")),
+    # 添加script应用的URL列表
+    path("task/", include(("task.urls", "task"), namespace="task")),
 ]

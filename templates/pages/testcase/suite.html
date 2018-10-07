@@ -1,0 +1,582 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    列表
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .textarea {
+            resize: none;
+            overflow-y: hidden;
+        }
+
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+    </style>
+{% endblock %}
+{% block mainbody %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">测试套件</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-list"></span>
+                    列表
+                </div>
+                <!-- .panel-heading -->
+                <div class="panel-body">
+                    <div class="panel-group" id="listPanel">
+                        {#    生成左边的列表#}
+                        <div class="panel-body">
+                            <div class="list-group">
+                                {#  生成测试套件列表#}
+                                {% ifequal has_default "no" %}
+                                    {% for suit in suits %}
+                                        <a class="list-group-item" href="#"
+                                           name="{{ suit.id }}">{{ suit.title }}</a>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for suit in suits %}
+                                        {% ifequal suit.title suit_title %}
+                                            <a class="list-group-item active" href="#"
+                                               name="{{ suit.id }}">{{ suit.title }}</a>
+                                        {% else %}
+                                            <a class="list-group-item" href="#"
+                                               name="{{ suit.id }}">{{ suit.title }}</a>
+                                        {% endifequal %}
+                                    {% empty %}
+                                        <a href='{% url "testcase:addSuit" %}" %}' class="btn btn-default">增加测试套件</a>
+                                    {% endfor %}
+                                {% endifequal %}
+                            </div>
+                        </div>
+                    </div>
+                    {#    完成生成左边的侧边栏#}
+
+                </div>
+
+            </div>
+            <!-- .panel-body -->
+        </div>
+        <!-- /.panel -->
+        <!-- /.col-lg-8 -->
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-folder-open"></span>
+                    详细信息
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" id="tabs">
+                        <li class="active">
+                            <a href="#history" data-toggle="tab">操作记录</a>
+                        </li>
+                        <li>
+                            <a href="#setup" data-toggle="tab">SetUp&TearDown</a>
+                        </li>
+                        <li>
+                            <a href="#cases" data-toggle="tab" id="aScript">测试用例</a>
+                        </li>
+                        <li>
+                            <a href="#products" data-toggle="tab" id="aScript">关联产品</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade  in active" id="history">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-lg-12" id="divProductInfo">
+                                    <div class="panel panel-success noborder">
+                                        <div class="panel-heading">
+                                            <label class="header" id="lbDesc"
+                                                   style="margin-left: 10px;">无</label>
+                                        </div>
+                                        <div class="panel-body">
+
+                                            <div class="row col-lg-12 text-left">
+                                                <hr/>
+                                                <div class="col-lg-12 text-left">
+                                                    <label class="header">基本信息</label>
+                                                </div>
+                                                <div class="row col-lg-8 text-left">
+                                                    <table class="table" style="margin-left: 30px;margin-top: 30px">
+                                                        <tr>
+                                                            <td class="col-lg-3">
+																						<span class="fa fa-user"
+                                                                                              style="margin-left: 30px;"
+                                                                                        >&nbsp;&nbsp;由谁创建
+																						</span>
+                                                            </td>
+                                                            <td class="col-lg-5" id="createUser">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-calendar-times-o"
+                                                                                              style="margin-left: 30px;"
+                                                                                        >&nbsp;&nbsp;创建时间
+																						</span>
+                                                            </td>
+                                                            <td id="createTime">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-user"
+                                                                                              style="margin-left: 30px;">&nbsp;&nbsp;最后编辑者
+																						</span>
+                                                            </td>
+                                                            <td id="lastEditer"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-calendar-times-o"
+                                                                                              style="margin-left: 30px;">&nbsp;&nbsp;编辑时间
+																						</span>
+                                                            </td>
+                                                            <td id="editTime"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-calendar-times-o"
+                                                                                              style="margin-left: 30px;">&nbsp;&nbsp;运行统计
+																						</span>
+                                                            </td>
+                                                            <td id="runCount"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+																						<span class="fa fa-calendar-times-o"
+                                                                                              style="margin-left: 30px;">&nbsp;&nbsp;上一次运行时间
+																						</span>
+                                                            </td>
+                                                            <td id="lastRun"></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="cases">
+                            <div class="row">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="panel">
+                                            <div class="panel-heading">
+                                                <div class="alert alert-info alert-dismissable">
+                                                    <button type="button" class="close" data-dismiss="alert"
+                                                            aria-hidden="true">&times;
+                                                    </button>
+                                                    当前套件关联的测试用例列表!
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                                <table class="table" style="margin-left: 30px;margin-top: 30px"
+                                                       id="tCase">
+                                                    <thead>
+                                                    <tr>
+                                                        <td>ID</td>
+                                                        <td>标题</td>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="products">
+                            <div class="row">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="panel">
+                                            <div class="panel-heading">
+                                                <div class="alert alert-info" id="pAlert">
+                                                    当前套件关联的产品列表!
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                                <table class="table" style="margin-left: 30px;margin-top: 30px"
+                                                       id="tProduct">
+                                                    <thead>
+                                                    <tr>
+                                                        <td>ID</td>
+                                                        <td>标题</td>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                                <button id="btProducts" class="btn btn-success " data-toggle="modal"
+                                                        data-target="#mProducts">添加产品关联
+                                                </button>
+                                                <div class="modal fade" id="mProducts" tabindex="-1" role="dialog"
+                                                     aria-labelledby="myModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" style="width: 800px">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                        aria-hidden="true">
+                                                                    &times;
+                                                                </button>
+                                                                <h4 class="modal-title" id="myModalLabel">
+                                                                    请选择脚本
+                                                                </h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <table width="100%"
+                                                                       class="table table-striped table-bordered table-hover"
+                                                                       id="tScripts">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th>ID</th>
+                                                                        <th>名称</th>
+                                                                        <th>负责人</th>
+                                                                        <th>当前状态</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    {% for info in product_info %}
+                                                                        <tr>
+                                                                            <td>{{ info | value:"id" }}</td>
+                                                                            <td>{{ info | value:"name" }}</td>
+                                                                            <td>{{ info | value:"inCharge" }}</td>
+                                                                            <td>{{ info | value:"status" }}</td>
+                                                                            <td><input type="checkbox"
+                                                                                       value="{{ info | value:"id" }}"
+                                                                                       id="cb{{ info | value:"id" }}">
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endfor %}
+
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-default"
+                                                                        data-dismiss="modal">关闭
+                                                                </button>
+                                                                <button type="button" class="btn btn-primary" id="btnPS"
+                                                                        data-dismiss="modal">
+                                                                    确认
+                                                                </button>
+                                                            </div>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal -->
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="setup">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-success noborder">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="panel-group" id="casePanel" style="border:none">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-lg-4">
+                                                                    <a class="panel-title btn btn-default btn-outline"
+                                                                       style="border: none;" data-toggle="collapse"
+                                                                       data-parent="#casePanel"
+                                                                       href="#set">Setup</a>
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div id="set" class="panel-collapse collapse in">
+                                                            <div class="panel-body">
+                                                                <pre id="codeSetup"></pre>
+                                                                <button id="newSetup" class="btn btn-success"
+                                                                        style="display: none">添加setup
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel panel-default ">
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-lg-4">
+                                                                    <a class="panel-title btn btn-default btn-outline"
+                                                                       style="border: none;" data-toggle="collapse"
+                                                                       data-parent="#casePanel"
+                                                                       href="#tearDown">TearDown</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="tearDown" class="panel-collapse collapse">
+                                                            <div class="panel-body">
+                                                                <pre id="codeTearDown"></pre>
+                                                                <button id="newTearDown" class="btn btn-success"
+                                                                        style="display: none">添加TearDown
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+        </div>
+        <!-- /.col-lg-6 -->
+    </div>
+{% endblock %}
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script id="caseRow" type="text/x-jsrender">
+<tr>
+<td>
+<%:id%>
+</td>
+<td>
+<a href="{% url 'testcase:list' %}"><%:title%></a>
+</td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+    <script id="productRow" type="text/x-jsrender">
+<tr>
+<td>
+<%:id%>
+</td>
+<td>
+<a href="/product/detail/<%:title%>"><%:title%></a>
+</td>
+</tr>
+
+
+    </script>
+
+    <script type="text/javascript">
+        function requestSuit(suitId) {
+            $.ajax({
+                url: "{% url 'testcase:suitDetail' %}",
+                type: "post",
+                data: {'suit_id': suitId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    handleData(data);
+                }
+            })
+        }
+
+        function handleData(data) {
+            let history = data["history"];
+            let setup_teardowns = data["setup_teardowns"];
+            let case_data = data["case_data"];
+            let related_products = data["related_products"];
+            {# 写基本信息#}
+            $("#createUser").html(history["creator"]);
+            $("#createTime").html(history["create_time"]);
+            $("#lastEditer").html(history["last_editor"]);
+            $("#editTime").html(history["last_edit_time"]);
+            $("#runCount").html(history["run_count"]);
+            $("#lbDesc").html(history["desc"]);
+            if (history["last_run_time"] === null) {
+                $("#lastRun").html("尚未运行！");
+            }
+            else {
+                $("#lastRun").html(history["last_run_time"]);
+            }
+            {# 写Setup和TearDown#}
+            let setup = setup_teardowns["setup"];
+            let tearDown = setup_teardowns["teardown"];
+            if (setup.length === 0) {
+                $("#codeSetup").css("display", "none");
+                $("#newSetup").removeAttr("style");
+            }
+            else {
+                $("#newSetup").css("display", "none");
+                $("#codeSetup").removeAttr("style").html(setup);
+            }
+            if (tearDown.length === 0) {
+                $("#codeTearDown").css("display", "none");
+                $("#newTearDown").removeAttr("style");
+            }
+            else {
+                $("#codeTearDown").removeAttr("style").html(tearDown);
+                $("#newTearDown").css("display", "none");
+            }
+            {# 写测试用例列表 #}
+            let cases = [];
+            let caseRow = $.templates("#caseRow");
+            for (let i = 0; i < case_data.length; i++) {
+                let singleCase = {};
+                let _case = case_data[i];
+                singleCase["id"] = _case[0];
+                singleCase["title"] = _case[1];
+                cases.push(singleCase);
+            }
+            let rows = caseRow(cases);
+            $("#tCase").find("tbody").html(rows);
+            {# 写关联产品信息#}
+            if (related_products.length === 0) {
+                $("#tProduct").css("display", "none");
+                $("#pAlert").removeClass("alert-info").addClass("alert-warning").html("当前无关联的产品!");
+            }
+            else {
+                let products = [];
+                let productRow = $.templates("#productRow");
+                for (let i = 0; i < related_products.length; i++) {
+                    let singleProduct = {};
+                    let _product = related_products[i];
+                    singleProduct["id"] = _product[0];
+                    singleProduct["title"] = _product[1];
+                    products.push(singleProduct);
+                }
+                checked_products(related_products);
+                let pRows = productRow(products);
+                $("#tProduct").removeAttr("style").find("tbody").html(pRows);
+            }
+        }
+
+        function checked_products(products) {
+            $("checkbox").removeAttr("checked");
+            {# 选中已经关联的产品#}
+            for (let i = 0; i < products.length; i++) {
+                let _product = products[i];
+                let checkBoxName = "#cb" + _product[0];
+                $(checkBoxName).attr("checked", "checked");
+            }
+        }
+
+
+        function handleProductsAjax() {
+            {# 处理产品关联的异步请求#}
+            let suitId = $(".list-group-item.active").attr("name");
+            let checked_products = [];
+            let checked_boxes = $("input:checkbox:checked");
+            for (let i = 0; i < checked_boxes.length; i++) {
+                checked_products.push($(checked_boxes[i]).val());
+            }
+            $.ajax({
+                url: "{% url 'product:suitProduct' %}",
+                type: "post",
+                data: {
+                    'suitId': suitId,
+                    'productIds': JSON.stringify(checked_products),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data["result_code"] === 1) {
+                        swal({
+                            title: "成功!",
+                            icon: "success",
+                            timer: 1000,
+                        });
+                    }
+                    else {
+                        swal({
+                            title: "出现错误!",
+                            text: data["result_reason"],
+                            icon: "error",
+                            button: "确定",
+                        });
+                    }
+                    requestSuit(suitId);
+                }
+            })
+        }
+        $(document).ready(function () {
+                $.views.settings.delimiters("<%", "%>");
+                if ($("a.list-group-item.active").length === 0) {
+                    $("a.list-group-item:first").addClass("active");
+                }
+                {#            获取初始的数据#}
+                let suitId = $("a.list-group-item.active").attr("name");
+                requestSuit(suitId);
+                {#为左侧的导航列表添加点击事件#}
+                $("a.list-group-item").click(function () {
+                    $("a.list-group-item").removeClass("active");
+                    $(this).addClass("active");
+                    {#进行异步请求，并且强行切换到用例信息TAB#}
+                    $("#tabs").find(".active").removeClass("active");
+                    $("#tabs").find("li:first").addClass("active");
+                    $(".tab-pane.in").removeClass("in").removeClass("active");
+                    $("#history").addClass("in").addClass("active");
+
+                });
+
+                {#                为产品和套件关联按钮添加点击事件#}
+                $("#btnPS").click(function () {
+                    handleProductsAjax()
+                })
+
+            }
+        )
+    </script>
+{% endblock %}

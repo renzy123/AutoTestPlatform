@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'product',
     'testcase',
     'script',
+    'task',
 ]
 
 MIDDLEWARE = [

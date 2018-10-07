@@ -251,10 +251,10 @@
                                 <a href="#"><i class="fa fa-list-ul  fa-fw"></i>测试套件<span class="fa arrow"></span></a>
                                 <ul class="nav nav-third-level">
                                     <li>
-                                        <a href="{% url "testcase:list" %}"><i class="fa fa-edit fa-fw"></i>列表</a>
+                                        <a href="{% url "testcase:suitList" %}"><i class="fa fa-edit fa-fw"></i>列表</a>
                                     </li>
                                     <li>
-                                        <a href="{% url "testcase:newSuit" %}"><i class="fa fa-chain fa-fw"></i>新增</a>
+                                        <a href="{% url "testcase:newSuit" %}"><i class="fa fa-plus fa-fw"></i>新增</a>
                                     </li>
                                 </ul>
                             </li>
@@ -280,10 +280,10 @@
                         <a href="#"><i class="fa fa-wrench fa-fw"></i> 执行<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="pages/product/detail.html">Panels and Wells</a>
+                                <a href="{% url 'task:new' %}">任务</a>
                             </li>
                             <li>
-                                <a href="./pages/grid.html">Grid</a>
+                                <a>报告</a>
                             </li>
                         </ul>
                         <!-- /.nav-second-level -->

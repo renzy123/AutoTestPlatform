@@ -3,7 +3,10 @@ from django.shortcuts import render
 
 from user.models import User
 from .dataModels import ProductData, ProductRelatedData
-from .models import Product, Status
+from .models import Product, Status, SuitProductMapping
+from utils.decorators import dec_request_dict, dec_sql_insert
+from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
+import json
 
 
 # Create your views here.
@@ -82,3 +85,24 @@ def product_detail_no_request(name=None):
     relatedData.task_count = 0
     relatedData.test_case_count = 0
     return relatedData
+
+
+@dec_request_dict
+@dec_sql_insert
+def combine_product_suit(request):
+    """处理关联产品和测试套件的请求"""
+    if request.method == "POST":
+        suit_id = request.POST["suitId"]
+        product_ids = request.POST['productIds']
+        product_ids = json.loads(product_ids, encoding="utf-8")
+        existed_suit_product_ids = set(
+            [s_product.product for s_product in SuitProductMapping.objects.filter(suit=suit_id)])
+        correct_product_ids = [_id for _id in product_ids if int(_id) not in existed_suit_product_ids]
+        if len(correct_product_ids) == 0:
+            return JsonResponse(result_to_json(SqlResultData(ResultEnum.Error, "请选择正确的产品！")))
+        for product_id in correct_product_ids:
+            suit_product = SuitProductMapping()
+            suit_product.suit = suit_id
+            suit_product.product = product_id
+            suit_product.save()
+        return JsonResponse(result_to_json(SqlResultData(ResultEnum.Success)))

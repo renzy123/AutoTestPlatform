@@ -29,4 +29,4 @@ class TaskStatus(models.Model):
     desc:状态描述
     """
     title = models.CharField(max_length=50, unique=True)
-    desc = models.CharField(null=True)
+    desc = models.CharField(max_length=100, null=True)

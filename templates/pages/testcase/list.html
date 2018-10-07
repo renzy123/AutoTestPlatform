@@ -472,7 +472,7 @@
                             console.log(data);
                             let isEmpty = data["res"];
                             if (isEmpty === "yes") {
-                                $("#btScriptId").val(data["id"]);
+                                $("#btScriptId").html(data["id"]);
                                 $("#lbScript").html(data["title"]);
                                 $("#codeBody").html(data["code"]);
                                 $("#codeBody").css("display", "block");

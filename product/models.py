@@ -30,3 +30,9 @@ class Status(models.Model):
     """
     status = models.CharField(max_length=40, unique=True, null=False)
     desc = models.TextField()
+
+
+class SuitProductMapping(models.Model):
+    """测试套件和产品的关联类"""
+    product = models.IntegerField()
+    suit = models.IntegerField()

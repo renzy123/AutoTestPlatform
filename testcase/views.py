@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 
 from AutoTestPlatform.CommonModels import ResultEnum, SqlResultData, result_to_json
 from product import views as pViews
-from product.models import Product
 from testcase import form
 from testcase.dataModels import TestCaseData, TestCaseDetail
 from testcase.models import TestCase, CaseModule, TestSuite, SuitCaseMapping
@@ -13,6 +12,10 @@ from user.models import User
 from user.userUtils import user_dict
 from utils.consts import *
 from django.utils.datastructures import MultiValueDictKeyError
+from utils.utilsFunc import read_scripts
+from script.models import Script
+from product.models import Product, SuitProductMapping, Status
+
 
 # Create your views here.
 
@@ -161,9 +164,68 @@ def init_case_detail(request):
 def init_suit_page(request):
     """初始化测试用例详情页面"""
     if request.method == "GET":
+        # 获取产品列表
+        products = Product.objects.all()
+        product_info = []
+        for a_product in products:
+            info = {"id": a_product.id, "name": a_product.name,
+                    "inCharge": User.objects.filter(id=a_product.inChargeUser)[0].name,
+                    "status": Status.objects.filter(id=a_product.status)[0].status}
+            product_info.append(info)
+        # 获取第测试套件列表
         suits = TestSuite.objects.all()
-        # 获取第一个测试套件的相关信息
-        return render(request, "pages/testcase/suite.html", {"suits": suits})
+        # 是否有参数传入
+        suit_title = None
+        has_default = "no"
+        try:
+            suit_id = request.GET["suit_id"]
+            has_default = "yes"
+            suit_title = TestSuite.objects.filter(id=suit_id)[0].title
+        except MultiValueDictKeyError:
+            pass
+        return render(request, "pages/testcase/suite.html",
+                      {"suits": suits, "has_default": has_default, "suit_title": suit_title,"product_info":product_info})
+
+
+def suit_info(request):
+    """用于请求某一ID下的测试套件的详细信息"""
+    try:
+        print(request.POST)
+        suit_id = request.POST["suit_id"]
+        suite = TestSuite.objects.filter(id=suit_id)[0]
+        # 获取历史信息的字典
+        history = {"creator": User.objects.filter(id=suite.create_user)[0].name, "create_time": suite.create_time,
+                   "last_editor": User.objects.filter(id=suite.last_editer)[0].name,
+                   "last_edit_time": suite.last_edit_time, "run_count": suite.run_count,
+                   "last_run_time": suite.last_run_time, "desc": suite.desc}
+        # 获取setup和teardown
+        s_t = {}
+        if not suite.setup:
+            s_t["setup"] = ""
+        else:
+            s_t["setup"] = read_scripts(Script.objects.filter(id=suite.setup)[0].path)
+        if not suite.teardown:
+            s_t["teardown"] = ""
+        else:
+            s_t["teardown"] = read_scripts(Script.objects.filter(id=suite.teardown)[0].path)
+        # 获取测试用例列表
+        case_ids = [case_map.id for case_map in SuitCaseMapping.objects.filter(suit=suite.id)]
+        _case_data = []
+        for case_id in case_ids:
+            case = TestCase.objects.filter(id=case_id)[0]
+            _case_data.append((case.id, case.title))
+        # 获取关联的产品列表
+        product_ids = [p_s_map.product for p_s_map in SuitProductMapping.objects.filter(suit=suite.id)]
+        related_products = []
+        for product_id in product_ids:
+            product = Product.objects.filter(id=product_id)[0]
+            related_products.append((product.id, product.name))
+
+        suite_info = {"history": history, "setup_teardowns": s_t, "case_data": _case_data,
+                      "related_products": related_products}
+        return JsonResponse(suite_info)
+    except MultiValueDictKeyError:
+        return JsonResponse(result_to_json(SqlResultData(ResultEnum.Error, "请求方式错误!")))
 
 
 def new_suit_page(request):
@@ -188,6 +250,8 @@ def new_suit_page(request):
         pass
     return render(request, "pages/testcase/newSuit.html",
                   {"module_case_dict": module_case_dict})
+
+
 def new_suit(request):
     if request.method == "POST":
         """增加测试套件的方法"""
@@ -206,6 +270,8 @@ def new_suit(request):
             suit.title = suitName
             suit.desc = desc
             suit.setup = setupId
+            suit.last_editer = suit.create_user
+            suit.run_count = 0
             suit.teardown = teardownId
             suit.save()
             # 获取ID
