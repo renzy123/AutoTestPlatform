@@ -8,3 +8,5 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_STORAGE_DIR = os.path.join(BASE_DIR, "storage")
 SCRIPT_DIR = os.path.join(BASE_STORAGE_DIR, "scripts")
 SESSION_CASE_ID = "case_id"
+DRIVER_PATH = os.path.join(BASE_STORAGE_DIR, "drivers")
+DRIVER_PATH_WINDOWS = os.path.join(DRIVER_PATH, "windows")
