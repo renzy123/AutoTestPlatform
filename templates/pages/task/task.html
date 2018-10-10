@@ -45,8 +45,7 @@
                     创建任务
                 </div>
                 <div class="panel-body">
-                    <form role="form" action="{% url 'script:upload' %}" method="POST"
-                          enctype="multipart/form-data">
+                    <form role="form">
                         {% csrf_token %}
                         <div class="form-group">
                             <label>请选择产品</label>
@@ -59,10 +58,9 @@
                         <div class="form-group">
                             <label>请选择需要执行的测试套件</label>
                             <select class="form-control" id="suits" name="suits">
-                                    <option>无</option>
                             </select>
                         </div>
-                        <button type="button" class="btn btn-default">提交</button>
+                        <button type="button" class="btn btn-default">执行</button>
                     </form>
                 </div>
             </div>
@@ -118,9 +116,33 @@
     <script src="{% static 'js/jsrender.min.js' %}"></script>
 {% endblock %}
 {% block script %}
+    <script id="suitOption" type="text/x-jsrender">
+<option value="<%:id%>"><%:title%></option>
+
+    </script>
     <script type="text/javascript">
+        {#    请求产品的套件列表#}
+        function requestSuites(productId) {
+            $.ajax({
+                url: "{% url "product:suitesOfProduct" %}",
+                type: "post",
+                data: {'product_id': productId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    let suitOptionTemplate = $.templates("#suitOption");
+                    let suitOption = suitOptionTemplate(data["suite_info"]);
+                    $("#suits").html(suitOption)
+                }
+            })
+        }
         $(document).ready(function () {
                 $.views.settings.delimiters("<%", "%>");
+                requestSuites($("#products").val());
+                {#为产品的下拉列表添加点击事件#}
+                $("#products").change(function () {
+                    requestSuites($(this).val());
+                })
             }
         )
     </script>

@@ -7,6 +7,7 @@ from .models import Product, Status, SuitProductMapping
 from utils.decorators import dec_request_dict, dec_sql_insert
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
 import json
+from testcase.models import TestSuite
 
 
 # Create your views here.
@@ -106,3 +107,16 @@ def combine_product_suit(request):
             suit_product.product = product_id
             suit_product.save()
         return JsonResponse(result_to_json(SqlResultData(ResultEnum.Success)))
+
+
+@dec_request_dict
+def suit_of_products(request):
+    """处理请求产品的套件列表的请求"""
+    if request.method == "POST":
+        product_id = request.POST["product_id"]
+        p_s_maps = SuitProductMapping.objects.filter(product=product_id)
+        suite_info = []
+        for p_s_map in p_s_maps:
+            suite = {"id": p_s_map.suit, "title": TestSuite.objects.filter(id=p_s_map.suit)[0].title}
+            suite_info.append(suite)
+        return JsonResponse({"suite_info": suite_info})

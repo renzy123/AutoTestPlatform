@@ -405,6 +405,7 @@
 
 
 
+
     </script>
 
     <script id="productRow" type="text/x-jsrender">
@@ -416,6 +417,7 @@
 <a href="/product/detail/<%:title%>"><%:title%></a>
 </td>
 </tr>
+
 
 
     </script>
@@ -561,6 +563,7 @@
                 requestSuit(suitId);
                 {#为左侧的导航列表添加点击事件#}
                 $("a.list-group-item").click(function () {
+                    requestSuit($(this).attr("name"));
                     $("a.list-group-item").removeClass("active");
                     $(this).addClass("active");
                     {#进行异步请求，并且强行切换到用例信息TAB#}
