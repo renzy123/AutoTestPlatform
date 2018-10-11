@@ -11,12 +11,14 @@ UTF8 = "UTF-8"
 class HTMLTestRunner(TextTestRunner):
     """" A test runner class that output the results. """
 
-    def __init__(self, output, verbosity=2, stream=sys.stderr,
+    def __init__(self, output, verbosity=2, stream=sys.stderr, report_path=None,
                  descriptions=True, failfast=False, buffer=False,
                  report_title=None, template=None, resultclass=None):
         self.verbosity = verbosity
         self.output = output
         self.encoding = UTF8
+        self.report_path = report_path
+        self.report_file_name = None
 
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast, buffer=buffer)
@@ -60,7 +62,7 @@ class HTMLTestRunner(TextTestRunner):
             self.stream.writeln(result.separator2)
             run = result.testsRun
             self.stream.writeln("Ran {} test{} in {}".format(run,
-                                run != 1 and "s" or "", str(self.time_taken)[:7]))
+                                                             run != 1 and "s" or "", str(self.time_taken)[:7]))
             self.stream.writeln()
 
             expectedFails = len(result.expectedFailures)

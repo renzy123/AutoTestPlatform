@@ -8,7 +8,6 @@ from unittest.result import failfast
 
 from jinja2 import Template
 
-
 DEFAULT_TEMPLATE = os.path.join(os.path.dirname(__file__), "template",
                                 "report_template.html")
 
@@ -118,6 +117,7 @@ class _HtmlTestResult(_TextTestResult):
                     "{} ({:3f})s".format(verbose_str, test_info.elapsed_time))
             elif self.dots:
                 self.stream.write(short_str)
+
         self.callback = callback
 
     def getDescription(self, test):
@@ -167,7 +167,7 @@ class _HtmlTestResult(_TextTestResult):
         testinfo = self.infoclass(
             self, test, self.infoclass.FAILURE, err)
         self.failures.append((testinfo,
-                             self._exc_info_to_string(err, test)))
+                              self._exc_info_to_string(err, test)))
         self._prepare_callback(testinfo, [], "FAIL", "F")
 
     @failfast
@@ -276,7 +276,7 @@ class _HtmlTestResult(_TextTestResult):
         test_description = testCase.test_description
         desc = test_description or test_name
 
-        status = ('success', 'danger', 'warning', 'info')[testCase.outcome-1]
+        status = ('success', 'danger', 'warning', 'info')[testCase.outcome - 1]
 
         error_type = ""
         if testCase.outcome != testCase.SKIP and testCase.outcome != testCase.SUCCESS:
@@ -337,13 +337,17 @@ class _HtmlTestResult(_TextTestResult):
 
             tests = self._report_tests(testcase_class_name, all_tests,
                                        testRunner)
+            testRunner.report_file_name = testcase_class_name
             self.generate_file(testRunner.output, testcase_class_name,
-                               tests)
+                               tests, testRunner.report_path)
 
-    def generate_file(self, output, report_name, report):
+    def generate_file(self, output, report_name, report, path):
         """ Generate the report file in the given path. """
-        current_dir = os.getcwd()
-        dir_to = os.path.join(current_dir, 'reports', output)
+        if path:
+            dir_to = path
+        else:
+            current_dir = os.getcwd()
+            dir_to = os.path.join(current_dir, 'reports', output)
         if not os.path.exists(dir_to):
             os.makedirs(dir_to)
         path_file = os.path.join(dir_to, report_name)

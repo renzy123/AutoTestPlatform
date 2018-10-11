@@ -184,7 +184,8 @@ def init_suit_page(request):
         except MultiValueDictKeyError:
             pass
         return render(request, "pages/testcase/suite.html",
-                      {"suits": suits, "has_default": has_default, "suit_title": suit_title,"product_info":product_info})
+                      {"suits": suits, "has_default": has_default, "suit_title": suit_title,
+                       "product_info": product_info})
 
 
 def suit_info(request):
@@ -268,11 +269,11 @@ def new_suit(request):
             user = request.session[SESSION_USER_NAME]
             suit.create_user = User.objects.filter(name=user)[0].id
             suit.title = suitName
-            suit.desc = desc
-            suit.setup = setupId
+            suit.desc = desc if desc != "" else None
+            # suit.setup = setupId if setupId != "" else None
             suit.last_editer = suit.create_user
             suit.run_count = 0
-            suit.teardown = teardownId
+            # suit.teardown = teardownId
             suit.save()
             # 获取ID
             currrent_suit_id = suit.id

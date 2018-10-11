@@ -1,12 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from product.models import Product, SuitProductMapping
 from utils.decorators import dec_request_dict
 import unittest
-from utils.HTMLTestRunner import HTMLTestRunner as HRunner
+from utils.HtmlTestRunner import HTMLTestRunner
 from testcase.models import SuitCaseMapping
 from script.models import Script
 from utils.consts import *
-import time
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -29,7 +29,12 @@ def run_test(request):
         suite_id = request.GET["suite_id"]
         suit_case_map = SuitCaseMapping.objects.filter(suit=suite_id)
         case_list = [_map.case for _map in suit_case_map]
-        _run_test(case_list)
+        report_file_name = _run_test(case_list)
+        return JsonResponse({"report": report_file_name})
+
+
+def init_report_page(request, report):
+    return render(request, "reports/" + report)
 
 
 def _run_test(case_list: list):
@@ -37,14 +42,11 @@ def _run_test(case_list: list):
     script_path = [os.path.join(SCRIPT_DIR, Script.objects.filter(related_case=case_id)[0].path) for case_id in
                    case_list
                    ]
-
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     for path in script_path:
-        dir_path, file_name = path.rsplit("/", maxsplit=2)[0], path.rsplit("/", maxsplit=2)[1]
+        dir_path, file_name = path.rsplit("\\", maxsplit=1)[0], path.rsplit("\\", maxsplit=1)[1]
         suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
-    timestamp = time.strftime("%Y%m%d %H:%M:%S", time.localtime())
-    report_name = str(timestamp) + "report.html"
-    with open(file=os.path.join(TEST_REPORT_DIR, report_name), mode="x") as f:
-        runner = HRunner(stream=f, verbosity=2, title="自动化测试报告！", description="本报告为自动化测试报告")
-        runner.run(suite)
+    runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR))
+    runner.run(suite)
+    return runner.report_file_name
