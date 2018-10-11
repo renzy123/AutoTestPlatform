@@ -7,4 +7,5 @@ urlpatterns = [
     path('detail/<str:name>', views.product_detail, name="detail"),
     path("detail/", views.product_detail, name="detailForPost"),
     path("suitProduct/", views.combine_product_suit, name="suitProduct"),
+    path("suitsOfProduct/", views.suit_of_products, name="suitsOfProduct"),
 ]

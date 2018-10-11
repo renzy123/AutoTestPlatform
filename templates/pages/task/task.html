@@ -59,10 +59,10 @@
                         <div class="form-group">
                             <label>请选择需要执行的测试套件</label>
                             <select class="form-control" id="suits" name="suits">
-                                    <option>无</option>
+                                <option>无</option>
                             </select>
                         </div>
-                        <button type="button" class="btn btn-default">提交</button>
+                        <button type="button" class="btn btn-default">执行</button>
                     </form>
                 </div>
             </div>
@@ -118,11 +118,47 @@
     <script src="{% static 'js/jsrender.min.js' %}"></script>
 {% endblock %}
 {% block script %}
+    <script id="suitOption" type="text/x-jsrender">
+<option value="<%:id%>"><%:title%></option>
+
+
+
+
+
+    </script>
+
+
+
     <script type="text/javascript">
+
+        function requestSuits(product_id) {
+            {#        请求suit信息#}
+            $.ajax({
+                url: '{% url "product:suitsOfProduct" %}',
+                type: "post",
+                data: {'product_id': product_id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: "json",
+                success: function (data) {
+                    {#   修改suit select中的值#}
+                    console.log(data);
+                    let optionTemplate = $.templates("#suitOption");
+                    let option = optionTemplate(data);
+                    $("#suits").html(option)
+                }
+            })
+        }
+
+
         $(document).ready(function () {
                 $.views.settings.delimiters("<%", "%>");
+            {# 为产品的select添加选择的事件#}
+            $("#products").change(function () {
+                requestSuits($(this).val());
+            })
             }
         )
+
+
     </script>
 {% endblock %}
 

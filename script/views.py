@@ -55,7 +55,6 @@ def init_upload_page(request):
                       {"module_case_dict": module_case_dict, "types": script_types, "selected_case": selected_case})
     if request.method == "POST":
         """请求方式为POST，即为提交脚本数据"""
-        print(request.FILES)
         upload_form = ScriptUploadForm(request.POST, request.FILES)
         if upload_form.is_valid():
             cleaned_data = upload_form.cleaned_data
