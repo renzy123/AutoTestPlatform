@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 工具方法模组
-import os
 from utils.consts import *
+from script.models import Script
 
 
 def first_letter_of_chinese(string):
@@ -100,3 +100,16 @@ def read_scripts(path):
     abs_path = os.path.join(SCRIPT_DIR, path)
     with open(abs_path, encoding="utf-8") as f:
         return f.readlines()
+
+
+
+
+
+
+
+
+
+
+
+
+

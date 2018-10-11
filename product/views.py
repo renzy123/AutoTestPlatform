@@ -111,12 +111,12 @@ def combine_product_suit(request):
 
 @dec_request_dict
 def suit_of_products(request):
-    """返回产品的所有Suit"""
+    """处理请求产品的套件列表的请求"""
     if request.method == "POST":
         product_id = request.POST["product_id"]
-        sp_maps = SuitProductMapping.objects.filter(product=product_id)
-        sp_list = []
-        for sp_map in sp_maps:
-            m_map = {"title": TestSuite.objects.filter(id=sp_map.suit)[0].title, "id": sp_map.suit}
-            sp_list.append(m_map)
-        return JsonResponse({"sp_list": json.dumps(sp_list)})
+        p_s_maps = SuitProductMapping.objects.filter(product=product_id)
+        suite_info = []
+        for p_s_map in p_s_maps:
+            suite = {"id": p_s_map.suit, "title": TestSuite.objects.filter(id=p_s_map.suit)[0].title}
+            suite_info.append(suite)
+        return JsonResponse({"suite_info": suite_info})

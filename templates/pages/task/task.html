@@ -45,8 +45,7 @@
                     创建任务
                 </div>
                 <div class="panel-body">
-                    <form role="form" action="{% url 'script:upload' %}" method="POST"
-                          enctype="multipart/form-data">
+                    <form role="form">
                         {% csrf_token %}
                         <div class="form-group">
                             <label>请选择产品</label>
@@ -59,7 +58,6 @@
                         <div class="form-group">
                             <label>请选择需要执行的测试套件</label>
                             <select class="form-control" id="suits" name="suits">
-                                <option>无</option>
                             </select>
                         </div>
                         <button type="button" class="btn btn-default">执行</button>
@@ -121,44 +119,32 @@
     <script id="suitOption" type="text/x-jsrender">
 <option value="<%:id%>"><%:title%></option>
 
-
-
-
-
     </script>
-
-
-
     <script type="text/javascript">
-
-        function requestSuits(product_id) {
-            {#        请求suit信息#}
+        {#    请求产品的套件列表#}
+        function requestSuites(productId) {
             $.ajax({
-                url: '{% url "product:suitsOfProduct" %}',
+                url: "{% url "product:suitesOfProduct" %}",
                 type: "post",
-                data: {'product_id': product_id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                data: {'product_id': productId, csrfmiddlewaretoken: '{{ csrf_token }}'},
                 dataType: "json",
                 success: function (data) {
-                    {#   修改suit select中的值#}
                     console.log(data);
-                    let optionTemplate = $.templates("#suitOption");
-                    let option = optionTemplate(data);
-                    $("#suits").html(option)
+                    let suitOptionTemplate = $.templates("#suitOption");
+                    let suitOption = suitOptionTemplate(data["suite_info"]);
+                    $("#suits").html(suitOption)
                 }
             })
         }
-
-
         $(document).ready(function () {
                 $.views.settings.delimiters("<%", "%>");
-            {# 为产品的select添加选择的事件#}
-            $("#products").change(function () {
-                requestSuits($(this).val());
-            })
+                requestSuites($("#products").val());
+                {#为产品的下拉列表添加点击事件#}
+                $("#products").change(function () {
+                    requestSuites($(this).val());
+                })
             }
         )
-
-
     </script>
 {% endblock %}
 
