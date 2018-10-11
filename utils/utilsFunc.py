@@ -100,16 +100,3 @@ def read_scripts(path):
     abs_path = os.path.join(SCRIPT_DIR, path)
     with open(abs_path, encoding="utf-8") as f:
         return f.readlines()
-
-
-
-
-
-
-
-
-
-
-
-
-

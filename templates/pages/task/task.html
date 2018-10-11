@@ -60,7 +60,7 @@
                             <select class="form-control" id="suits" name="suits">
                             </select>
                         </div>
-                        <button type="button" class="btn btn-default">执行</button>
+                        <button type="button" class="btn btn-default" id="btRun">执行</button>
                     </form>
                 </div>
             </div>
@@ -114,14 +114,31 @@
 
 {% block scriptLinks %}
     <script src="{% static 'js/jsrender.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script id="suitOption" type="text/x-jsrender">
 <option value="<%:id%>"><%:title%></option>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
     <script type="text/javascript">
         {#    请求产品的套件列表#}
+
         function requestSuites(productId) {
             $.ajax({
                 url: "{% url "product:suitesOfProduct" %}",
@@ -136,15 +153,37 @@
                 }
             })
         }
+
         $(document).ready(function () {
-                $.views.settings.delimiters("<%", "%>");
-                requestSuites($("#products").val());
-                {#为产品的下拉列表添加点击事件#}
-                $("#products").change(function () {
-                    requestSuites($(this).val());
-                })
-            }
-        )
+            $.views.settings.delimiters("<%", "%>");
+            requestSuites($("#products").val());
+            {#为产品的下拉列表添加点击事件#}
+            $("#products").change(function () {
+                requestSuites($(this).val());
+            });
+
+            {#            为执行按钮添加点击事件#}
+
+            $("#btRun").click(function () {
+                let suite_id = $("#suits").val();
+                $.ajax({
+                        url: '{% url "task:runTest" %}',
+                        data: {suite_id: suite_id},
+                        dataType: "json",
+                        success: function (data) {
+                            let report_name = data["report"];
+                            swal({
+                                title: "成功!",
+                                icon: "success",
+                                timer: 2000,
+                            });
+                            location.href = "/task/showReport/" + report_name
+                        }
+                    }
+                )
+            });
+        })
+
     </script>
 {% endblock %}
 
