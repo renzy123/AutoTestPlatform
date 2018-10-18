@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 工具方法模组
+import platform
+
 from utils.consts import *
-from script.models import Script
 
 
 def first_letter_of_chinese(string):
@@ -89,10 +90,6 @@ def serialize_model(model):
     return res
 
 
-if __name__ == '__main__':
-    print(first_letter_of_chinese("默认模组"))
-
-
 def read_scripts(path):
     """
     读取测试用例的代码，用以进行展示
@@ -100,3 +97,17 @@ def read_scripts(path):
     abs_path = os.path.join(SCRIPT_DIR, path)
     with open(abs_path, encoding="utf-8") as f:
         return f.readlines()
+
+
+def current_os():
+    """返回当前的操作系统"""
+    _current_os = platform.platform()
+    _current_os = _current_os.split("-", maxsplit=1)[0]
+    if _current_os == "Darwin":
+        return OS_MACOS
+    if _current_os == "Windows":
+        return OS_WINDOWS
+
+
+if __name__ == '__main__':
+    print(current_os())

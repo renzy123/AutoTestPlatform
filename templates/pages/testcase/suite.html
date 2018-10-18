@@ -55,6 +55,8 @@
                                     {% endfor %}
                                 {% else %}
                                     {% for suit in suits %}
+                                    {% empty %}
+                                        <a href='{% url "testcase:addSuit" %}" %}' class="btn btn-default">增加测试套件</a>
                                         {% ifequal suit.title suit_title %}
                                             <a class="list-group-item active" href="#"
                                                name="{{ suit.id }}">{{ suit.title }}</a>
@@ -62,8 +64,7 @@
                                             <a class="list-group-item" href="#"
                                                name="{{ suit.id }}">{{ suit.title }}</a>
                                         {% endifequal %}
-                                    {% empty %}
-                                        <a href='{% url "testcase:addSuit" %}" %}' class="btn btn-default">增加测试套件</a>
+
                                     {% endfor %}
                                 {% endifequal %}
                             </div>
@@ -406,6 +407,7 @@
 
 
 
+
     </script>
 
     <script id="productRow" type="text/x-jsrender">
@@ -417,6 +419,7 @@
 <a href="/product/detail/<%:title%>"><%:title%></a>
 </td>
 </tr>
+
 
 
 
@@ -553,6 +556,7 @@
                 }
             })
         }
+
         $(document).ready(function () {
                 $.views.settings.delimiters("<%", "%>");
                 if ($("a.list-group-item.active").length === 0) {

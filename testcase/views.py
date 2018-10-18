@@ -210,7 +210,7 @@ def suit_info(request):
         else:
             s_t["teardown"] = read_scripts(Script.objects.filter(id=suite.teardown)[0].path)
         # 获取测试用例列表
-        case_ids = [case_map.id for case_map in SuitCaseMapping.objects.filter(suit=suite.id)]
+        case_ids = [case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite.id)]
         _case_data = []
         for case_id in case_ids:
             case = TestCase.objects.filter(id=case_id)[0]

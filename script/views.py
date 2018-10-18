@@ -1,17 +1,17 @@
 import time
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
 from script.dataModels import ScriptData
 from script.form import ScriptUploadForm
-from script.models import ScriptType, Script
+from script.models import Script
+from script.models import ScriptType
 from testcase.models import CaseModule
 from testcase.models import TestCase
 from user.models import User
-from utils.consts import *
 from utils.utilsFunc import *
 
 
@@ -84,8 +84,7 @@ def init_upload_page(request):
                 result = SqlResultData(ResultEnum.Error, "插入数据库失败！")
                 return JsonResponse(result_to_json(result))
             else:
-                result = SqlResultData(ResultEnum.Success, "插入数据库失败！")
-                return JsonResponse(result_to_json(result))
+                return redirect("/testcase/list")
         else:
             print(upload_form.errors)
 
