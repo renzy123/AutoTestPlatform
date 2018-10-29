@@ -38,7 +38,7 @@ def new_task(request):
         if task_form.is_valid():
             cleaned_data = task_form.cleaned_data
             task_title = cleaned_data["taskTitle"]
-            task_time = cleaned_data["taskTime"]
+            # task_time = cleaned_data["taskTime"]
             task_dec = cleaned_data["taskDesc"]
             task_product = cleaned_data["products"]
             task_suite = cleaned_data["suits"]
@@ -48,7 +48,7 @@ def new_task(request):
             task.title = task_title
             task.create_user = user_id
             task.product = task_product
-            task.run_time = task_time
+            # task.run_time = task_time
             task.desc = task_dec
             task.suit = task_suite
             # 获取status
@@ -73,6 +73,30 @@ def run_test(request):
 
 def init_report_page(request, report):
     return render(request, "reports/" + report)
+
+
+def init_run_task_page(request):
+    return render(request, "pages/task/runTask.html")
+
+
+def run_some_test(request):
+    if request.method == "POST":
+        type = request.POST["type"]
+        start_dir = os.path.join(SCRIPT_DIR, "WEB自动化")
+        suite = unittest.TestSuite()
+        loader = unittest.TestLoader()
+        if type == "1":
+            file_name = "testProjectPermissions.py"
+            suite.addTest(loader.discover(start_dir=start_dir, pattern=file_name))
+        elif type == "2":
+            file_name = "testDocumentsPermissions.py"
+            suite.addTest(loader.discover(start_dir=start_dir, pattern=file_name))
+        else:
+            file_name = "testGoupPermissions.py"
+            suite.addTest(loader.discover(start_dir=start_dir, pattern=file_name))
+        runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR))
+        runner.run(suite)
+        return JsonResponse({"file_name": runner.report_file_name})
 
 
 def _run_test(case_list: list):

@@ -18,7 +18,6 @@ class TestTask(models.Model):
     suit = models.IntegerField()
     create_time = models.DateTimeField(auto_now_add=True)
     create_user = models.IntegerField()
-    run_time = models.DateTimeField(null=True)
     desc = models.CharField(max_length=100)
 
 
