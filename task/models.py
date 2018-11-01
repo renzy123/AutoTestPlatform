@@ -15,10 +15,11 @@ class TestTask(models.Model):
     title = models.CharField(max_length=255)
     status = models.IntegerField()
     product = models.IntegerField()
-    suit = models.IntegerField()
     create_time = models.DateTimeField(auto_now_add=True)
     create_user = models.IntegerField()
     desc = models.CharField(max_length=100)
+    runtime = models.IntegerField(default=0)
+    last_run_time = models.DateTimeField(null=True)
 
 
 class TaskStatus(models.Model):
@@ -29,3 +30,22 @@ class TaskStatus(models.Model):
     """
     title = models.CharField(max_length=50, unique=True)
     desc = models.CharField(max_length=100, null=True)
+
+
+class Result(models.Model):
+    """执行结果类，用于记录任务执行的结果
+    report_title:执行报告名
+    log_title:日志目录
+    task:任务名称
+    """
+    report_title = models.CharField(max_length=100)
+    log_title = models.CharField(max_length=100)
+    task = models.IntegerField()
+
+
+class TaskSuiteMapping(models.Model):
+    """
+    任务和测试套件的多对多的关系的隐射
+    """
+    task = models.IntegerField()
+    suite = models.IntegerField()

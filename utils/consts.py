@@ -11,6 +11,7 @@ SESSION_CASE_ID = "case_id"
 DRIVER_PATH = os.path.join(BASE_STORAGE_DIR, "drivers")
 DRIVER_PATH_WINDOWS = os.path.join(DRIVER_PATH, "windows")
 TEST_REPORT_DIR = os.path.join(BASE_DIR, "templates/reports")
+RUN_LOG_PATH = os.path.join(BASE_STORAGE_DIR, "logs")
 
 OS_MACOS = "macOS"
 OS_WINDOWS = "windows"

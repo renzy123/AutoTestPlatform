@@ -1,0 +1,293 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    任务列表
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+    </style>
+{% endblock %}
+{% block mainbody %}
+    {% ifequal products_tasks None %}
+        <script src="{% static 'js/sweetalert.min.js' %}"></script>
+        <script type="text/javascript">
+
+            swal("当前无任务，请创建新任务!")
+                .then(() => {
+                    window.location.href = '{% url  "task:new"%}'
+                });
+        </script>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">任务</h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span class="fa fa-list"></span>
+                        任务列表
+                    </div>
+
+
+                    <div class="panel-body">
+                        <div class="panel-group" id="listPanel">
+                            {% for product,task_list in products_tasks.items %}
+                                {#                                 生成标题#}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#listPanel"
+                                               href="#group{{ product | timestamp }}">
+                                                {{ product }}</a>
+                                        </h4>
+                                    </div>
+                                    <div id="group{{ product | timestamp }}" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+                                            <div class="list-group">
+                                                {% for task in task_list %}
+                                                    {% if task.id == selected_task %}
+                                                        <a class="list-group-item active"
+                                                           href="{% url "task:tasks" task.id %}"
+                                                        >{{ task.title }}</a>
+                                                    {% else %}
+                                                        <a class="list-group-item" href="{% url "task:tasks" task.id %}"
+                                                        >{{ task.title }}</a>
+                                                    {% endif %}
+                                                {% empty %}
+                                                    <p>该产品无任务</p>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-8 -->
+            <div class="col-lg-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span class="fa fa-folder-open"></span>
+                        任务信息
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <!-- 执行区块 -->
+                        <div class="row col-lg-12">
+                            <button class="btn btn-default" id="btnRun"><span class="fa fa-play"> 执行</span></button>
+                            <span>执行时间较长，请耐心等候！</span>
+                            <div class="progress progress-striped active" style="margin-top: 5px;">
+                                <div class="progress-bar progress-striped" role="progressbar" aria-valuenow="40"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100" style="width: 10%">
+                                    <span>40%</span>
+                                </div>
+                            </div>
+
+                            <hr/>
+
+                        </div>
+                        <div class="row">
+                            <!-- TABs -->
+
+                            <ul class="nav nav-tabs" id="tabs">
+                                <li class="active">
+                                    <a href="#profile" data-toggle="tab">任务信息</a>
+                                </li>
+                                <li>
+                                    <a href="#history" data-toggle="tab">历史记录</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="profile">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-lg-12" id="divProductInfo">
+                                            <div class="panel panel-success noborder">
+                                                <div class="panel-heading">
+                                                    <button class="btn btn-default btn-xs disabled"
+                                                            id="btCaseId">{{ taskDetail.id }}
+                                                    </button>
+                                                    <label class="header" id="lbTitle"
+                                                           style="margin-left: 10px;">{{ taskDetail.title }}</label>
+                                                </div>
+                                                <div class="panel-body">
+
+                                                    <div class="row col-lg-12 row">
+                                                        <span id="taskDesc">{{ taskDetail.desc }}</span>
+
+                                                        <div class="col-lg-12 row text-left" style="margin-top: 10px;">
+                                                            <div class="row col-lg-12">
+                                                                <strong>基本信息</strong>
+                                                            </div>
+
+
+                                                            <div class="row col-lg-8 text-left">
+                                                                <table class="table"
+                                                                       style="margin-left: 30px;margin-top: 30px">
+                                                                    <tr>
+                                                                        <td class="col-lg-3">
+																				<span class="fa fa-user"
+                                                                                      style="margin-left: 30px;">&nbsp;&nbsp;由谁创建
+																				</span>
+                                                                        </td>
+                                                                        <td class="col-lg-5" id="createUser">
+                                                                            {{ taskDetail.create_user }}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+																				<span class="fa fa-calendar-times-o"
+                                                                                      style="margin-left: 30px;">&nbsp;&nbsp;创建时间
+																				</span>
+                                                                        </td>
+                                                                        <td id="createTime">
+                                                                            {{ taskDetail.create_time }}
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+																				<span class="fa fa-user"
+                                                                                      style="margin-left: 30px;">&nbsp;&nbsp;执行次数
+																				</span>
+                                                                        </td>
+                                                                        <td id="lastEditer">{{ taskDetail.runtime }}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+																				<span class="fa fa-calendar-times-o"
+                                                                                      style="margin-left: 30px;">&nbsp;&nbsp;最后执行时间
+																				</span>
+                                                                        </td>
+                                                                        <td id="lastEditTime">{{ taskDetail.last_run_time }}</td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 row text-left" style="margin-top: 10px;">
+                                                            <div class="row col-lg-12">
+                                                                <strong>关联信息</strong>
+                                                            </div>
+
+
+                                                            <div class="row col-lg-8 text-left">
+                                                                <table class="table"
+                                                                       style="margin-left: 30px;margin-top: 30px">
+                                                                    <tr>
+                                                                        <td class="col-lg-3">
+																				<span class="fa fa-user"
+                                                                                      style="margin-left: 30px;">&nbsp;&nbsp;产品
+																				</span>
+                                                                        </td>
+                                                                        <td class="col-lg-5" id="createUser">
+                                                                            <a href="/product/detail/{{ taskDetail.product }}">{{ taskDetail.product }}</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+																				<span class="fa fa-calendar-times-o"
+                                                                                      style="margin-left: 30px;">&nbsp;&nbsp;套件
+																				</span>
+                                                                        </td>
+                                                                        <td id="createTime">
+                                                                            <ul class="list-unstyled">
+                                                                                {% for suite in suites_info %}
+                                                                                    <li>
+                                                                                        <a href="{% url "testcase:suitList" %}">{{ suite.title }}</a>
+                                                                                    </li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                        </td>
+                                                                    </tr>
+
+                                                                </table>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="history">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-lg-12">
+                                            <div class="panel panel-success noborder">
+
+                                                <table class="table" style="margin: 30px">
+
+                                                    <tr>
+                                                        <th>执行时间</th>
+                                                        <th>执行结果</th>
+                                                        <th>测试报告</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            2018/10/31
+                                                        </td>
+                                                        <td>
+                                                            成功
+                                                        </td>
+                                                        <td>
+                                                            <a href="#">测试报告2010/10/31</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-6 -->
+            </div>
+        </div>
+
+    {% endifequal %}
+
+
+{% endblock %}
+
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            {#            为点击按钮添加点击事件#}
+            $("#btnRun").click(function () {
+                window.location.href = "{% url 'task:runTask' selected_task %}"
+            })
+        })
+
+
+    </script>
+{% endblock %}
+
