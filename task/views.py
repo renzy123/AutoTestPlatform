@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 
 from script.models import Script
 from task.forms import TaskForm
-from task.models import TestTask, TaskStatus, TaskSuiteMapping
+from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result
 from testcase.models import SuitCaseMapping
 from user.models import User
 from utils.HtmlTestRunner import HTMLTestRunner
@@ -15,9 +15,13 @@ from utils.decorators import dec_request_dict, dec_sql_insert
 from utils.utilsFunc import current_os
 from product.models import Product
 from testcase.models import TestSuite
+import time
 
 
 # Create your views here.
+
+
+
 
 
 def init_new_task_page(request):
@@ -72,10 +76,22 @@ def _info_of_task(task_id):
 
 def run_task_page(request, task_id):
     task = TestTask.objects.filter(id=task_id)[0]
-    # 获取对应suite的所有case
-    suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
-    _run_test(suites)
+    # _run_test(suites)
     return render(request, "pages/task/taskRunDetail.html", {"task": task})
+
+
+def run_task(request):
+    if request.method == "POST":
+        task_id = request.POST["task_id"]
+        suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
+        log_title = TestTask.objects.filter(id=task_id)[0].title + str(time.time() * 1000 * 1000) + ".log"
+        report_title = _run_test(suites, log_title)
+        res = Result()
+        res.log_title = log_title
+        res.report_title = report_title
+        res.task = task_id
+        res.save()
+        # 返回执行的相关信息
 
 
 @dec_sql_insert
@@ -114,15 +130,14 @@ def init_report_page(request, report):
     return render(request, "reports/" + report)
 
 
-def init_run_task_page(request):
-    return render(request, "pages/task/tasks.html")
-
-
 def task_progress_and_output(request):
     """该方法将返回当前的测试进度和测试输出"""
 
 
-def _run_test(suites: list):
+progress = {"count": 0, "tested": 0}
+
+
+def _run_test(suites: list, log_title):
     """执行一系列的测试用例"""
     case_list = []
     for suite in suites:
@@ -136,9 +151,10 @@ def _run_test(suites: list):
     if current_os() == OS_MACOS:
         spliter = "/"
     for path in script_path:
-        print("当前的路径为" + path)
         dir_path, file_name = path.rsplit(spliter, maxsplit=1)[0], path.rsplit(spliter, maxsplit=1)[1]
         suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
-    runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR))
-    runner.run(suite)
-    return runner.report_file_name
+    progress["count"] = suite.countTestCases()
+    with open(os.path.join(RUN_LOG_PATH, log_title), "w") as log:
+        runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log)
+        runner.run(suite)
+        return runner.report_file_name

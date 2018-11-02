@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import djcelery
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,6 +24,8 @@ SECRET_KEY = '4r6%#(e4=^f^^iibhxyuq5$61j_%z=#zrkt+uf+s_$r1o@u_w%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+djcelery.setup_loader()
+BROKER_URL = "django://"
 
 ALLOWED_HOSTS = [
     "100.64.15.40",
@@ -43,6 +46,8 @@ INSTALLED_APPS = [
     'testcase',
     'script',
     'task',
+    "djcelery",
+
 ]
 
 MIDDLEWARE = [
