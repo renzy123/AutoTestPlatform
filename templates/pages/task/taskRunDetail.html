@@ -46,14 +46,53 @@
                 <div class="panel-body">
                     <!-- 执行区块 -->
                     <div class="row col-lg-12">
-                        <span>执行时间较长，请耐心等候！</span>
-                        <div class="progress progress-striped active" style="margin-top: 5px;">
-                            <div class="progress-bar progress-striped" role="progressbar" aria-valuenow="40"
-                                 aria-valuemin="0"
-                                 aria-valuemax="100" style="width: 10%">
-                                <span>40%</span>
+                        <div class="row col-lg-12">
+                            <div class="form-group">
+                                <label>日志等级</label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="verbosity" id="verbosity"
+                                           value="option1">0
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="verbosity" id="verbosity"
+                                           value="option2">1
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="verbosity" id="verbosity"
+                                           value="option3" checked>2
+                                </label>
                             </div>
+                            <label>启用快速测试</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="radioFailfast" id="radioFailfast"
+                                       value="option1">是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="radioFailfast" id="radioFailfast"
+                                       value="option2" checked>否
+                            </label>
+
                         </div>
+
+                        <div class="row col-lg-12">
+                            <button id="btnRunTask" class="btn btn-success"><span class="fa fa-play">执行</span>
+                            </button>
+                            <span>执行时间较长，请耐心等候！</span>
+                        </div>
+
+                        {#                        进度展示行#}
+
+                        <div class="row col-lg-12">
+                            <div class="progress progress-striped active" style="margin-top: 5px;">
+                                <div class="progress-bar progress-striped" role="progressbar" aria-valuenow="40"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100" style="width: 10%">
+                                    <span>1/16</span>
+                                </div>
+                            </div>
+
+                        </div>
+
                         <hr/>
                     </div>
                     <div class="row col-lg-12">
@@ -62,10 +101,9 @@
                                     此为详细的测试输出
                                 </textarea>
                     </div>
+                    <!-- /.panel -->
                 </div>
-                <!-- /.panel -->
             </div>
-            <!-- /.col-lg-6 -->
         </div>
     </div>
 
@@ -77,6 +115,37 @@
 {% endblock %}
 {% block script %}
     <script type="text/javascript">
+
+        function handleAjax(verbosity, failfast) {
+            {#处理ajax的请求#}
+
+            $.ajax({
+                    url: '{% url "task:runTask" %}',
+                    method: "post",
+                    data: {
+                        'verbosity': verbosity,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'failfast': failfast,
+                        'task_id': '{{task.id }}',
+                    },
+                    success: function (data) {
+                        console.log(data)
+                    }
+                }
+            )
+        }
+
+
+        $(document).ready(function () {
+            {#            为执行按钮添加点击事件#}
+            $("#btnbtnRunTaskRun").click(function () {
+                $(this).addClass("disable");
+                {# 获取各个设置项的值#}
+                let verbosity = $("input[name='verbosity']:checked").val();
+                let failfast = $("input[name='radioFailfast']:checked").val()
+                handleAjax(verbosity, failfast)
+            })
+        });
 
 
     </script>

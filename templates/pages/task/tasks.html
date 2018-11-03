@@ -283,7 +283,7 @@
         $(document).ready(function () {
             {#            为点击按钮添加点击事件#}
             $("#btnRun").click(function () {
-                window.location.href = "{% url 'task:runTask' selected_task %}"
+                window.location.href = "{% url 'task:taskDetail' selected_task %}"
             })
         })
 

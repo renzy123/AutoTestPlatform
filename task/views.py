@@ -4,24 +4,57 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
-from script.models import Script
 from task.forms import TaskForm
-from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result
-from testcase.models import SuitCaseMapping
+from task.models import TestTask, TaskStatus, TaskSuiteMapping
 from user.models import User
-from utils.HtmlTestRunner import HTMLTestRunner
 from utils.consts import *
-from utils.decorators import dec_request_dict, dec_sql_insert
-from utils.utilsFunc import current_os
+from utils.decorators import dec_sql_insert, dec_singleton
 from product.models import Product
 from testcase.models import TestSuite
 import time
+from task.tasks import run_test
+from AutoTestPlatform.CommonModels import JsonResult, ResultEnum
 
 
 # Create your views here.
 
 
 
+
+@dec_singleton
+class TestDetail:
+    """定义一个singleTon，用于保存测试信息"""
+
+    def __init__(self, task_id):
+        self.progress = {"count": 0, "tested": 0}
+        self.is_finished = True
+        self.log_title = ""
+        self.current_task = None
+        self.task_id = task_id
+
+    def clear(self, task_id):
+        """清除当前测试的所有信息"""
+        self.progress = {"count": 0, "tested": 0}
+        self.is_finished = True
+        self.log_title = ""
+        self.current_task = None
+        self.task_id = task_id
+
+    def read_logs(self):
+        """阅读日志信息，并且返回"""
+        with open(os.path.join(RUN_LOG_PATH, self.log_title), "r") as log:
+            log_detail = log.read()
+            return log_detail
+
+    def to_json(self):
+        """获取相应的JSON信息"""
+        task_info = {"task_id": self.task_id, "task_count": self.progress["count"],
+                     "task_tested": self.progress["tested"], "is_finished": self.is_finished,
+                     "log_title": self.log_title, "log_detail": self.read_logs()}
+        return task_info
+
+
+current_test_detail = TestDetail(0)
 
 
 def init_new_task_page(request):
@@ -81,17 +114,21 @@ def run_task_page(request, task_id):
 
 
 def run_task(request):
+    # 判断当前的任务是否在执行中
+    if not current_test_detail.is_finished:
+        result = JsonResult(ResultEnum.Error, result_reason="当前有任务正在执行中,请稍后再试！")
+        return JsonResponse(result.to_json())
     if request.method == "POST":
         task_id = request.POST["task_id"]
         suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
         log_title = TestTask.objects.filter(id=task_id)[0].title + str(time.time() * 1000 * 1000) + ".log"
-        report_title = _run_test(suites, log_title)
-        res = Result()
-        res.log_title = log_title
-        res.report_title = report_title
-        res.task = task_id
-        res.save()
-        # 返回执行的相关信息
+        # 清除当前运行的任务数据
+        current_test_detail.clear(task_id)
+        current_test_detail.log_title = log_title
+        # 调用异步任务进行执行
+        current_test_detail.current_task = run_test.delay(suites, current_test_detail)
+        result = JsonResult(ResultEnum.Success, result_reason=None)
+        return JsonResponse(result.to_json())
 
 
 @dec_sql_insert
@@ -132,29 +169,26 @@ def init_report_page(request, report):
 
 def task_progress_and_output(request):
     """该方法将返回当前的测试进度和测试输出"""
+    return JsonResponse(current_test_detail.to_json())
 
-
-progress = {"count": 0, "tested": 0}
-
-
-def _run_test(suites: list, log_title):
-    """执行一系列的测试用例"""
-    case_list = []
-    for suite in suites:
-        case_list.extend([case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite)])
-    script_path = [os.path.join(SCRIPT_DIR, Script.objects.filter(related_case=case_id)[0].path) for case_id in
-                   case_list
-                   ]
-    suite = unittest.TestSuite()
-    loader = unittest.TestLoader()
-    spliter = "\\"
-    if current_os() == OS_MACOS:
-        spliter = "/"
-    for path in script_path:
-        dir_path, file_name = path.rsplit(spliter, maxsplit=1)[0], path.rsplit(spliter, maxsplit=1)[1]
-        suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
-    progress["count"] = suite.countTestCases()
-    with open(os.path.join(RUN_LOG_PATH, log_title), "w") as log:
-        runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log)
-        runner.run(suite)
-        return runner.report_file_name
+# def _run_test(suites: list, log_title, _progress):
+#     """执行一系列的测试用例"""
+#     case_list = []
+#     for suite in suites:
+#         case_list.extend([case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite)])
+#     script_path = [os.path.join(SCRIPT_DIR, Script.objects.filter(related_case=case_id)[0].path) for case_id in
+#                    case_list
+#                    ]
+#     suite = unittest.TestSuite()
+#     loader = unittest.TestLoader()
+#     spliter = "\\"
+#     if current_os() == OS_MACOS:
+#         spliter = "/"
+#     for path in script_path:
+#         dir_path, file_name = path.rsplit(spliter, maxsplit=1)[0], path.rsplit(spliter, maxsplit=1)[1]
+#         suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
+#         _progress["count"] = suite.countTestCases()
+#     with open(os.path.join(RUN_LOG_PATH, log_title), "w") as log:
+#         runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log)
+#         runner.run(suite)
+#         return runner.report_file_name
