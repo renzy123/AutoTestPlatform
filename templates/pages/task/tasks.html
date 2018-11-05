@@ -41,7 +41,7 @@
         <!-- /.row -->
         <div class="row">
             <div class="col-lg-3">
-                <div class="panel panel-default">
+                <div class="panel panel-default noborder">
                     <div class="panel-heading">
                         <span class="fa fa-list"></span>
                         任务列表
@@ -96,19 +96,11 @@
                     <div class="panel-body">
                         <!-- 执行区块 -->
                         <div class="row col-lg-12">
-                            <button class="btn btn-default" id="btnRun"><span class="fa fa-play"> 执行</span></button>
-                            <span>执行时间较长，请耐心等候！</span>
-                            <div class="progress progress-striped active" style="margin-top: 5px;">
-                                <div class="progress-bar progress-striped" role="progressbar" aria-valuenow="40"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100" style="width: 10%">
-                                    <span>40%</span>
-                                </div>
-                            </div>
+                            <button class="btn btn-success" id="btnRun"><span class="fa fa-play"> 执行</span></button>
 
                             <hr/>
-
                         </div>
+
                         <div class="row">
                             <!-- TABs -->
 
@@ -242,6 +234,7 @@
                                                         <th>执行时间</th>
                                                         <th>执行结果</th>
                                                         <th>测试报告</th>
+                                                        <th>日志</th>
                                                     </tr>
                                                     <tr>
                                                         <td>
@@ -251,7 +244,10 @@
                                                             成功
                                                         </td>
                                                         <td>
-                                                            <a href="#">测试报告2010/10/31</a>
+                                                            <a href="">测试报告2010/10/31</a>
+                                                        </td>
+                                                        <td>
+                                                            日志
                                                         </td>
                                                     </tr>
                                                 </table>

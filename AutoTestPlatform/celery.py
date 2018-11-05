@@ -5,11 +5,16 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery, platforms
+from django.conf import settings
 
-# set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AutoTestPlatform.settings')
+# 获取当前文件夹名，即为该Django的项目名
+project_name = os.path.split(os.path.abspath('.'))[-1]
+project_settings = '%s.settings' % project_name
 
-app = Celery('AutoTestPlatform')
+# 设置环境变量
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', project_settings)
+
+app = Celery(project_name)
 
 # Using a string here means the worker don't have to serialize
 # the configuration object to child processes.
@@ -18,7 +23,7 @@ app = Celery('AutoTestPlatform')
 app.config_from_object('django.conf:settings')
 
 # Load task modules from all registered Django app configs.
-app.autodiscover_tasks("AutoTestPlatform")
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 # 允许root 用户运行celery
 platforms.C_FORCE_ROOT = True

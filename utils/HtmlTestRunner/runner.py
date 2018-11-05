@@ -2,6 +2,7 @@ import sys
 import time
 from datetime import datetime
 
+
 from unittest import TextTestRunner
 from .result import _HtmlTestResult
 
@@ -13,13 +14,14 @@ class HTMLTestRunner(TextTestRunner):
 
     def __init__(self, output, verbosity=2, stream=sys.stderr, report_path=None,
                  descriptions=True, failfast=False, buffer=False,
-                 report_title=None, template=None, resultclass=None, progress=None):
+                 report_title=None, template=None, resultclass=None, progress=None, redis_client=None):
         self.verbosity = verbosity
         self.output = output
         self.encoding = UTF8
         self.report_path = report_path
         self.report_file_name = None
         self.progress = progress
+        self.redis_client = redis_client
 
         TextTestRunner.__init__(self, stream, descriptions, verbosity,
                                 failfast=failfast, buffer=buffer)
@@ -38,7 +40,7 @@ class HTMLTestRunner(TextTestRunner):
         """ Create a TestResult object which will be used to store
         information about the executed tests. """
         return self.resultclass(self.stream, self.descriptions, self.verbosity,
-                                self.elapsed_times, self.progress)
+                                self.elapsed_times, self.progress, self.redis_client)
 
     def run(self, test):
         """ Runs the given testcase or testsuite. """
