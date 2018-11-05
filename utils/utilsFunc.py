@@ -109,5 +109,16 @@ def current_os():
         return OS_WINDOWS
 
 
+def rename_file(file_name):
+    """修改文件的命名，以符合操作系统规范"""
+    inlegal_chars = ["\\", "/", ":", "*", "?", "''", "<", ">", "|"]
+
+    if current_os() == OS_WINDOWS:
+        for char in inlegal_chars:
+            if char in file_name:
+                file_name = str(file_name).replace(char, "_")
+        return file_name
+
+
 if __name__ == '__main__':
-    print(current_os())
+    print(rename_file("测试任务1，添加于11/11541387286477495.8.log"))

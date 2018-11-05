@@ -41,6 +41,13 @@ class Result(models.Model):
     report_title = models.CharField(max_length=100)
     log_title = models.CharField(max_length=100)
     task = models.IntegerField()
+    result = models.IntegerField(default=0)
+
+
+class TestResultType(models.Model):
+    """测试结果的类型"""
+    title = models.CharField(max_length=20)
+    desc = models.CharField(max_length=200)
 
 
 class TaskSuiteMapping(models.Model):

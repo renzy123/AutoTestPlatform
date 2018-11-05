@@ -11,12 +11,14 @@ from script.models import Script
 from utils.HtmlTestRunner import HTMLTestRunner
 from utils.utilsFunc import current_os
 from task.models import Result
+import json
+import redis
 
 
 @shared_task
-def run_test(suites: list, test_detail):
+def run_test(suites: list, log_title, task_id):
     """执行一系列的测试用例"""
-    log_title, task_id, progress = test_detail.log_title, test_detail.task_id, test_detail.progress
+    progress = {"count": 0, "tested": 0}
     case_list = []
     for suite in suites:
         case_list.extend([case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite)])
@@ -30,14 +32,21 @@ def run_test(suites: list, test_detail):
         spliter = "/"
     for path in script_path:
         dir_path, file_name = path.rsplit(spliter, maxsplit=1)[0], path.rsplit(spliter, maxsplit=1)[1]
+        print(dir_path)
         suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
     if progress:
         progress["count"] = suite.countTestCases()
-    with open(os.path.join(RUN_LOG_PATH, log_title), "w") as log:
-        runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log)
+
+    # 打开redis的pubsub功能，进行消息分发
+    redis_client = redis.Redis(REDIS_HOST)
+    redis_client.publish(REDIS_PUB_CHANEL, json.dumps(progress))
+
+    with open(os.path.join(RUN_LOG_PATH, log_title), "x", encoding="utf-8") as log:
+        runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log,
+                                redis_client=redis_client)
         runner.run(suite)
         # 执行完成后，保存执行的结果
-        report_title = runner.report_title
+        report_title = runner.report_file_name
         res = Result()
         res.log_title = log_title
         res.report_title = report_title

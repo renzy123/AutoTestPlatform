@@ -7,6 +7,8 @@ from unittest import TestResult, _TextTestResult
 from unittest.result import failfast
 
 from jinja2 import Template
+from utils.consts import *
+import json
 
 DEFAULT_TEMPLATE = os.path.join(os.path.dirname(__file__), "template",
                                 "report_template.html")
@@ -89,7 +91,7 @@ class _TestInfo(object):
 class _HtmlTestResult(_TextTestResult):
     """ A test result class that express test results in Html. """
 
-    def __init__(self, stream, descriptions, verbosity, elapsed_times, progress=None):
+    def __init__(self, stream, descriptions, verbosity, elapsed_times, progress=None, redis_client=None):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
         super().__init__(stream, descriptions, verbosity)
         self.buffer = True
@@ -100,6 +102,7 @@ class _HtmlTestResult(_TextTestResult):
         self.elapsed_times = elapsed_times
         self.infoclass = _TestInfo
         self.progress = progress
+        self.redis_client = redis_client
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
@@ -153,7 +156,8 @@ class _HtmlTestResult(_TextTestResult):
         self.stop_time = time.time()
         if type(self.progress) == dict and "tested" in self.progress.keys():
             self.progress["tested"] += 1
-
+        if self.redis_client:
+            self.redis_client.publish(REDIS_PUB_CHANEL, json.dumps(self.progress))
         if self.callback and callable(self.callback):
             self.callback()
             self.callback = None
@@ -355,7 +359,7 @@ class _HtmlTestResult(_TextTestResult):
         if not os.path.exists(dir_to):
             os.makedirs(dir_to)
         path_file = os.path.join(dir_to, report_name)
-        with open(path_file, 'w') as report_file:
+        with open(path_file, 'w', encoding="utf-8") as report_file:
             report_file.write(report)
 
     def _exc_info_to_string(self, err, test):
@@ -402,7 +406,7 @@ class _HtmlTestResult(_TextTestResult):
                     error += '\n'
                 msgLines.append(error)
         # This is the extra magic to make sure all lines are str
-        encoding = getattr(sys.stdout, 'encoding', 'utf-8')
+        encoding = 'utf-8'
         lines = []
         for line in msgLines:
             if not isinstance(line, str):

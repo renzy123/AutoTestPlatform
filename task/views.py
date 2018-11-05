@@ -1,5 +1,3 @@
-import unittest
-
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -7,22 +5,19 @@ from django.shortcuts import render, redirect
 from task.forms import TaskForm
 from task.models import TestTask, TaskStatus, TaskSuiteMapping
 from user.models import User
-from utils.consts import *
+from utils.utilsFunc import *
 from utils.decorators import dec_sql_insert, dec_singleton
 from product.models import Product
 from testcase.models import TestSuite
 import time
 from task.tasks import run_test
 from AutoTestPlatform.CommonModels import JsonResult, ResultEnum
-
-
-# Create your views here.
-
-
+import redis
+import json
 
 
 @dec_singleton
-class TestDetail:
+class _TestDetail:
     """定义一个singleTon，用于保存测试信息"""
 
     def __init__(self, task_id):
@@ -54,7 +49,7 @@ class TestDetail:
         return task_info
 
 
-current_test_detail = TestDetail(0)
+current_test_detail = _TestDetail(0)
 
 
 def init_new_task_page(request):
@@ -122,11 +117,13 @@ def run_task(request):
         task_id = request.POST["task_id"]
         suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
         log_title = TestTask.objects.filter(id=task_id)[0].title + str(time.time() * 1000 * 1000) + ".log"
+        log_title = rename_file(log_title)
         # 清除当前运行的任务数据
         current_test_detail.clear(task_id)
         current_test_detail.log_title = log_title
         # 调用异步任务进行执行
-        current_test_detail.current_task = run_test.delay(suites, current_test_detail)
+        current_test_detail.current_task = run_test.delay(suites, current_test_detail.log_title,
+                                                          current_test_detail.task_id)
         result = JsonResult(ResultEnum.Success, result_reason=None)
         return JsonResponse(result.to_json())
 
@@ -169,26 +166,11 @@ def init_report_page(request, report):
 
 def task_progress_and_output(request):
     """该方法将返回当前的测试进度和测试输出"""
+    # 从Redis的chanel中读取当前的进度
+    redis_client = redis.Redis(REDIS_HOST)
+    sub = redis_client.pubsub()
+    sub.subscribe(REDIS_PUB_CHANEL)
+    progress = sub.parse_response()
+    progress = json.load(progress)
+    print(progress)
     return JsonResponse(current_test_detail.to_json())
-
-# def _run_test(suites: list, log_title, _progress):
-#     """执行一系列的测试用例"""
-#     case_list = []
-#     for suite in suites:
-#         case_list.extend([case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite)])
-#     script_path = [os.path.join(SCRIPT_DIR, Script.objects.filter(related_case=case_id)[0].path) for case_id in
-#                    case_list
-#                    ]
-#     suite = unittest.TestSuite()
-#     loader = unittest.TestLoader()
-#     spliter = "\\"
-#     if current_os() == OS_MACOS:
-#         spliter = "/"
-#     for path in script_path:
-#         dir_path, file_name = path.rsplit(spliter, maxsplit=1)[0], path.rsplit(spliter, maxsplit=1)[1]
-#         suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
-#         _progress["count"] = suite.countTestCases()
-#     with open(os.path.join(RUN_LOG_PATH, log_title), "w") as log:
-#         runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log)
-#         runner.run(suite)
-#         return runner.report_file_name

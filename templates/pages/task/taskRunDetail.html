@@ -75,7 +75,8 @@
                         </div>
 
                         <div class="row col-lg-12">
-                            <button id="btnRunTask" class="btn btn-success"><span class="fa fa-play">执行</span>
+                            <button id="btnRunTask" class="btn btn-success "><span class="fa fa-play"
+                                                                                   id="spanRunTask">执行</span>
                             </button>
                             <span>执行时间较长，请耐心等候！</span>
                         </div>
@@ -110,7 +111,6 @@
 {% endblock %}
 
 {% block scriptLinks %}
-    <script src="{% static 'js/jsrender.min.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
 {% endblock %}
 {% block script %}
@@ -128,8 +128,16 @@
                         'failfast': failfast,
                         'task_id': '{{task.id }}',
                     },
+                dataType: "json",
                     success: function (data) {
-                        console.log(data)
+                        if (data["result_code"] === 1) {
+                            $("#spanRunTask").html("执行中");
+                            swal("", "已添加到任务队列！", "success")
+                        }
+                        else {
+                            swal(data["result_reason"])
+                        }
+
                     }
                 }
             )
@@ -138,11 +146,11 @@
 
         $(document).ready(function () {
             {#            为执行按钮添加点击事件#}
-            $("#btnbtnRunTaskRun").click(function () {
-                $(this).addClass("disable");
+            $("#btnRunTask").click(function () {
+                $(this).attr("disabled", "disabled");
                 {# 获取各个设置项的值#}
                 let verbosity = $("input[name='verbosity']:checked").val();
-                let failfast = $("input[name='radioFailfast']:checked").val()
+                let failfast = $("input[name='radioFailfast']:checked").val();
                 handleAjax(verbosity, failfast)
             })
         });
