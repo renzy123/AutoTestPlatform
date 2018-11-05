@@ -22,6 +22,7 @@ class User(models.Model):
     default_mail = str(name) + "@mail.jj.cn"
     email = models.EmailField(default=default_mail, unique=True)
     id = models.AutoField(primary_key=True)
+    real_name = models.CharField(max_length=20, default="无")
 
 
 class Privilege(models.Model):

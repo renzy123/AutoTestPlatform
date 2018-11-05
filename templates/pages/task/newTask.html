@@ -27,6 +27,32 @@
     </style>
 {% endblock %}
 {% block mainbody %}
+    {{ taskId }}
+    {% if taskId %}
+        <script src="{% static 'js/sweetalert.min.js' %}"></script>
+        <script type="text/javascript">
+            swal({
+                text: "添加成功",
+                icon: "success",
+                buttons: {
+                    "continue": "继续添加",
+                    "run": {
+                        text: "执行!",
+                        value: "run"
+                    },
+                },
+            })
+                .then((value) => {
+                    switch (value) {
+                        case "run":
+                            window.location.href = '{% url "task:tasks" %}'
+                    }
+                });
+        </script>
+    {% endif %}
+
+
+
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">创建任务</h1>
@@ -107,6 +133,14 @@
 {% block script %}
     <script id="suitOption" type="text/x-jsrender">
 <option value="<%:id%>"><%:title%></option>
+
+
+
+
+
+
+
+
 
     </script>
     <script type="text/javascript">

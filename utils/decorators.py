@@ -6,9 +6,11 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.http import JsonResponse
 from AutoTestPlatform.CommonModels import result_to_json, ResultEnum, SqlResultData
 import traceback
+from functools import wraps
 
 
 def dec_is_login(func):
+    @wraps(func)
     def wrapped(request, *args, **kwargs):
         try:
             user = request.sesson.get("user", None)
@@ -26,6 +28,7 @@ def dec_is_login(func):
 def dec_request_dict(func):
     """捕捉使用从request中请求数据时可能的KEY错误"""
 
+    @wraps(func)
     def wrapped(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -39,6 +42,7 @@ def dec_request_dict(func):
 def dec_sql_insert(func):
     """捕捉进行sql操作时可能发生的异常，然后进行输出"""
 
+    @wraps(func)
     def wrapped(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -46,3 +50,15 @@ def dec_sql_insert(func):
             return JsonResponse(result_to_json(SqlResultData(ResultEnum.Error, traceback.format_exc())))
 
     return wrapped
+
+
+def dec_singleton(cls):
+    instances = {}
+
+    @wraps(cls)
+    def getinstance(*args, **kw):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kw)
+        return instances[cls]
+
+    return getinstance

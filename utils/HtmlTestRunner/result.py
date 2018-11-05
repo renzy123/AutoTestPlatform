@@ -89,8 +89,9 @@ class _TestInfo(object):
 class _HtmlTestResult(_TextTestResult):
     """ A test result class that express test results in Html. """
 
-    def __init__(self, stream, descriptions, verbosity, elapsed_times):
+    def __init__(self, stream, descriptions, verbosity, elapsed_times, progress=None):
         _TextTestResult.__init__(self, stream, descriptions, verbosity)
+        super().__init__(stream, descriptions, verbosity)
         self.buffer = True
         self._stdout_data = None
         self._stderr_data = None
@@ -98,6 +99,7 @@ class _HtmlTestResult(_TextTestResult):
         self.callback = None
         self.elapsed_times = elapsed_times
         self.infoclass = _TestInfo
+        self.progress = progress
 
     def _prepare_callback(self, test_info, target_list, verbose_str,
                           short_str):
@@ -149,6 +151,8 @@ class _HtmlTestResult(_TextTestResult):
         self._save_output_data()
         _TextTestResult.stopTest(self, test)
         self.stop_time = time.time()
+        if type(self.progress) == dict and "tested" in self.progress.keys():
+            self.progress["tested"] += 1
 
         if self.callback and callable(self.callback):
             self.callback()
