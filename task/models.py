@@ -22,6 +22,7 @@ class TestTask(models.Model):
     last_run_time = models.DateTimeField(null=True)
 
 
+
 class TaskStatus(models.Model):
     """
     任务状态实体类，用于描述任务的状态
@@ -42,6 +43,8 @@ class Result(models.Model):
     log_title = models.CharField(max_length=100)
     task = models.IntegerField()
     result = models.IntegerField(default=0)
+    run_time = models.DateTimeField()
+    run_user = models.IntegerField(default=0)
 
 
 class TestResultType(models.Model):

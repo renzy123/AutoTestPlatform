@@ -4,6 +4,7 @@
 import platform
 
 from utils.consts import *
+import datetime
 
 
 def first_letter_of_chinese(string):
@@ -120,5 +121,21 @@ def rename_file(file_name):
         return file_name
 
 
+def gen_data_json(model, *args):
+    """将模型文件和其他数据联合生成数据模型，并且返回json数据"""
+
+    model_dict = model.__dict__
+    for data in args:
+        model_dict = {**model_dict, **data}
+    return model_dict
+
+
+def local_time_now():
+    """格式化时间的显示"""
+    time_format = "%Y-%m-%d %H:%M:%S"
+    tz_utc_8 = datetime.timezone(datetime.timedelta(hours=8))
+    now = datetime.datetime.now(tz=tz_utc_8)
+    return now.strftime(time_format)
+
 if __name__ == '__main__':
-    print(rename_file("测试任务1，添加于11/11541387286477495.8.log"))
+    print(local_time_now())

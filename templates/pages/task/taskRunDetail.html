@@ -4,6 +4,10 @@
 {% block title %}
     创建任务
 {% endblock %}
+{% block cssLink %}
+    <link href="{% static 'css/datatable/dataTables.responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'css/datatable/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+{% endblock %}
 {% block css %}
     <style type="text/css">
         .textarea {
@@ -24,6 +28,15 @@
         table.borderless td, table.borderless th {
             border: none !important;
         }
+
+        td {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+
     </style>
 {% endblock %}
 {% block mainbody %}
@@ -83,7 +96,7 @@
 
                         {#                        进度展示行#}
 
-                        <div class="row col-lg-12">
+                        <div class="row col-lg-12" style="display: none">
                             <div class="progress progress-striped active" style="margin-top: 5px;">
                                 <div class="progress-bar progress-striped" role="progressbar" aria-valuenow="40"
                                      aria-valuemin="0"
@@ -96,13 +109,99 @@
 
                         <hr/>
                     </div>
-                    <div class="row col-lg-12">
-								<textarea class="form-control textarea" style="width: 100%;height: 500px;"
-                                          id="taskOutput">
-                                    此为详细的测试输出
-                                </textarea>
-                    </div>
                     <!-- /.panel -->
+                </div>
+            </div>
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <span>历史记录</span>
+                </div>
+
+                <div class="panel-body">
+                    <table class="table table-hover table-striped" style="table-layout:fixed" id="tableHistories">
+                        <thead>
+                        <tr>
+                            <th class="col-lg-1">编号</th>
+                            <th class="col-lg-2">名称</th>
+                            <th class="col-lg-1">执行者</th>
+                            <th class="col-lg-2">结果</th>
+                            <th class="col-lg-2">报告</th>
+                            <th class="col-lg-2">日志</th>
+                            <th class="col-lg-2">时间</th>
+                        </tr>
+                        </thead>
+
+                        {% for run_history in run_histories %}
+
+                            <tr>
+                                <td title="{{ run_history.id }}">{{ run_history.id }}</td>
+                                <td title="{{ run_history.task_title }}">{{ run_history.task_title }}</td>
+                                <td>{{ run_history.run_user }}</td>
+                                <td>
+                                    {% if run_history.result_status == "成功" %}
+                                        <span class="label label-success">{{ run_history.result_status }}</span>
+                                    {% elif run_history.result_status == "部分成功" %}
+                                        <span class="label label-warning">{{ run_history.result_status }}</span>
+                                    {% elif run_history.result_status == "全部失败" %}
+                                        <span class="label label-danger">{{ run_history.result_status }}</span>
+                                    {% elif run_history.result_status == "无效" %}
+                                        <span class="label label-default">{{ run_history.result_status }}</span>
+                                    {% endif %}
+                                </td>
+
+                                <td title="{{ run_history.report_title }}">
+                                    <a href="{% url 'task:showReport' run_history.report_title %}">{{ run_history.report_title }}</a>
+                                </td>
+                                <td title="{{ run_history.log_title }}">{{ run_history.log_title }}</td>
+                                <td title="{{ run_history.run_time|date:"Y-m-d H:i" }}">{{ run_history.run_time|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td>
+                                    无任何记录
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default noborder">
+                <div class="panel-heading">
+                    <span>任务队列</span>
+                </div>
+                <div class="panel-body">
+
+                    {% if task_queue|length != 0 %}
+                        <table class="table">
+                            <tr>
+                                <th>
+                                    名称
+                                </th>
+                                <th>
+                                    状态
+                                </th>
+                            </tr>
+                            {% for task in task_queue %}
+                                <TR>
+                                    <td>
+                                        {{ task.task_title }}
+                                    </td>
+                                    <td>
+                                        {{ task.state }}
+                                    </td>
+                                </TR>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <span>当前无任何任务！</span>
+                    {% endif %}
+                    <button class="btn btn-success col-lg-12">添加任务</button>
                 </div>
             </div>
         </div>
@@ -112,6 +211,9 @@
 
 {% block scriptLinks %}
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script type="text/javascript">
@@ -135,7 +237,8 @@
                             swal("", "已添加到任务队列！", "success")
                         }
                         else {
-                            swal(data["result_reason"])
+                            swal(data["result_reason"]);
+                            $("#btnRunTask").removeAttr("disabled");
                         }
 
                     }
@@ -145,6 +248,38 @@
 
 
         $(document).ready(function () {
+
+            $("#tableHistories").DataTable({
+                responsive: true,
+                language: {
+                    "sProcessing": "处理中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有匹配结果",
+                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中数据为空",
+                    "sLoadingRecords": "载入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 以升序排列此列",
+                        "sSortDescending": ": 以降序排列此列"
+                    }
+                }
+
+
+            });
+
+
             {#            为执行按钮添加点击事件#}
             $("#btnRunTask").click(function () {
                 $(this).attr("disabled", "disabled");

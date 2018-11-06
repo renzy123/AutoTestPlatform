@@ -9,14 +9,14 @@ from utils.consts import *
 from testcase.models import SuitCaseMapping
 from script.models import Script
 from utils.HtmlTestRunner import HTMLTestRunner
-from utils.utilsFunc import current_os
-from task.models import Result
+from utils.utilsFunc import current_os, local_time_now
+from task.models import Result, TestResultType
 import json
 import redis
 
 
 @shared_task
-def run_test(suites: list, log_title, task_id):
+def run_test(suites: list, log_title, task_id, current_user):
     """执行一系列的测试用例"""
     progress = {"count": 0, "tested": 0}
     case_list = []
@@ -44,11 +44,16 @@ def run_test(suites: list, log_title, task_id):
     with open(os.path.join(RUN_LOG_PATH, log_title), "x", encoding="utf-8") as log:
         runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log,
                                 redis_client=redis_client)
-        runner.run(suite)
+        test_result = runner.run(suite)
+        test_state = test_result.state_of_test()
+        result_state = TestResultType.objects.filter(title=test_state)[0].id
         # 执行完成后，保存执行的结果
         report_title = runner.report_file_name
         res = Result()
         res.log_title = log_title
         res.report_title = report_title
         res.task = task_id
+        res.run_user = current_user
+        res.result = result_state
+        res.run_time = local_time_now()
         res.save()

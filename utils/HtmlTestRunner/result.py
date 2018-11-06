@@ -125,6 +125,21 @@ class _HtmlTestResult(_TextTestResult):
 
         self.callback = callback
 
+    def state_of_test(self):
+        """返回本次的测试状态"""
+        count_failures = len(self.failures)
+        count_errors = len(self.errors)
+        count_skipped = len(self.skipped)
+        count_need_success = self.testsRun - count_skipped
+        if count_errors == count_need_success:
+            return TEST_RESULT_USELESS
+        elif count_errors == 0 and count_failures == 0:
+            return TEST_RESULT_SUCCESS
+        elif count_need_success > (count_errors + count_failures):
+            return TEST_RESULT_PARTLY_SUCCESS
+        elif count_need_success == count_errors + count_failures:
+            return TEST_RESULT_FAIL
+
     def getDescription(self, test):
         """ Return the test descriotion if not have test name. """
         doc_first_line = test.shortDescription()

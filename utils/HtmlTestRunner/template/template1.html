@@ -2,7 +2,6 @@
 <html lang="zh-cn">
 
 <head>
-    Time Elapsed: 0:00:00.001002
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,7 +70,7 @@ function showCase(level) {
     for (var i = 0; i < trs.length; i++) {
         tr = trs[i];
         id = tr.id;
-        if (id.substr(0, 2) == 'ft') {
+        if (id.substr(0, 2) === 'ft') {
             if (level < 1) {
                 tr.className = 'hiddenRow';
             }
@@ -160,8 +159,8 @@ function showOutput(id, name) {
 <div class="container">
     <div class='heading'>
         <h1>Unit Test Report</h1>
-        <p><strong>Start Time:</strong> 2018-11-05 17:37:05</p>
-        <p><strong>Duration:</strong> 0:00:00.001002</p>
+        <p><strong>Start Time:</strong> {{ headers.start_time }}</p>
+        <p><strong>Duration:</strong> {{ headers.duration }}</p>
         <p><strong>Status:</strong> <span class="text text-success">Pass <strong>1</strong></span> <span
                 class="text text-danger">Failure <strong>1</strong></span></p>
 
