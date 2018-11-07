@@ -7,9 +7,8 @@ from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResu
 from user.models import User
 from utils.utilsFunc import *
 from utils.decorators import dec_sql_insert, dec_singleton
-from product.models import Product
+from product.models import Product, SuitProductMapping
 from testcase.models import TestSuite
-import time
 from task.tasks import run_test
 from AutoTestPlatform.CommonModels import JsonResult, ResultEnum
 import redis
@@ -63,7 +62,6 @@ def init_new_task_page(request):
         _p = {"name": product.name, "id": product.id}
         product_info.append(_p)
     if "task_id" in request.GET.keys():
-        print("传入的task_id为" + request.GET["task_id"])
         return render(request, "pages/task/newTask.html", {"products": product_info, "taskId": request.GET["task_id"]})
     return render(request, "pages/task/newTask.html", {"products": product_info})
 
@@ -81,9 +79,17 @@ def init_task_page(request, task_id=0):
     if task_id != 0:
         chosen_task_id = task_id
     task_detail, suite_info = _info_of_task(chosen_task_id)
+    # 获取任务的历史信息
+    results = Result.objects.filter(task=task_id)
+    run_histories = []
+    for result in results:
+        task_title = TestTask.objects.filter(id=result.task)[0].title
+        result_status = TestResultType.objects.filter(id=result.result)[0].title
+        extra_data = {"task_title": task_title, "result_status": result_status}
+        run_histories.append(gen_data_json(result, extra_data))
     return render(request, "pages/task/tasks.html",
                   {"products_tasks": product_tasks, "taskDetail": task_detail, "suites_info": suite_info,
-                   "selected_task": chosen_task_id})
+                   "selected_task": chosen_task_id, "run_histories": run_histories})
 
 
 def _info_of_task(task_id):
@@ -105,9 +111,7 @@ def _info_of_task(task_id):
     return task_detail, suites_info
 
 
-def run_task_page(request, task_id):
-    task = TestTask.objects.filter(id=task_id)[0]
-    # _run_test(suites)
+def run_task_page(request):
     # 获取任务的历史记录信息
     results = Result.objects.all()
     tasks = TestTask.objects.all()
@@ -120,33 +124,22 @@ def run_task_page(request, task_id):
         result_status = result_types.filter(id=result.result)[0].title
         extra_data = {"run_user": run_user, "task_title": task_title, "result_status": result_status}
         run_histories.append(gen_data_json(result, extra_data))
+    # 获取所有task列表
+    tasks = []
+    for _task in TestTask.objects.all():
+        status = _task.status
+        _task.status = TaskStatus.objects.filter(id=status)[0].title
+        tasks.append(gen_data_json(_task))
     # 获取任务队列
     task_queue = _progress_of_tasks(request)
     return render(request, "pages/task/taskRunDetail.html",
-                  {"task": task, "run_histories": run_histories, "task_queue": task_queue})
+                  {"run_histories": run_histories, "task_queue": task_queue, "tasks": tasks})
 
 
 def run_task(request):
-    # 判断当前的任务是否在执行中
-    if not current_test_detail.is_finished:
-        result = JsonResult(ResultEnum.Error, result_reason="当前有任务正在执行中,请稍后再试！")
-        return JsonResponse(result.to_json())
     if request.method == "POST":
         task_id = request.POST["task_id"]
-        suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
-        log_title = TestTask.objects.filter(id=task_id)[0].title + str(time.time() * 1000 * 1000) + ".log"
-        log_title = rename_file(log_title)
-        # 清除当前运行的任务数据
-        current_test_detail.clear(task_id)
-        current_test_detail.log_title = log_title
-        # 获取当前的用户
-        current_user = User.objects.filter(name=request.session[SESSION_USER_NAME])[0].id
-        # 调用异步任务进行执行
-        global _handleTask
-        if not _handleTask:
-            _handleTask = HandleTask(request.session)
-        res = _handleTask.add_task(task_id, run_test, suites, log_title,
-                                   task_id, current_user)
+        res = _run_test(request, task_id)
         if res == "success":
             # 添加运行次数和运行时间
             test_task = TestTask.objects.filter(id=task_id)[0]
@@ -232,5 +225,57 @@ def task_progress_and_output(request):
     return JsonResponse(current_test_detail.to_json())
 
 
-if __name__ == '__main__':
+def read_log(request, log_title):
+    """读取日志并且返回"""
+    # 判断日志是否存在
+    file_path = os.path.join(RUN_LOG_PATH, log_title)
+    if not os.path.exists(file_path):
+        content = "该日志不存在或者被删除!"
+    else:
+        with open(file_path, encoding="gbk") as log:
+            content = log.read()
+    return JsonResponse({"content": content})
+
+
+def _run_test(request, task_id):
+    def _type_of_task(_id):
+        # 判断任务的类型
+        _suite = TaskSuiteMapping.objects.filter(id=_id)[0].suite
+        # 获取suite所关联的产品
+        _first_product = SuitProductMapping.objects.filter(suit=_suite)[0].product
+        _type_product = Product.objects.filter(id=_first_product)[0].productType
+        # 1:API自动化
+        # 2:WEB自动化
+        # 3:移动自动化
+        return _type_product
+
+    _type = _type_of_task(task_id)
+
+    if _type == 2:
+        return _run_web_test(request, task_id)
+    elif _type == 1:
+        return _run_web_test(request, task_id)
+    else:
+        return _run_mobile_test(request, task_id)
+
+
+def _run_web_test(request, task_id):
+    # 执行WEB测试的方法
+    suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
+    log_title = gen_log_title(TestTask.objects.filter(id=task_id)[0].title)
+    # 调用异步任务
+    global _handleTask
+    if not _handleTask:
+        _handleTask = HandleTask(request.session)
+    current_user = User.objects.filter(name=request.session[SESSION_USER_NAME])[0].id
+    res = _handleTask.add_task(task_id, run_test, suites, log_title,
+                               task_id, current_user)
+    return res
+
+
+def _run_api_test(request, task_id):
+    pass
+
+
+def _run_mobile_test(request, task_id):
     pass

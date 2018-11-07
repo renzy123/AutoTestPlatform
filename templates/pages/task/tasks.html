@@ -4,6 +4,10 @@
 {% block title %}
     任务列表
 {% endblock %}
+{% block cssLink %}
+    <link href="{% static 'css/datatable/dataTables.responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'css/datatable/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+{% endblock %}
 {% block css %}
     <style type="text/css">
         .panel.noborder {
@@ -16,8 +20,15 @@
             border-radius: 0;
         }
 
-        table.borderless td, table.borderless th {
-            border: none !important;
+        {#        table.borderless td, table.borderless th {#}
+        {#            border: none !important;#}
+        {#        }#}
+
+        td {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: left;
         }
     </style>
 {% endblock %}
@@ -41,6 +52,7 @@
         <!-- /.row -->
         <div class="row">
             <div class="col-lg-3">
+
                 <div class="panel panel-default noborder">
                     <div class="panel-heading">
                         <span class="fa fa-list"></span>
@@ -81,9 +93,9 @@
                                 </div>
                             {% endfor %}
                         </div>
+                        <a class="btn btn-success col-lg-12" href="{% url 'task:new' %}">添加任务</a>
                     </div>
                 </div>
-                <!-- /.panel -->
             </div>
             <!-- /.col-lg-8 -->
             <div class="col-lg-9">
@@ -206,7 +218,7 @@
                                                                             <ul class="list-unstyled">
                                                                                 {% for suite in suites_info %}
                                                                                     <li>
-                                                                                        <a href="{% url "testcase:suitList" %}">{{ suite.title }}</a>
+                                                                                        <a href="{% url "testcase:suiteList" suite.id %}">{{ suite.title }}</a>
                                                                                     </li>
                                                                                 {% endfor %}
                                                                             </ul>
@@ -226,44 +238,94 @@
                                 <div class="tab-pane fade" id="history">
                                     <div class="row" style="margin-top: 10px;">
                                         <div class="col-lg-12">
-                                            <div class="panel panel-success noborder">
 
-                                                <table class="table" style="margin: 30px">
 
+                                            <table class="table table-striped table-bordered table-hover"
+                                                   id="tableHistories" style="margin-left: 30px">
+                                                <thead>
+                                                <tr>
+                                                    <th class="col-lg-2">结果</th>
+                                                    <th class="col-lg-4">报告</th>
+                                                    <th class="col-lg-2">日志</th>
+                                                    <th class="col-lg-4">时间</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for run_history in run_histories %}
                                                     <tr>
-                                                        <th>执行时间</th>
-                                                        <th>执行结果</th>
-                                                        <th>测试报告</th>
-                                                        <th>日志</th>
+                                                        <td>
+                                                            {% if run_history.result_status == "成功" %}
+                                                                <span class="label label-success">{{ run_history.result_status }}</span>
+                                                            {% elif run_history.result_status == "部分成功" %}
+                                                                <span class="label label-warning">{{ run_history.result_status }}</span>
+                                                            {% elif run_history.result_status == "全部失败" %}
+                                                                <span class="label label-danger">{{ run_history.result_status }}</span>
+                                                            {% elif run_history.result_status == "无效" %}
+                                                                <span class="label label-default">{{ run_history.result_status }}</span>
+                                                            {% endif %}
+                                                        </td>
+
+                                                        <td title="{{ run_history.report_title }}">
+                                                            <a href="{% url 'task:showReport' run_history.report_title %}">{{ run_history.report_title }}</a>
+                                                        </td>
+                                                        <td title="{{ run_history.log_title }}">
+                                                            <a href="" data-toggle="modal" name="log_href"
+                                                               data-target="#mLog"
+                                                               title="{{ run_history.log_title }}">日志</a>
+                                                        </td>
+                                                        <td title="{{ run_history.run_time|date:"Y-m-d H:i" }}">{{ run_history.run_time|date:"Y-m-d H:i" }}</td>
                                                     </tr>
-                                                    <tr>
-                                                        <td>
-                                                            2018/10/31
-                                                        </td>
-                                                        <td>
-                                                            成功
-                                                        </td>
-                                                        <td>
-                                                            <a href="">测试报告2010/10/31</a>
-                                                        </td>
-                                                        <td>
-                                                            日志
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
+                                                {% endfor %}
+
+
+                                                </tbody>
+
+
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.panel-body -->
                         </div>
+                        <!-- /.panel-body -->
                     </div>
-                    <!-- /.panel -->
                 </div>
-                <!-- /.col-lg-6 -->
+                <!-- /.panel -->
             </div>
+            <!-- /.col-lg-6 -->
         </div>
+
+        <div class="modal fade" id="mLog" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: 800px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            日志详情
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                    <pre class="pre-scrollable" id="logContent">
+
+                    </pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnPS"
+                                data-dismiss="modal">
+                            确认
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
 
     {% endifequal %}
 
@@ -271,16 +333,104 @@
 {% endblock %}
 
 {% block scriptLinks %}
-    <script src="{% static 'js/jsrender.min.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script type="text/javascript">
+
+
+        function setDataTable(id) {
+            $("#" + id).DataTable({
+                responsive: true,
+                language: {
+                    "sProcessing": "处理中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有匹配结果",
+                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中数据为空",
+                    "sLoadingRecords": "载入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 以升序排列此列",
+                        "sSortDescending": ": 以降序排列此列"
+                    }
+                }
+            });
+
+
+        }
+
+        function handleAjax(task_id) {
+            {#处理ajax的请求#}
+
+            $.ajax({
+                    url: '{% url "task:runTask" %}',
+                    method: "post",
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'task_id': task_id,
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data["result_code"] === 1) {
+                            $("#btnRun").html("执行中");
+                        }
+                        else {
+                            swal(data["result_reason"]);
+                            $("#btnRun").removeAttr("disabled");
+                        }
+
+                    }
+                }
+            )
+        }
+
+        function readLog(logTitle) {
+            {#            异步阅读日志#}
+            $.ajax(
+                {
+                    beforeSend: function () {
+                        $("pre").html("正在读取日志，请稍后!");
+                    },
+                    url: "/task/readLog/" + logTitle,
+                    method: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $("pre").html(data.content);
+                    }
+                }
+            )
+        }
+
         $(document).ready(function () {
             {#            为点击按钮添加点击事件#}
             $("#btnRun").click(function () {
-                window.location.href = "{% url 'task:taskDetail' selected_task %}"
-            })
+
+                handleAjax({{ selected_task }});
+                window.location.href = "{% url 'task:taskDetail'%}"
+            });
+
+            setDataTable("tableHistories");
+
+            $("#tableHistories").on("click", "[name='log_href']", function () {
+                let title = $(this).attr("title");
+                readLog(title);
+            });
+
         })
 
 

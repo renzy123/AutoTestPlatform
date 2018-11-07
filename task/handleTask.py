@@ -26,6 +26,8 @@ class HandleTask:
         """从session中获取当前保存的TaskQueue"""
         try:
             self.task_queue = json.decode(self.session[_SESSION_TASK_QUEUE])
+            # for task_dict in _task_queue:
+            #     _async_task = AsyncTaskDetail(task_id=task_dict["task_id"], celery_task_id=task_dict["celery_task_id"])
         except KeyError:
             self.task_queue = []
 

@@ -5,6 +5,7 @@ import platform
 
 from utils.consts import *
 import datetime
+import random
 
 
 def first_letter_of_chinese(string):
@@ -137,5 +138,13 @@ def local_time_now():
     now = datetime.datetime.now(tz=tz_utc_8)
     return now.strftime(time_format)
 
+
+def gen_log_title(task_title):
+    """生成日志的方法"""
+    time_stamp = local_time_now()
+    random_suffix = random.randint(0, 100)
+    return rename_file(task_title + "_" + time_stamp + str(random_suffix) + ".log")
+
+
 if __name__ == '__main__':
-    print(local_time_now())
+    pass
