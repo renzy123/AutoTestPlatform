@@ -19,3 +19,10 @@ OS_WINDOWS = "windows"
 # redis的HOST服务器地址
 REDIS_HOST = "127.0.0.1"
 REDIS_PUB_CHANEL = "test_running_chanel"
+
+# 测试的结果定义
+
+TEST_RESULT_SUCCESS = "成功"
+TEST_RESULT_PARTLY_SUCCESS = "部分成功"
+TEST_RESULT_USELESS = "无效"
+TEST_RESULT_FAIL = "全部失败"

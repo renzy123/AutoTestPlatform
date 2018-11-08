@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>警告</title>
+</head>
+<script src="{% static 'js/sweetalert.min.js' %}"></script>
+<body>
+
+<script type="text/javascript">
+
+    swal({
+        text: "{{ alert }}",
+        icon: "error",
+        buttons: {
+            "run": {
+                text: "确定!",
+                value: "confirm"
+            },
+        },
+    })
+        .then((value) => {
+            switch (value) {
+                case "confirm":
+                    history.back()
+            }
+        });
+
+</script>
+
+</body>
+</html>

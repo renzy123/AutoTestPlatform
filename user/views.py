@@ -11,14 +11,13 @@ from testcase.models import TestCase
 from user.form import LoginForm
 from user.models import User
 from utils.consts import *
+from task.models import TestTask
 
 
 def login(request):
-    print(request.method)
     if request.method == "GET":
         try:
             user = request.session.get("user", None)
-            print(user)
         except AttributeError:
             return render(request, "login.html")
         else:
@@ -60,5 +59,8 @@ def init_home(request):
     product_count = Product.objects.all().count()
     case_count = TestCase.objects.all().count()
     script_count = Script.objects.all().count()
+    task_count = TestTask.objects.count()
+
     return render(request, "home.html",
-                  {"count_product": product_count, "count_case": case_count, "count_script": script_count})
+                  {"count_product": product_count, "count_case": case_count, "count_script": script_count,
+                   "task_count": task_count})

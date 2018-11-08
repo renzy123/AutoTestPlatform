@@ -2,7 +2,11 @@
 {% load staticfiles %}
 {% load customTags %}
 {% block title %}
-    创建任务
+    执行任务
+{% endblock %}
+{% block cssLink %}
+    <link href="{% static 'css/datatable/dataTables.responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'css/datatable/dataTables.bootstrap.min.css' %}" rel="stylesheet">
 {% endblock %}
 {% block css %}
     <style type="text/css">
@@ -24,6 +28,16 @@
         table.borderless td, table.borderless th {
             border: none !important;
         }
+
+        td {
+
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+
     </style>
 {% endblock %}
 {% block mainbody %}
@@ -39,8 +53,8 @@
         <div class="col-lg-8">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <span class="fa fa-play"></span>
-                    {{ task.title }}
+                    <span class="fa  fa-gear"></span>
+                    执行参数
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -75,15 +89,12 @@
                         </div>
 
                         <div class="row col-lg-12">
-                            <button id="btnRunTask" class="btn btn-success "><span class="fa fa-play"
-                                                                                   id="spanRunTask">执行</span>
-                            </button>
-                            <span>执行时间较长，请耐心等候！</span>
+
                         </div>
 
                         {#                        进度展示行#}
 
-                        <div class="row col-lg-12">
+                        <div class="row col-lg-12" style="display: none">
                             <div class="progress progress-striped active" style="margin-top: 5px;">
                                 <div class="progress-bar progress-striped" role="progressbar" aria-valuenow="40"
                                      aria-valuemin="0"
@@ -96,27 +107,224 @@
 
                         <hr/>
                     </div>
-                    <div class="row col-lg-12">
-								<textarea class="form-control textarea" style="width: 100%;height: 500px;"
-                                          id="taskOutput">
-                                    此为详细的测试输出
-                                </textarea>
-                    </div>
                     <!-- /.panel -->
+                </div>
+            </div>
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <span>历史记录</span>
+                </div>
+
+                <div class="panel-body">
+                    <table class="table table-hover table-striped" style="table-layout:fixed" id="tableHistories">
+                        <thead>
+                        <tr>
+                            <th class="col-lg-1">编号</th>
+                            <th class="col-lg-2">名称</th>
+                            <th class="col-lg-1">用户</th>
+                            <th class="col-lg-2">结果</th>
+                            <th class="col-lg-2">报告</th>
+                            <th class="col-lg-2">日志</th>
+                            <th class="col-lg-2">时间</th>
+                        </tr>
+                        </thead>
+
+                        {% for run_history in run_histories %}
+
+                            <tr>
+                                <td title="{{ run_history.id }}">{{ run_history.id }}</td>
+                                <td>
+                                    <a href="{% url "task:tasks" run_history.task %}"
+                                       title="{{ run_history.task_title }}">
+                                        {{ run_history.task_title }}
+                                    </a>
+                                </td>
+                                <td>{{ run_history.run_user }}</td>
+                                <td>
+                                    {% if run_history.result_status == "成功" %}
+                                        <span class="label label-success">{{ run_history.result_status }}</span>
+                                    {% elif run_history.result_status == "部分成功" %}
+                                        <span class="label label-warning">{{ run_history.result_status }}</span>
+                                    {% elif run_history.result_status == "全部失败" %}
+                                        <span class="label label-danger">{{ run_history.result_status }}</span>
+                                    {% elif run_history.result_status == "无效" %}
+                                        <span class="label label-default">{{ run_history.result_status }}</span>
+                                    {% endif %}
+                                </td>
+
+                                <td title="{{ run_history.report_title }}">
+                                    <a href="{% url 'task:showReport' run_history.report_title %}">{{ run_history.report_title }}</a>
+                                </td>
+                                <td title="{{ run_history.log_title }}">
+                                    <a href="" data-toggle="modal" name="log_href"
+                                       data-target="#mLog">{{ run_history.log_title }}</a>
+                                </td>
+                                <td title="{{ run_history.run_time|date:"Y-m-d H:i" }}">{{ run_history.run_time|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td>
+                                    无任何记录
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default noborder">
+                <div class="panel-heading">
+                    <span>任务队列</span>
+                </div>
+                <div class="panel-body">
+
+                    {% if task_queue|length != 0 %}
+                        <table class="table">
+                            <tr>
+                                <th>
+                                    名称
+                                </th>
+                                <th>
+                                    状态
+                                </th>
+                            </tr>
+                            {% for task in task_queue %}
+                                <TR>
+                                    <td>
+                                        {{ task.task_title }}
+                                    </td>
+                                    <td>
+                                        {{ task.state }}
+                                    </td>
+                                </TR>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <span>当前无任何任务！</span>
+                    {% endif %}
+                    <button class="btn btn-success col-lg-12" data-toggle="modal"
+                            data-target="#mTasks">添加任务
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="modal fade" id="mTasks" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        请选择任务
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <table width="100%"
+                           class="table table-striped table-bordered table-hover"
+                           id="tableTasks">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>当前状态</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in tasks %}
+                            <tr>
+                                <td>{{ task.id }}</td>
+                                <td>
+                                    <a href="{% url 'task:tasks'  task.id %}" title="{{ task.title }}">
+                                        {{ task.title }}
+                                    </a>
+
+                                </td>
+                                <td>
+                                    {% if task.status == "正常" %}
+                                        <span class="label label-success">{{ task.status }}</span>
+                                    {% elif task.status == "需要修改" %}
+                                        <span class="label label-warning">{{ task.status }}</span>
+                                    {% else %}
+                                        <span class="label label-default">{{ task.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-success" name="{{ task.id }}"
+                                            id="btnTask{{ task.id }}">添加
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnPS"
+                            data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="mLog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        日志详情
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <pre class="pre-scrollable" id="logContent">
+
+                    </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnPS"
+                            data-dismiss="modal">
+                        确认
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+
+
 {% endblock %}
 
 {% block scriptLinks %}
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script type="text/javascript">
 
-        function handleAjax(verbosity, failfast) {
+        function handleAjax(verbosity, failfast, task_id) {
             {#处理ajax的请求#}
 
             $.ajax({
@@ -126,7 +334,7 @@
                         'verbosity': verbosity,
                         csrfmiddlewaretoken: '{{ csrf_token }}',
                         'failfast': failfast,
-                        'task_id': '{{task.id }}',
+                        'task_id': task_id,
                     },
                 dataType: "json",
                     success: function (data) {
@@ -135,7 +343,9 @@
                             swal("", "已添加到任务队列！", "success")
                         }
                         else {
-                            swal(data["result_reason"])
+                            swal(data["result_reason"]);
+                            $("#btnRunTask").removeAttr("disabled");
+                            $("#tableTasks").find("button").removeAttr("disabled");
                         }
 
                     }
@@ -143,16 +353,86 @@
             )
         }
 
+        function setDataTable(id) {
+            $("#" + id).DataTable({
+                responsive: true,
+                language: {
+                    "sProcessing": "处理中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有匹配结果",
+                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中数据为空",
+                    "sLoadingRecords": "载入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 以升序排列此列",
+                        "sSortDescending": ": 以降序排列此列"
+                    }
+                }
+            });
+
+
+        }
+
+        function readLog(logTitle) {
+            {#            异步阅读日志#}
+            $.ajax(
+                {
+                    beforeSend: function () {
+                        $("pre").html("正在读取日志，请稍后!");
+                    },
+                    url: "/task/readLog/" + logTitle,
+                    method: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $("pre").html(data.content);
+                    }
+                }
+            )
+        }
+
 
         $(document).ready(function () {
+
+            setDataTable("tableTasks");
+            setDataTable("tableHistories");
+            {##}
             {#            为执行按钮添加点击事件#}
-            $("#btnRunTask").click(function () {
+            {#            $("#btnRunTask").click(function () {#}
+            {#                $(this).attr("disabled", "disabled");#}
+            {# 获取各个设置项的值#}
+            {#                let verbosity = $("input[name='verbosity']:checked").val();#}
+            {#                let failfast = $("input[name='radioFailfast']:checked").val();#}
+            {#                handleAjax(verbosity, failfast, {{ task.id }})#}
+            {#            });#}
+
+            $("#tableTasks").find("button").click(function () {
+
                 $(this).attr("disabled", "disabled");
                 {# 获取各个设置项的值#}
                 let verbosity = $("input[name='verbosity']:checked").val();
                 let failfast = $("input[name='radioFailfast']:checked").val();
-                handleAjax(verbosity, failfast)
-            })
+                let task_id = $(this).attr("name");
+                handleAjax(verbosity, failfast, task_id);
+            });
+            {#            为任务历史记录中的日志添加记录#}
+            $("#tableHistories").on("click", "[name='log_href']", function () {
+                let title = $(this).html();
+                console.info(title);
+                readLog(title);
+            });
+
         });
 
 

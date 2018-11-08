@@ -2,7 +2,6 @@ import sys
 import time
 from datetime import datetime
 
-
 from unittest import TextTestRunner
 from .result import _HtmlTestResult
 

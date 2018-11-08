@@ -251,7 +251,8 @@
                                 <a href="#"><i class="fa fa-list-ul  fa-fw"></i>测试套件<span class="fa arrow"></span></a>
                                 <ul class="nav nav-third-level">
                                     <li>
-                                        <a href="{% url "testcase:suitList" %}"><i class="fa fa-edit fa-fw"></i>列表</a>
+                                        <a href="{% url "testcase:suiteList" 0 %}"><i
+                                                class="fa fa-edit fa-fw"></i>列表</a>
                                     </li>
                                     <li>
                                         <a href="{% url "testcase:newSuit" %}"><i class="fa fa-plus fa-fw"></i>新增</a>
@@ -281,6 +282,9 @@
                         <ul class="nav nav-second-level">
                             <li>
                                 <a href="{% url 'task:tasks' 0 %}">任务</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'task:taskDetail' %}">执行</a>
                             </li>
                             <li>
                                 <a>报告</a>

@@ -20,6 +20,7 @@ class Product(models.Model):
     desc = models.TextField()
     status = models.IntegerField(null=False, default=1)
     manager = models.CharField(max_length=50, default="暂无")
+    productType = models.IntegerField(default=2)
 
 
 class Status(models.Model):
@@ -36,3 +37,7 @@ class SuitProductMapping(models.Model):
     """测试套件和产品的关联类"""
     product = models.IntegerField()
     suit = models.IntegerField()
+
+
+class ProductType(models.Model):
+    title = models.CharField(max_length=100)
