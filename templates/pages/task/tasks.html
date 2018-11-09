@@ -386,8 +386,9 @@
                     },
                     dataType: "json",
                     success: function (data) {
+                        console.log(data);
                         if (data["result_code"] === 1) {
-                            $("#btnRun").html("执行中");
+                            window.location.href = "{% url 'task:taskDetail'%}"
                         }
                         else {
                             swal(data["result_reason"]);
@@ -421,7 +422,6 @@
             $("#btnRun").click(function () {
 
                 handleAjax({{ selected_task }});
-                window.location.href = "{% url 'task:taskDetail'%}"
             });
 
             setDataTable("tableHistories");

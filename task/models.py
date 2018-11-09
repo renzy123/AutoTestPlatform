@@ -22,7 +22,6 @@ class TestTask(models.Model):
     last_run_time = models.DateTimeField(null=True)
 
 
-
 class TaskStatus(models.Model):
     """
     任务状态实体类，用于描述任务的状态
@@ -59,3 +58,10 @@ class TaskSuiteMapping(models.Model):
     """
     task = models.IntegerField()
     suite = models.IntegerField()
+
+
+class CachedTask(models.Model):
+    """用来缓存任务执行的数据，不再使用session来进行保存"""
+    task_id = models.IntegerField(primary_key=True)
+    async_result_id = models.CharField(max_length=255)
+    create_time = models.DateTimeField(auto_now=True)

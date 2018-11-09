@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from task.forms import TaskForm
-from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResultType
+from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResultType, CachedTask
 from user.models import User
 from utils.utilsFunc import *
 from utils.decorators import dec_sql_insert, dec_singleton
@@ -11,11 +11,9 @@ from product.models import Product, SuitProductMapping
 from testcase.models import TestSuite
 from task.tasks import run_test
 from AutoTestPlatform.CommonModels import JsonResult, ResultEnum
-import redis
-import json
-from task.handleTask import HandleTask
+from task.handleTask import TaskQueue, ProgressHandler
 
-_handleTask = None
+_taskQueue = TaskQueue()
 
 
 @dec_singleton
@@ -130,10 +128,8 @@ def run_task_page(request):
         status = _task.status
         _task.status = TaskStatus.objects.filter(id=status)[0].title
         tasks.append(gen_data_json(_task))
-    # 获取任务队列
-    task_queue = _progress_of_tasks(request)
     return render(request, "pages/task/taskRunDetail.html",
-                  {"run_histories": run_histories, "task_queue": task_queue, "tasks": tasks})
+                  {"run_histories": run_histories, "tasks": tasks})
 
 
 def run_task(request):
@@ -195,34 +191,38 @@ def init_report_page(request, report):
     return render(request, "reports/" + report)
 
 
-def _progress_of_tasks(request):
+def _progress_of_tasks():
     """获取当前的所有任务的状态"""
-    global _handleTask
-    if not _handleTask:
-        _handleTask = HandleTask(request.session)
-    _handleTask.update_queue()
-    task_queue = _handleTask.task_queue
-    tasks = []
-    for _task in task_queue:
+    _tasks_queen = []
+    for _task in _taskQueue.queue:
         task_id = _task.task_id
-        tasks.append(gen_data_json(_task, {"task_title": TestTask.objects.filter(id=task_id)[0].title}))
-    return tasks
+        task_title = TestTask.objects.filter(id=task_id)[0].title
+        _tasks_queen.append(gen_data_json(_task, {"task_title": task_title}))
+    return _tasks_queen
 
 
 def task_status(request):
-    tasks = _progress_of_tasks(request)
+    tasks = _progress_of_tasks()
     return JsonResponse({"tasks": tasks})
 
 
-def task_progress_and_output(request):
-    """该方法将返回当前的测试进度和测试输出"""
-    # 从Redis的chanel中读取当前的进度
-    redis_client = redis.Redis(REDIS_HOST)
-    sub = redis_client.pubsub()
-    sub.subscribe(REDIS_PUB_CHANEL)
-    progress = sub.parse_response()
-    progress = json.load(progress)
-    return JsonResponse(current_test_detail.to_json())
+def task_progress(request):
+    """该方法将返回当前的测试进度"""
+    if request.method == "GET":
+        task_id = request.GET["task_id"]
+        progress = _progress_of_single_task(task_id)
+        return JsonResponse({"progress": progress})
+
+
+def progress_of_queue(request):
+    """请求当前的所有进度"""
+    progress_of_tasks = []
+    for task in _taskQueue.queue:
+        task_id = task.task_id
+        progress = _progress_of_single_task(task_id)
+        task_title = TestTask.objects.filter(id=task_id)[0].title
+        progress_of_tasks.append(gen_data_json(task, progress, {"task_title": task_title}))
+    return JsonResponse({"progress_of_tasks": progress_of_tasks})
 
 
 def read_log(request, log_title):
@@ -237,18 +237,24 @@ def read_log(request, log_title):
     return JsonResponse({"content": content})
 
 
-def _run_test(request, task_id):
-    def _type_of_task(_id):
-        # 判断任务的类型
-        _suite = TaskSuiteMapping.objects.filter(id=_id)[0].suite
-        # 获取suite所关联的产品
-        _first_product = SuitProductMapping.objects.filter(suit=_suite)[0].product
-        _type_product = Product.objects.filter(id=_first_product)[0].productType
-        # 1:API自动化
-        # 2:WEB自动化
-        # 3:移动自动化
-        return _type_product
+def _type_of_task(_id):
+    """
+    判断任务的类型
+    :param _id: 任务ID
+    :return: 该任务的类型
+    """
+    # 判断任务的类型
+    _suite = TaskSuiteMapping.objects.filter(id=_id)[0].suite
+    # 获取suite所关联的产品
+    _first_product = SuitProductMapping.objects.filter(suit=_suite)[0].product
+    _type_product = Product.objects.filter(id=_first_product)[0].productType
+    # 1:API自动化
+    # 2:WEB自动化
+    # 3:移动自动化
+    return _type_product
 
+
+def _run_test(request, task_id):
     _type = _type_of_task(task_id)
 
     if _type == 2:
@@ -264,12 +270,10 @@ def _run_web_test(request, task_id):
     suites = [mapping.suite for mapping in TaskSuiteMapping.objects.filter(task=task_id)]
     log_title = gen_log_title(TestTask.objects.filter(id=task_id)[0].title)
     # 调用异步任务
-    global _handleTask
-    if not _handleTask:
-        _handleTask = HandleTask(request.session)
+    global _taskQueue
     current_user = User.objects.filter(name=request.session[SESSION_USER_NAME])[0].id
-    res = _handleTask.add_task(task_id, run_test, suites, log_title,
-                               task_id, current_user)
+    res = _taskQueue.add_task(task_id, run_test, suites, log_title,
+                              task_id, current_user)
     return res
 
 
@@ -279,3 +283,12 @@ def _run_api_test(request, task_id):
 
 def _run_mobile_test(request, task_id):
     pass
+
+
+def _progress_of_single_task(task_id):
+    # 判断任务的类型，获取进度
+    _type = _type_of_task(task_id)
+    result_id = CachedTask.objects.filter(task_id=task_id)[0].async_result_id
+    # 获取进度
+    p_handler = ProgressHandler(result_id, _type)
+    return p_handler.progress

@@ -1,88 +1,92 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 定义执行任务的一系列方法
-from task.asyncTask import AsyncTaskDetail
 
-QUEUE_STATE_DONE = "done"
-QUEUE_STATE_RUNNING = "running"
+CELERY_TASK_COMPLETE = ["FAILURE", "SUCCESS"]
 
-_task_detail = AsyncTaskDetail
 from celery.result import AsyncResult
 from utils.decorators import dec_singleton
 
-_SESSION_TASK_QUEUE = "task_queue"
+from task.models import CachedTask
 
-import demjson as json
+
+class _CeleryTask:
+    def __init__(self, task_id, result_id, state):
+        self.task_id = task_id
+        self.result_id = result_id
+        self.state = state
+
+
+def _state_of_result(result_id):
+    """获取指定result的ID"""
+    return AsyncResult(result_id).state
 
 
 @dec_singleton
-class HandleTask:
-    def __init__(self, session):
-        self.session = session
-        self.task_queue = None
-        self._task_queue()
+class TaskQueue:
+    """任务队列类，用于保存当前的任务队列"""
 
-    def _task_queue(self):
-        """从session中获取当前保存的TaskQueue"""
-        try:
-            self.task_queue = json.decode(self.session[_SESSION_TASK_QUEUE])
-            # for task_dict in _task_queue:
-            #     _async_task = AsyncTaskDetail(task_id=task_dict["task_id"], celery_task_id=task_dict["celery_task_id"])
-        except KeyError:
-            self.task_queue = []
+    def __init__(self):
+        self._queue = []
+        # 创建queue时，将会从数据库中读取任务列表，获取result_id，查看该任务是否完成
+        # 如果该任务未完成，该任务将被插入到执行列表中
+        cached_tasks = CachedTask.objects.all()
+        for cached_task in cached_tasks:
+            async_result = cached_task.async_result_id
+            current_state = AsyncResult(async_result).state
+            if current_state not in CELERY_TASK_COMPLETE:
+                self._queue.append(_CeleryTask(cached_task.task_id, async_result, current_state))
 
     def add_task(self, task_id, func, *args, **kwargs):
-        for async_task in self.task_queue:
-            if task_id == async_task.task_id:
-                celery_task_id = async_task.celery_task_id
-                state = AsyncResult(id=celery_task_id).state
-                if state != "SUCCESS":
-                    return "已存在该任务!"
+        """将异步任务添加到任务队列中"""
+        self.update_queue()
+        if task_id in [celery_task.task_id for celery_task in self._queue]:
+            return "当前队列已经存在该任务!"
         else:
-            # 进行异步任务
             async_result = func.delay(*args, **kwargs)
-            a_task = AsyncTaskDetail(task_id, async_result.task_id)
-            self.task_queue.append(a_task)
-            self._save_to_session()
+            # 将该任务保存到队列中
+            self._queue.append(_CeleryTask(task_id, async_result.id, async_result.state))
+            # 将该任务保存到数据库中
+            cached_task = CachedTask()
+            cached_task.task_id = task_id
+            cached_task.async_result_id = async_result.id
+            cached_task.save()
             return "success"
 
-    def remove_task_from_queen(self, _id):
-        """从队列中移除一个任务"""
-        for async_task in self.task_queue:
-            if async_task.id == _id:
-                self.task_queue.pop(async_task)
-        self._save_to_session()
-
-    def _task_of_id(self, _id):
-        """获取相应ID的对象"""
-        for _task in self.task_queue:
-            if _task.id == _id:
-                return _task
-        return None
-
-    def update_task(self, _id):
-        """获取任意ID的Task的当前状态"""
-        _task = self._task_of_id(_id)
-
-        if _task:
-            _task.state = AsyncResult(id=_task.celery_task_id).state
+    @property
+    def queue(self):
+        """获取当前任务队列"""
+        self.update_queue()
+        return self._queue
 
     def update_queue(self):
-        """更新队列中所有的任务"""
-        for _task in self.task_queue:
-            self.update_task(_task.id)
-        self._save_to_session()
+        """更新当前队列的状态"""
+        for celery_task in self._queue:
+            state = _state_of_result(celery_task.result_id)
+            if state in CELERY_TASK_COMPLETE:
+                self._queue.remove(celery_task)
+            else:
+                celery_task.state = state
 
-    def state_of_queue(self):
-        """获取队列的当前状态"""
-        self.update_queue()
-        states_of_tasks = [_task.state for _task in self.task_queue]
-        for task_state in states_of_tasks:
-            if task_state != "success":
-                return QUEUE_STATE_RUNNING
 
-    def _save_to_session(self):
-        task_list = []
-        for _task in self.task_queue:
-            task_list.append(_task.toJSON())
-        self.session[_SESSION_TASK_QUEUE] = json.encode(task_list)
+class ProgressHandler:
+    """处理进度相关的问题"""
+    WEB_PROGRESS_STATUS = "p_web"
+
+    def __init__(self, async_result, _type):
+        self.async_result = async_result
+        self._type = _type
+
+    def progress_of_web(self):
+        result = AsyncResult(self.async_result)
+        info = result.info
+        if type(info) == dict:
+            progress = info.get(ProgressHandler.WEB_PROGRESS_STATUS)
+            return progress
+        else:
+            return {"done": "done"}
+
+    @property
+    def progress(self):
+        if self._type == 2:
+            return self.progress_of_web()
