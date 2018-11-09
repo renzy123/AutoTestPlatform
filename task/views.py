@@ -6,7 +6,7 @@ from task.forms import TaskForm
 from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResultType, CachedTask
 from user.models import User
 from utils.utilsFunc import *
-from utils.decorators import dec_sql_insert, dec_singleton
+from utils.decorators import dec_sql_insert
 from product.models import Product, SuitProductMapping
 from testcase.models import TestSuite
 from task.tasks import run_test
@@ -16,40 +16,40 @@ from task.handleTask import TaskQueue, ProgressHandler
 _taskQueue = TaskQueue()
 
 
-@dec_singleton
-class _TestDetail:
-    """定义一个singleTon，用于保存测试信息"""
+# @dec_singleton
+# class _TestDetail:
+#     """定义一个singleTon，用于保存测试信息"""
+#
+#     def __init__(self, task_id):
+#         self.progress = {"count": 0, "tested": 0}
+#         self.is_finished = True
+#         self.log_title = ""
+#         self.current_task = []
+#         self.task_id = task_id
+#
+#     def clear(self, task_id):
+#         """清除当前测试的所有信息"""
+#         self.progress = {"count": 0, "tested": 0}
+#         self.is_finished = True
+#         self.log_title = ""
+#         self.current_task = []
+#         self.task_id = task_id
+#
+#     def read_logs(self):
+#         """阅读日志信息，并且返回"""
+#         with open(os.path.join(RUN_LOG_PATH, self.log_title), "r") as log:
+#             log_detail = log.read()
+#             return log_detail
+#
+#     def to_json(self):
+#         """获取相应的JSON信息"""
+#         task_info = {"task_id": self.task_id, "task_count": self.progress["count"],
+#                      "task_tested": self.progress["tested"], "is_finished": self.is_finished,
+#                      "log_title": self.log_title, "log_detail": self.read_logs()}
+#         return task_info
 
-    def __init__(self, task_id):
-        self.progress = {"count": 0, "tested": 0}
-        self.is_finished = True
-        self.log_title = ""
-        self.current_task = []
-        self.task_id = task_id
-
-    def clear(self, task_id):
-        """清除当前测试的所有信息"""
-        self.progress = {"count": 0, "tested": 0}
-        self.is_finished = True
-        self.log_title = ""
-        self.current_task = []
-        self.task_id = task_id
-
-    def read_logs(self):
-        """阅读日志信息，并且返回"""
-        with open(os.path.join(RUN_LOG_PATH, self.log_title), "r") as log:
-            log_detail = log.read()
-            return log_detail
-
-    def to_json(self):
-        """获取相应的JSON信息"""
-        task_info = {"task_id": self.task_id, "task_count": self.progress["count"],
-                     "task_tested": self.progress["tested"], "is_finished": self.is_finished,
-                     "log_title": self.log_title, "log_detail": self.read_logs()}
-        return task_info
 
 
-current_test_detail = _TestDetail(0)
 
 
 def init_new_task_page(request):
