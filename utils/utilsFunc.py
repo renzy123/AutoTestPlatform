@@ -8,6 +8,20 @@ import datetime
 import random
 
 
+class BaseResult:
+    """返回结果的默认格式"""
+
+    # code=1:成功
+    # code=2:失败
+
+    def __init__(self):
+        self.code = 1
+        self.reason = None
+
+    def toJSON(self):
+        return {"code": self.code, "reason": self.reason}
+
+
 def first_letter_of_chinese(string):
     def single_get_first(unicode1):
         str1 = unicode1.encode('gbk')

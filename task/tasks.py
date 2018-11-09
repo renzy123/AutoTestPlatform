@@ -13,10 +13,23 @@ from utils.utilsFunc import current_os, local_time_now
 from task.models import Result, TestResultType
 import json
 import redis
+from celery import Task
+import time
+import threading
 
 
-@shared_task
-def run_test(suites: list, log_title, task_id, current_user):
+class _BaseTask(Task):
+    def run(self, *args, **kwargs):
+        pass
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        """打印出错信息"""
+        print("异步任务执行出错，出错信息为" + str(einfo))
+        super(_BaseTask, self).on_failure(exc, task_id, args, kwargs, einfo)
+
+
+@shared_task(base=_BaseTask, bind=True)
+def run_test(self, suites: list, log_title, task_id, current_user):
     """执行一系列的测试用例"""
     progress = {"count": 0, "tested": 0}
     case_list = []
@@ -44,6 +57,18 @@ def run_test(suites: list, log_title, task_id, current_user):
     with open(os.path.join(RUN_LOG_PATH, log_title), "x", encoding="utf-8") as log:
         runner = HTMLTestRunner(output="", report_path=os.path.join(TEST_REPORT_DIR), progress=progress, stream=log,
                                 redis_client=redis_client)
+
+        # 另起线程更新进度
+        async_task_id = self.request.id
+
+        def _function_update_progress():
+            while progress["tested"] < progress["count"]:
+                self.update_state(task_id=async_task_id, state="PROGRESS", meta={"p_web": progress})
+                print("当前的进度为" + str(progress))
+                time.sleep(1)
+
+        threading.Thread(target=_function_update_progress, name="updateThread").start()
+        # 执行任务
         test_result = runner.run(suite)
         test_state = test_result.state_of_test()
         result_state = TestResultType.objects.filter(title=test_state)[0].id

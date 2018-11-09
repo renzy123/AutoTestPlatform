@@ -171,6 +171,8 @@ class _HtmlTestResult(_TextTestResult):
         self.stop_time = time.time()
         if type(self.progress) == dict and "tested" in self.progress.keys():
             self.progress["tested"] += 1
+            time.sleep(1)
+
         if self.redis_client:
             self.redis_client.publish(REDIS_PUB_CHANEL, json.dumps(self.progress))
         if self.callback and callable(self.callback):
