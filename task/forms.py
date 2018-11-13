@@ -9,4 +9,4 @@ class TaskForm(forms.Form):
     # taskTime = forms.DateTimeField(required=False, input_formats=['%Y-%m-%dT%H:%M'])
     taskDesc = forms.CharField(required=False)
     products = forms.IntegerField(required=True)
-    suits = forms.IntegerField(required=True)
+    suites = forms.ChoiceField(required=True)

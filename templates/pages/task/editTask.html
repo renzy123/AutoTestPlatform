@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% load customTags %}
 {% block title %}
-    创建任务
+    编辑任务
 {% endblock %}
 {% block cssLink %}
     <link href="{% static 'css/pretty-checkbox.min.css' %}" rel="stylesheet">
@@ -54,6 +54,8 @@
         </script>
     {% endif %}
 
+
+
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">创建任务</h1>
@@ -62,14 +64,14 @@
     </div>
     <div class="alert alert-info alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        请按照顺序创建任务！
+        编辑任务页面！
     </div>
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <form role="form" action="{% url 'task:newTask' %}" method="post" data-toggle="validator">
+            <div class="panel panel-default noborder ">
+                <div class="panel-body ">
+                    <form role="form" action="{% url 'task:newTask' %}" method="post">
                         {% csrf_token %}
                         <div class="col-lg-4">
                             <div class="row">
@@ -79,7 +81,11 @@
                                     <div class="col-lg-8">
                                         <select class="form-control" id="products" name="products">
                                             {% for product in products %}
-                                                <option value="{{ product|value:"id" }}">{{ product|value:"name" }}</option>
+                                                {% if product.id == current_task.product %}
+                                                    <option value="{{ product|value:"id" }}">{{ product|value:"name" }}</option>
+                                                {% else %}
+                                                    <option value="{{ product|value:"id" }}">{{ product|value:"name" }}</option>
+                                                {% endif %}
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -87,17 +93,14 @@
                                         <label style="color: red;margin-top: 6px">*</label>
                                     </div>
                                 </div>
-                                <label>请选择需要执行的测试套件</label>
-                                <div class="form-group">
-                                    <fieldset id="suitesCheckboxes">
-
-                                    </fieldset>
+                                <label for="suits">请选择需要执行的测试套件</label>
+                                <div class="form-group" id="suitesCheckboxes">
                                 </div>
                                 <label for="taskTitle">任务名</label>
                                 <div class="row form-group">
                                     <div class="col-lg-8">
                                         <input type="text" name="taskTitle" id="taskTitle" class="form-control"
-                                               placeholder="请输入任务名称!" required maxlength="20">
+                                               placeholder="请输入任务名称!" value="{{ current_task.title }}">
                                     </div>
                                     <div class="col-lg-4">
                                         <label style="color: red;margin-top: 6px">*</label>
@@ -106,9 +109,9 @@
                                 <label for="taskDesc">任务说明</label>
                                 <div class="row form-group">
                                     <div class="col-lg-12">
-                                        <input type="text" name="taskDesc" id="taskDesc" class="form-control"
+                                        <input type="text" name="taskTitle" id="taskTitle" class="form-control"
                                                style="height: 80px"
-                                               placeholder="请输入任务名称!">
+                                               placeholder="请输入任务说明!" value="{{ current_task.desc }}">
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-default">提交</button>
@@ -126,18 +129,22 @@
 {% block scriptLinks %}
     <script src="{% static 'js/jsrender.min.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
-    <script src="{% static 'js/validator.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script id="suitOption" type="text/x-jsrender">
-<div class="row" style="margin-left:30px;margin-top:10px">
-    <div class="pretty p-default">
-          <input type="checkbox" name="suites" value="<%:id%>" required/>
-              <div class="state p-primary">
-                     <label><%:title%></label>
-                        </div>
-                        </div>
-                        </div>
+<div class="form-check abc-checkbox abc-checkbox-primary">
+<input class="form-check-input" id="suits" name="suits" type="checkbox" value="<%:id%>">
+<label class="form-check-label" for="suits">
+<%:title%>
+ </label>
+</div>
+
+
+
+
+
+
+
 
 
 
@@ -169,21 +176,9 @@
                 requestSuites($(this).val());
             });
 
-            {#       为checkbox 添加事件#}
+            {#            为执行按钮添加点击事件#}
+        })
 
-            let checkboxFiledSet = $("#suitesCheckboxes");
-            checkboxFiledSet.on("change", ":checkbox", function () {
-                    var requiredCheckboxes = $(':checkbox');
-                    if ($(this).is(':checked')) {
-                        requiredCheckboxes.removeAttr('required');
-                    }
-                    else {
-                        console.log("执行到这里");
-                        requiredCheckboxes.attr('required', 'required');
-                    }
-                    $("form").validator();
-                }
-            );
-        });
     </script>
 {% endblock %}
+

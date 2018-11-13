@@ -153,9 +153,11 @@ def run_task(request):
 @dec_sql_insert
 def new_task(request):
     if request.method == "POST":
+        print(request.POST)
         task_form = TaskForm(request.POST)
         if task_form.is_valid():
             cleaned_data = task_form.cleaned_data
+            print(cleaned_data)
             task_title = cleaned_data["taskTitle"]
             # task_time = cleaned_data["taskTime"]
             task_desc = cleaned_data["taskDesc"]
@@ -283,6 +285,22 @@ def _run_api_test(request, task_id):
 
 def _run_mobile_test(request, task_id):
     pass
+
+
+def edit_task(request, task_id):
+    """获取任务的相关信息"""
+    products = Product.objects.all()
+    # 获取产品信息
+    product_info = []
+    for product in products:
+        _p = {"name": product.name, "id": product.id}
+        product_info.append(_p)
+
+    current_task = TestTask.objects.filter(id=task_id)[0]
+    related_suite = TaskSuiteMapping.objects.filter(task=current_task.id)
+    suites = [suite.suite for suite in related_suite]
+    return render(request, "pages/task/editTask.html",
+                  {"products": product_info, "current_task": current_task, "suites": suites})
 
 
 def _progress_of_single_task(task_id):

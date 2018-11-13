@@ -32,6 +32,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Shanghai'
+CELERY_SEND_TASK_SENT_EVENT = True
+task_reject_on_worker_lost = True
 
 ALLOWED_HOSTS = [
     "100.64.15.40",
