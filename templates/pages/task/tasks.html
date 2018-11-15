@@ -109,7 +109,8 @@
                         <!-- 执行区块 -->
                         <div class="row col-lg-12">
                             <button class="btn btn-success" id="btnRun"><span class="fa fa-play"> 执行</span></button>
-
+                            <a href="{% url 'task:editTask' selected_task %}" class="btn btn-warning"
+                               style="margin-left: 30px"><span class="fa fa-edit">编辑</span></a>
                             <hr/>
                         </div>
 
@@ -224,7 +225,6 @@
                                                                             </ul>
                                                                         </td>
                                                                     </tr>
-
                                                                 </table>
                                                             </div>
                                                         </div>

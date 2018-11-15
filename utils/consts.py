@@ -16,6 +16,9 @@ RUN_LOG_PATH = os.path.join(BASE_STORAGE_DIR, "logs")
 OS_MACOS = "macOS"
 OS_WINDOWS = "windows"
 
+# Excel文件的保存位置
+EXCELS_DIR = os.path.join(BASE_STORAGE_DIR, "excels")
+
 # redis的HOST服务器地址
 REDIS_HOST = "127.0.0.1"
 REDIS_PUB_CHANEL = "test_running_chanel"

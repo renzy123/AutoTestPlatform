@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% load customTags %}
 {% block title %}
-    创建任务
+    编辑任务
 {% endblock %}
 {% block cssLink %}
     <link href="{% static 'css/pretty-checkbox.min.css' %}" rel="stylesheet">
@@ -54,32 +54,39 @@
         </script>
     {% endif %}
 
+
+
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">创建任务</h1>
+            <h1 class="page-header">编辑任务</h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
     <div class="alert alert-info alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        请按照顺序创建任务！
+        编辑任务页面！
     </div>
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <form role="form" action="{% url 'task:newTask' %}" method="post" data-toggle="validator"
-                          id="formNewTask">
+            <div class="panel panel-default noborder ">
+                <div class="panel-body ">
+                    <form role="form" action="{% url 'task:editTask' current_task.id %}" method="post">
                         {% csrf_token %}
                         <div class="col-lg-4">
                             <div class="row">
+                                <input type="text" name="task_id" value="{{ current_task.id }}" style="display: none"
+                                       id="taskId">
                                 <label for="products">请选择产品</label>
                                 <div class="row form-group">
                                     <div class="col-lg-8">
                                         <select class="form-control" id="products" name="products">
                                             {% for product in products %}
-                                                <option value="{{ product|value:"id" }}">{{ product|value:"name" }}</option>
+                                                {% if product.id == current_task.product %}
+                                                    <option value="{{ product|value:"id" }}">{{ product|value:"name" }}</option>
+                                                {% else %}
+                                                    <option value="{{ product|value:"id" }}">{{ product|value:"name" }}</option>
+                                                {% endif %}
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -87,18 +94,14 @@
                                         <label style="color: red;margin-top: 6px">*</label>
                                     </div>
                                 </div>
-                                <label>请选择需要执行的测试套件</label>
-                                <div class="form-group">
-                                    <fieldset id="suitesCheckboxes">
-
-                                    </fieldset>
+                                <label for="suits">请选择需要执行的测试套件</label>
+                                <div class="form-group" id="suitesCheckboxes">
                                 </div>
                                 <label for="taskTitle">任务名</label>
                                 <div class="row form-group">
                                     <div class="col-lg-8">
                                         <input type="text" name="taskTitle" id="taskTitle" class="form-control"
-                                               placeholder="请输入任务名称!" required maxlength="20">
-                                        <div class="help-block with-errors"></div>
+                                               placeholder="请输入任务名称!" value="{{ current_task.title }}">
                                     </div>
                                     <div class="col-lg-4">
                                         <label style="color: red;margin-top: 6px">*</label>
@@ -109,10 +112,14 @@
                                     <div class="col-lg-12">
                                         <input type="text" name="taskDesc" id="taskDesc" class="form-control"
                                                style="height: 80px"
-                                               placeholder="请输入任务名称!">
+                                               placeholder="请输入任务说明!" value="{{ current_task.desc }}">
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-default">提交</button>
+                                <a class="btn btn-danger" style="margin-left: 200px" id="btnDelete"
+                                   href="{% url 'task:deleteTask' current_task.id %}">
+                                    删除
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -127,39 +134,21 @@
 {% block scriptLinks %}
     <script src="{% static 'js/jsrender.min.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
-    <script src="{% static 'js/validator.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script id="suitOption" type="text/x-jsrender">
 <div class="row" style="margin-left:30px;margin-top:10px">
     <div class="pretty p-default">
+    <%if checked%>
+          <input type="checkbox" name="suites"  id ="suites" value="<%:id%>" checked required/>
+          <%else%>
           <input type="checkbox" name="suites"  id ="suites" value="<%:id%>" required/>
+          <%/if%>
               <div class="state p-primary">
                      <label><%:title%></label>
                         </div>
                         </div>
                         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     </script>
     <script type="text/javascript">
@@ -174,8 +163,22 @@
                 success: function (data) {
                     console.log(data);
                     let suitOptionTemplate = $.templates("#suitOption");
-                    let suitOption = suitOptionTemplate(data["suite_info"]);
+                    {#处理suite列表的数据#}
+                    let suite_info = data["suite_info"];
+                    var current_suite = {{ suites }};
+                    for (index in suite_info) {
+                        let _suite = suite_info[index];
+                        let res = $.inArray(_suite.id, current_suite);
+                        if (res === -1) {
+                        }
+                        else {
+                            _suite["checked"] = "checked";
+                        }
+                    }
+                    let suitOption = suitOptionTemplate(suite_info);
                     $("#suitesCheckboxes").html(suitOption);
+
+
                 }
             })
         }
@@ -183,10 +186,16 @@
         function verityTaskName() {
             let task_name = $("#taskTitle").val();
             let product_id = $("#products").val();
+            let task_id = $("#taskId").val();
             $.ajax({
                     url: "{% url 'task:verifyTaskName' %}",
                     method: "post",
-                    data: {'product_id': product_id, csrfmiddlewaretoken: '{{ csrf_token }}', "task_name": task_name},
+                    data: {
+                        'product_id': product_id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        "task_name": task_name,
+                        "task_id": task_id
+                    },
                     dataType: "json",
                     success: function (data) {
                         console.log(data);
@@ -225,9 +234,10 @@
                     else {
                         requiredCheckboxes.attr('required', 'required');
                     }
-                $("form").validator("update").validator("validate");
+                    $("form").validator("update").validator("validate");
                 }
             );
         });
     </script>
 {% endblock %}
+
