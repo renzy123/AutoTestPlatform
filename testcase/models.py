@@ -24,6 +24,7 @@ class TestCase(models.Model):
     precondition = models.TextField(max_length=255, null=True)
     steps = models.TextField(null=False)
     expect = models.TextField(null=False)
+    priority = models.IntegerField(default=1)
     create_user = models.IntegerField(null=False)
     create_time = models.DateTimeField(auto_now_add=True)
     last_edit_user = models.IntegerField()
@@ -37,14 +38,12 @@ class CaseModule(models.Model):
     模块的数据模型
     字段说明：
     name:模块名称
-    create_time: 创建时间
-    create_user: 创建者
-    desc: 描述
+    parent_module:父模块
+    child_module:子模块
     """
     name = models.CharField(max_length=255, unique=True)
-    create_time = models.DateTimeField(auto_now=True)
-    create_user = models.IntegerField()
-    desc = models.TextField()
+    parent_module = models.IntegerField(null=True)
+    child_module = models.IntegerField(null=True)
 
 
 class TestSuite(models.Model):

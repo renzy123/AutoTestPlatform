@@ -6,6 +6,7 @@ import platform
 from utils.consts import *
 import datetime
 import random
+from openpyxl import load_workbook
 
 
 class BaseResult:
@@ -160,5 +161,64 @@ def gen_log_title(task_title):
     return rename_file(task_title + "_" + time_stamp + str(random_suffix) + ".log")
 
 
+def read_excel():
+    wb = load_workbook(r'C:\Users\renzy\Desktop\二人麻将\JJcd_九天项目群_二人麻将10期_功能需求case_导入用.xlsx')
+    print(wb.sheetnames)
+    sheet = wb.get_sheet_by_name("详细测试用例")
+    print([cell.value for cell in sheet["C"]])
+
+
+class ExcelHandler:
+    def __init__(self, file_name):
+        """
+        :param path:Excel的路径
+        """
+        self.workbook = load_workbook(filename=file_name)
+        self.default_sheet_to_read = 2
+
+    def modules_of_case(self):
+        """生成相应的获取所有的Module和二级module"""
+
+        class ModuleIndex:
+            def __init__(self):
+                self.start_index = 0
+                self.end_index = 0
+                self.name = ""
+
+        # 从第二列获取所有的一级module
+        # 从第三列获取所有的二级module
+        # 默认获取的为读取第一个sheet
+        sheet_list = self.workbook.sheetnames
+        case_sheet = self.workbook[sheet_list[self.default_sheet_to_read - 1]]
+        primary_modules = [_cell.value for _cell in case_sheet["B"]]
+        primary_modules.pop(0)
+        # 获取Primary_module所对应的相应的index列表
+        current_index = 0
+        primary_modules_indexes = []
+        for _value in primary_modules:
+            if _value:
+                _module = ModuleIndex()
+                _module.name = _value
+                _module.start_index = current_index
+                primary_modules_indexes.append(_module)
+            primary_modules_indexes[-1].end_index = current_index
+            current_index += 1
+        # 获取secondary_module的index范围
+        secondary_module = [_cell.value for _cell in case_sheet["C"]]
+        secondary_module.pop(0)
+        secondary_modules_indexes = []
+        current_index = 0
+        for _value in primary_modules:
+            if _value:
+                _module = ModuleIndex()
+                _module.name = _value
+                _module.start_index = current_index
+                secondary_modules_indexes.append(_module)
+            secondary_modules_indexes[-1].end_index = current_index
+            current_index += 1
+        return {"primary_module": primary_modules_indexes, "secondary_module": secondary_modules_indexes}
+
+
 if __name__ == '__main__':
-    pass
+    excel_handler = ExcelHandler(r'C:\Users\renzy\Desktop\二人麻将\JJcd_九天项目群_二人麻将10期_功能需求case_导入用.xlsx')
+    print(excel_handler.modules_of_case())
