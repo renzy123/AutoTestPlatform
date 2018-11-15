@@ -258,7 +258,10 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8;
+)
+  ENGINE = InnoDB
+  AUTO_INCREMENT = 54
+  DEFAULT CHARSET = utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -267,7 +270,58 @@ CREATE TABLE `django_migrations` (
 
 LOCK TABLES `django_migrations` WRITE;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
-INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2018-09-14 02:35:21.417064'),(2,'auth','0001_initial','2018-09-14 02:35:21.426089'),(3,'admin','0001_initial','2018-09-14 02:35:21.430585'),(4,'admin','0002_logentry_remove_auto_add','2018-09-14 02:35:21.436573'),(5,'admin','0003_logentry_add_action_flag_choices','2018-09-14 02:35:21.441586'),(6,'contenttypes','0002_remove_content_type_name','2018-09-14 02:35:21.446634'),(7,'auth','0002_alter_permission_name_max_length','2018-09-14 02:35:21.453767'),(8,'auth','0003_alter_user_email_max_length','2018-09-14 02:35:21.458196'),(9,'auth','0004_alter_user_username_opts','2018-09-14 02:35:21.462772'),(10,'auth','0005_alter_user_last_login_null','2018-09-14 02:35:21.468794'),(11,'auth','0006_require_contenttypes_0002','2018-09-14 02:35:21.473802'),(12,'auth','0007_alter_validators_add_error_messages','2018-09-14 02:35:21.478817'),(13,'auth','0008_alter_user_username_max_length','2018-09-14 02:35:21.483829'),(14,'auth','0009_alter_user_last_name_max_length','2018-09-14 02:35:21.490368'),(15,'product','0001_initial','2018-09-14 02:35:21.494378'),(16,'product','0002_auto_20180911_1615','2018-09-14 02:35:21.499402'),(17,'product','0003_product_status','2018-09-14 02:35:21.506441'),(18,'product','0004_auto_20180912_1421','2018-09-14 02:35:21.510452'),(19,'product','0005_auto_20180914_1021','2018-09-14 02:35:21.514484'),(20,'sessions','0001_initial','2018-09-14 02:35:21.522484'),(21,'user','0001_initial','2018-09-14 02:35:21.527497'),(22,'user','0002_auto_20180910_1654','2018-09-14 02:35:21.531507'),(23,'testcase','0001_initial','2018-09-14 02:36:13.405621'),(24,'testcase','0002_auto_20180914_1042','2018-09-14 02:42:48.218609'),(25,'testcase','0003_auto_20180919_1557','2018-09-19 07:57:23.862907'),(26,'testcase','0004_auto_20180919_1726','2018-09-19 09:26:51.339110'),(27,'script','0001_initial','2018-09-20 09:14:49.354937'),(28,'script','0002_auto_20180921_0858','2018-09-21 00:58:35.689544'),(29,'testcase','0003_auto_20180919_2226','2018-09-21 00:58:35.700503'),(30,'testcase','0005_merge_20180920_2243','2018-09-21 00:58:35.705346'),(31,'script','0002_auto_20180923_1818','2018-09-29 11:41:35.738963'),(32,'script','0003_suitcasemapping_testsuite','2018-09-29 11:41:35.799638'),(33,'script','0004_auto_20180929_1753','2018-09-29 11:41:35.828715'),(34,'script','0005_merge_20180929_1941','2018-09-29 11:41:35.833970'),(35,'testcase','0006_suitcasemapping_testsuite','2018-09-29 11:41:35.897152'),(36,'testcase','0007_auto_20180929_1954','2018-09-29 11:54:38.082641'),(37,'product','0006_suitproductmapping','2018-10-08 08:03:36.693247'),(38,'task','0001_initial','2018-10-08 08:03:36.754508'),(39,'testcase','0008_auto_20181008_1603','2018-10-08 08:03:37.111077'),(40,'task','0002_remove_testtask_test_times','2018-10-29 03:58:02.731495'),(41,'task','0003_auto_20181101_0957','2018-11-01 01:58:02.587666'),(42,'user','0003_user_real_name','2018-11-01 02:25:44.513232'),(43,'task','0004_auto_20181101_1427','2018-11-01 06:27:28.133764'),(44,'task','0005_auto_20181105_1651','2018-11-05 08:52:40.413150'),(45,'task','0006_testtask_last_run_user','2018-11-06 02:31:21.643439'),(46,'task','0007_auto_20181106_1121','2018-11-06 03:22:07.987699'),(47,'task','0008_auto_20181106_1743','2018-11-06 09:44:08.415282'),(48,'product','0007_auto_20181107_1430','2018-11-07 06:30:42.207704'),(49,'task','0009_cachedtask','2018-11-08 06:54:13.759181'),(50,'testcase','0009_auto_20181108_1454','2018-11-08 06:54:13.905402'),(51,'task','0010_auto_20181108_1544','2018-11-08 07:45:08.094552'),(52,'task','0011_auto_20181108_1649','2018-11-08 08:49:40.721737');
+INSERT INTO `django_migrations` VALUES (1, 'contenttypes', '0001_initial', '2018-09-14 02:35:21.417064'),
+  (2, 'auth', '0001_initial', '2018-09-14 02:35:21.426089'), (3, 'admin', '0001_initial', '2018-09-14 02:35:21.430585'),
+  (4, 'admin', '0002_logentry_remove_auto_add', '2018-09-14 02:35:21.436573'),
+  (5, 'admin', '0003_logentry_add_action_flag_choices', '2018-09-14 02:35:21.441586'),
+  (6, 'contenttypes', '0002_remove_content_type_name', '2018-09-14 02:35:21.446634'),
+  (7, 'auth', '0002_alter_permission_name_max_length', '2018-09-14 02:35:21.453767'),
+  (8, 'auth', '0003_alter_user_email_max_length', '2018-09-14 02:35:21.458196'),
+  (9, 'auth', '0004_alter_user_username_opts', '2018-09-14 02:35:21.462772'),
+  (10, 'auth', '0005_alter_user_last_login_null', '2018-09-14 02:35:21.468794'),
+  (11, 'auth', '0006_require_contenttypes_0002', '2018-09-14 02:35:21.473802'),
+  (12, 'auth', '0007_alter_validators_add_error_messages', '2018-09-14 02:35:21.478817'),
+  (13, 'auth', '0008_alter_user_username_max_length', '2018-09-14 02:35:21.483829'),
+  (14, 'auth', '0009_alter_user_last_name_max_length', '2018-09-14 02:35:21.490368'),
+  (15, 'product', '0001_initial', '2018-09-14 02:35:21.494378'),
+  (16, 'product', '0002_auto_20180911_1615', '2018-09-14 02:35:21.499402'),
+  (17, 'product', '0003_product_status', '2018-09-14 02:35:21.506441'),
+  (18, 'product', '0004_auto_20180912_1421', '2018-09-14 02:35:21.510452'),
+  (19, 'product', '0005_auto_20180914_1021', '2018-09-14 02:35:21.514484'),
+  (20, 'sessions', '0001_initial', '2018-09-14 02:35:21.522484'),
+  (21, 'user', '0001_initial', '2018-09-14 02:35:21.527497'),
+  (22, 'user', '0002_auto_20180910_1654', '2018-09-14 02:35:21.531507'),
+  (23, 'testcase', '0001_initial', '2018-09-14 02:36:13.405621'),
+  (24, 'testcase', '0002_auto_20180914_1042', '2018-09-14 02:42:48.218609'),
+  (25, 'testcase', '0003_auto_20180919_1557', '2018-09-19 07:57:23.862907'),
+  (26, 'testcase', '0004_auto_20180919_1726', '2018-09-19 09:26:51.339110'),
+  (27, 'script', '0001_initial', '2018-09-20 09:14:49.354937'),
+  (28, 'script', '0002_auto_20180921_0858', '2018-09-21 00:58:35.689544'),
+  (29, 'testcase', '0003_auto_20180919_2226', '2018-09-21 00:58:35.700503'),
+  (30, 'testcase', '0005_merge_20180920_2243', '2018-09-21 00:58:35.705346'),
+  (31, 'script', '0002_auto_20180923_1818', '2018-09-29 11:41:35.738963'),
+  (32, 'script', '0003_suitcasemapping_testsuite', '2018-09-29 11:41:35.799638'),
+  (33, 'script', '0004_auto_20180929_1753', '2018-09-29 11:41:35.828715'),
+  (34, 'script', '0005_merge_20180929_1941', '2018-09-29 11:41:35.833970'),
+  (35, 'testcase', '0006_suitcasemapping_testsuite', '2018-09-29 11:41:35.897152'),
+  (36, 'testcase', '0007_auto_20180929_1954', '2018-09-29 11:54:38.082641'),
+  (37, 'product', '0006_suitproductmapping', '2018-10-08 08:03:36.693247'),
+  (38, 'task', '0001_initial', '2018-10-08 08:03:36.754508'),
+  (39, 'testcase', '0008_auto_20181008_1603', '2018-10-08 08:03:37.111077'),
+  (40, 'task', '0002_remove_testtask_test_times', '2018-10-29 03:58:02.731495'),
+  (41, 'task', '0003_auto_20181101_0957', '2018-11-01 01:58:02.587666'),
+  (42, 'user', '0003_user_real_name', '2018-11-01 02:25:44.513232'),
+  (43, 'task', '0004_auto_20181101_1427', '2018-11-01 06:27:28.133764'),
+  (44, 'task', '0005_auto_20181105_1651', '2018-11-05 08:52:40.413150'),
+  (45, 'task', '0006_testtask_last_run_user', '2018-11-06 02:31:21.643439'),
+  (46, 'task', '0007_auto_20181106_1121', '2018-11-06 03:22:07.987699'),
+  (47, 'task', '0008_auto_20181106_1743', '2018-11-06 09:44:08.415282'),
+  (48, 'product', '0007_auto_20181107_1430', '2018-11-07 06:30:42.207704'),
+  (49, 'task', '0009_cachedtask', '2018-11-08 06:54:13.759181'),
+  (50, 'testcase', '0009_auto_20181108_1454', '2018-11-08 06:54:13.905402'),
+  (51, 'task', '0010_auto_20181108_1544', '2018-11-08 07:45:08.094552'),
+  (52, 'task', '0011_auto_20181108_1649', '2018-11-08 08:49:40.721737'),
+  (53, 'testcase', '0010_auto_20181115_1644', '2018-11-15 08:44:12.718299');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -293,7 +347,21 @@ CREATE TABLE `django_session` (
 
 LOCK TABLES `django_session` WRITE;
 /*!40000 ALTER TABLE `django_session` DISABLE KEYS */;
-INSERT INTO `django_session` VALUES ('36zo1koziry7abqkrwvv84u2crk4k072','ZGNiODA0MDZmODE1N2I2NmMwODdjZmY0NzBjZTQ2OTM2MzY4NmUwZDp7InVzZXIiOiJhZG1pbiIsImN1cnJlbnRfY2FzZV9pZCI6MX0=','2018-10-02 10:03:32.153489'),('dsqn0ioomz1s282oagoq4gv7rgafg45o','M2UzODQ5NDA0ZDMwZGY4ZTMwMDJhMGJmMjUzOTJjYWRmZWZiMWNiZTp7InVzZXIiOiJhZG1pbiJ9','2018-11-22 11:58:56.662167'),('s1yneeozx15k0sm8mnuo44cjtl1b8ce9','ZjI1MTk1NWFlMjY1MmJiMTY3N2FhNGQ4MTlkM2M0ODVlMGQyMmE4MTp7InVzZXIiOiJhZG1pbiIsImNhc2VfaWQiOjJ9','2018-11-23 09:22:08.947270'),('xo3k9hwajotn29bzzyqw3jkwulmrbesw','YTA1NGNlYzgzYmVjYjdmZmQyOTg5YmRjNTM0MDg5Y2Q5Yzc3M2VjMTp7InVzZXIiOiJhZG1pbiIsIl9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIwM2QxOGRmYmM4YjhmMWNmOWVjOGJlOTNlZTk3YzM4ODk0MmU0N2QxIn0=','2018-09-25 06:17:29.157499');
+INSERT INTO `django_session` VALUES ('36zo1koziry7abqkrwvv84u2crk4k072',
+                                     'ZGNiODA0MDZmODE1N2I2NmMwODdjZmY0NzBjZTQ2OTM2MzY4NmUwZDp7InVzZXIiOiJhZG1pbiIsImN1cnJlbnRfY2FzZV9pZCI6MX0=',
+                                     '2018-10-02 10:03:32.153489'), ('3ymzwuxs7ojdn72i5qim6lesa7mwpwsh',
+                                                                     'MjRmNDIwODYzNDA4OWFhYmM3MWQ5OTRhMWNmMjg1ZTU1NWI4OTQwNTp7InVzZXIiOiJhZG1pbiIsImNhc2VfaWQiOjR9',
+                                                                     '2018-11-29 08:04:33.040428'),
+  ('dsqn0ioomz1s282oagoq4gv7rgafg45o', 'M2UzODQ5NDA0ZDMwZGY4ZTMwMDJhMGJmMjUzOTJjYWRmZWZiMWNiZTp7InVzZXIiOiJhZG1pbiJ9',
+   '2018-11-22 11:58:56.662167'), ('myp1axwbo5kclxfjv9h840b9c5h9p61g',
+                                   'ZjI1MTk1NWFlMjY1MmJiMTY3N2FhNGQ4MTlkM2M0ODVlMGQyMmE4MTp7InVzZXIiOiJhZG1pbiIsImNhc2VfaWQiOjJ9',
+                                   '2018-11-26 07:02:11.341818'), ('s1yneeozx15k0sm8mnuo44cjtl1b8ce9',
+                                                                   'ZjI1MTk1NWFlMjY1MmJiMTY3N2FhNGQ4MTlkM2M0ODVlMGQyMmE4MTp7InVzZXIiOiJhZG1pbiIsImNhc2VfaWQiOjJ9',
+                                                                   '2018-11-23 09:22:08.947270'),
+  ('wgixk0hhp4yvmkigocq2y9cpzub8bpda', 'M2UzODQ5NDA0ZDMwZGY4ZTMwMDJhMGJmMjUzOTJjYWRmZWZiMWNiZTp7InVzZXIiOiJhZG1pbiJ9',
+   '2018-11-27 01:57:52.631513'), ('xo3k9hwajotn29bzzyqw3jkwulmrbesw',
+                                   'YTA1NGNlYzgzYmVjYjdmZmQyOTg5YmRjNTM0MDg5Y2Q5Yzc3M2VjMTp7InVzZXIiOiJhZG1pbiIsIl9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIwM2QxOGRmYmM4YjhmMWNmOWVjOGJlOTNlZTk3YzM4ODk0MmU0N2QxIn0=',
+                                   '2018-09-25 06:17:29.157499');
 /*!40000 ALTER TABLE `django_session` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -391,7 +459,10 @@ CREATE TABLE `product_suitproductmapping` (
   `product` int(11) NOT NULL,
   `suit` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+)
+  ENGINE = InnoDB
+  AUTO_INCREMENT = 5
+  DEFAULT CHARSET = utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -400,7 +471,7 @@ CREATE TABLE `product_suitproductmapping` (
 
 LOCK TABLES `product_suitproductmapping` WRITE;
 /*!40000 ALTER TABLE `product_suitproductmapping` DISABLE KEYS */;
-INSERT INTO `product_suitproductmapping` VALUES (1,1,5),(2,2,5);
+INSERT INTO `product_suitproductmapping` VALUES (1, 1, 5), (2, 2, 5), (3, 1, 4), (4, 2, 4);
 /*!40000 ALTER TABLE `product_suitproductmapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -556,7 +627,10 @@ CREATE TABLE `task_tasksuitemapping` (
   `task` int(11) NOT NULL,
   `suite` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+)
+  ENGINE = InnoDB
+  AUTO_INCREMENT = 10
+  DEFAULT CHARSET = utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -565,7 +639,8 @@ CREATE TABLE `task_tasksuitemapping` (
 
 LOCK TABLES `task_tasksuitemapping` WRITE;
 /*!40000 ALTER TABLE `task_tasksuitemapping` DISABLE KEYS */;
-INSERT INTO `task_tasksuitemapping` VALUES (1,2,5),(2,3,5),(3,4,5);
+INSERT INTO `task_tasksuitemapping`
+VALUES (1, 2, 5), (2, 3, 5), (3, 4, 5), (4, 5, 5), (5, 6, 5), (6, 7, 5), (7, 8, 4), (8, 9, 5), (9, 9, 4);
 /*!40000 ALTER TABLE `task_tasksuitemapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -612,7 +687,10 @@ CREATE TABLE `task_testtask` (
   `last_run_time` datetime(6) DEFAULT NULL,
   `runtime` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+)
+  ENGINE = InnoDB
+  AUTO_INCREMENT = 10
+  DEFAULT CHARSET = utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -633,11 +711,10 @@ DROP TABLE IF EXISTS `testcase_casemodule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `testcase_casemodule` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `create_time` datetime(6) NOT NULL,
-  `create_user` int(11) NOT NULL,
-  `desc` longtext NOT NULL,
+  `id`            int(11) NOT NULL AUTO_INCREMENT,
+  `name`          varchar(255) NOT NULL,
+  `child_module`  INT(11)          DEFAULT NULL,
+  `parent_module` INT(11)          DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
@@ -649,7 +726,8 @@ CREATE TABLE `testcase_casemodule` (
 
 LOCK TABLES `testcase_casemodule` WRITE;
 /*!40000 ALTER TABLE `testcase_casemodule` DISABLE KEYS */;
-INSERT INTO `testcase_casemodule` VALUES (1,'默认','2018-09-14 02:39:30.087737',2,'该模组为测试用例的默认模组，一般不建议选择该模组'),(2,'登录','2018-09-14 02:39:52.473049',3,'WEB的登录模块'),(3,'项目管理','2018-09-14 02:40:24.378361',3,'该模块为项目管理模块'),(4,'用户管理','2018-09-14 02:40:50.464069',2,'用户管理模块');
+INSERT INTO `testcase_casemodule`
+VALUES (1, '默认', NULL, NULL), (2, '登录', NULL, NULL), (3, '项目管理', NULL, NULL), (4, '用户管理', NULL, NULL);
 /*!40000 ALTER TABLE `testcase_casemodule` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -811,4 +889,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-09 17:30:38
+-- Dump completed on 2018-11-15 18:21:33
