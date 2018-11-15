@@ -2,16 +2,16 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
-from task.forms import TaskForm
 from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResultType, CachedTask
 from user.models import User
 from utils.utilsFunc import *
-from utils.decorators import dec_sql_insert
+from utils.decorators import dec_sql_insert, dec_request_dict
 from product.models import Product, SuitProductMapping
 from testcase.models import TestSuite
 from task.tasks import run_test
-from AutoTestPlatform.CommonModels import JsonResult, ResultEnum
+from AutoTestPlatform.CommonModels import JsonResult, ResultEnum, RenderResPageData
 from task.handleTask import TaskQueue, ProgressHandler
+from django.utils.datastructures import MultiValueDictKeyError
 
 _taskQueue = TaskQueue()
 
@@ -74,7 +74,7 @@ def init_task_page(request, task_id=0):
         tasks_of_products = [task for task in TestTask.objects.filter(product=product)]
         product_tasks[Product.objects.filter(id=product)[0].name] = tasks_of_products
     chosen_task_id = TestTask.objects.filter()[0].id
-    if task_id != 0:
+    if task_id != 0 and TestTask.objects.filter(id=task_id).count() == 1:
         chosen_task_id = task_id
     task_detail, suite_info = _info_of_task(chosen_task_id)
     # 获取任务的历史信息
@@ -94,6 +94,7 @@ def _info_of_task(task_id):
     """获取需要任务展示的所有信息"""
     chosen_task_id = task_id
     chosen_task = TestTask.objects.filter(id=chosen_task_id)[0]
+
     # 返回当前选中的任务的相关信息
     task_detail = chosen_task.__dict__
     task_detail["create_user"] = User.objects.filter(id=chosen_task.create_user)[0].real_name
@@ -153,35 +154,30 @@ def run_task(request):
 @dec_sql_insert
 def new_task(request):
     if request.method == "POST":
-        print(request.POST)
-        task_form = TaskForm(request.POST)
-        if task_form.is_valid():
-            cleaned_data = task_form.cleaned_data
-            print(cleaned_data)
-            task_title = cleaned_data["taskTitle"]
-            # task_time = cleaned_data["taskTime"]
-            task_desc = cleaned_data["taskDesc"]
-            task_product = cleaned_data["products"]
-            task_suite = cleaned_data["suits"]
-            user_name = request.session[SESSION_USER_NAME]
-            user_id = User.objects.filter(name=user_name)[0].id
-            task = TestTask()
-            task.title = task_title
-            task.create_user = user_id
-            task.product = task_product
-            # task.run_time = task_time
-            task.desc = task_desc
-            # 获取status
-            status_id = TaskStatus.objects.filter(title="正常")[0].id
-            task.status = status_id
-            task.save()
-            # 写TaskSuite的映射表
+        cleaned_data = request.POST
+        task_title = cleaned_data["taskTitle"]
+        task_desc = cleaned_data["taskDesc"]
+        task_product = cleaned_data["products"]
+        task_suites = cleaned_data.getlist("suites")
+        user_name = request.session[SESSION_USER_NAME]
+        user_id = User.objects.filter(name=user_name)[0].id
+        task = TestTask()
+        task.title = task_title
+        task.create_user = user_id
+        task.product = task_product
+        # task.run_time = task_time
+        task.desc = task_desc
+        # 获取status
+        status_id = TaskStatus.objects.filter(title="正常")[0].id
+        task.status = status_id
+        task.save()
+        # 写TaskSuite的映射表
+        for suite in task_suites:
             task_suite_mapping = TaskSuiteMapping()
-            task_suite_mapping.suite = task_suite
+            task_suite_mapping.suite = suite
             task_suite_mapping.task = task.id
             task_suite_mapping.save()
-            return redirect("/task/new/", {"task_id": task.id})
-        return HttpResponse(task_form.as_ul())
+        return redirect("/task/new/", {"task_id": task.id})
 
 
 def init_report_page(request, report):
@@ -288,19 +284,51 @@ def _run_mobile_test(request, task_id):
 
 
 def edit_task(request, task_id):
-    """获取任务的相关信息"""
-    products = Product.objects.all()
-    # 获取产品信息
-    product_info = []
-    for product in products:
-        _p = {"name": product.name, "id": product.id}
-        product_info.append(_p)
+    if request.method == "GET":
+        """获取任务的相关信息"""
+        products = Product.objects.all()
+        # 获取产品信息
+        product_info = []
+        for product in products:
+            _p = {"name": product.name, "id": product.id}
+            product_info.append(_p)
 
-    current_task = TestTask.objects.filter(id=task_id)[0]
-    related_suite = TaskSuiteMapping.objects.filter(task=current_task.id)
-    suites = [suite.suite for suite in related_suite]
-    return render(request, "pages/task/editTask.html",
-                  {"products": product_info, "current_task": current_task, "suites": suites})
+        current_task = TestTask.objects.filter(id=task_id)[0]
+        related_suite = TaskSuiteMapping.objects.filter(task=current_task.id)
+        suites = [suite.suite for suite in related_suite]
+        return render(request, "pages/task/editTask.html",
+                      {"products": product_info, "current_task": current_task, "suites": suites})
+    else:
+        cleaned_data = request.POST
+        task_id = request.POST["task_id"]
+        task_title = cleaned_data["taskTitle"]
+        task_desc = cleaned_data["taskDesc"]
+        task_product = cleaned_data["products"]
+        task_suites = cleaned_data.getlist("suites")
+        task = TestTask.objects.filter(id=task_id)[0]
+        task.title = task_title
+        task.product = task_product
+        task.desc = task_desc
+        # 获取status
+        status_id = TaskStatus.objects.filter(title="正常")[0].id
+        task.status = status_id
+        task.save()
+        # 修改TaskSuite的映射表
+        suite_list = [_map.suite for _map in TaskSuiteMapping.objects.filter(task=task_id)]
+        # 判断是否需要进行修改
+        suite_list.sort()
+        task_suites.sort()
+        if suite_list != task_suites:
+            """删除之前所有的关联隐射"""
+            for _map in TaskSuiteMapping.objects.filter(task=task_id):
+                _map.delete()
+            """重新插入"""
+            for suite in task_suites:
+                task_suite_mapping = TaskSuiteMapping()
+                task_suite_mapping.suite = suite
+                task_suite_mapping.task = task.id
+                task_suite_mapping.save()
+        return redirect(init_task_page)
 
 
 def _progress_of_single_task(task_id):
@@ -310,3 +338,32 @@ def _progress_of_single_task(task_id):
     # 获取进度
     p_handler = ProgressHandler(result_id, _type)
     return p_handler.progress
+
+
+def delete_task(request, task_id):
+    """删除TestTask及相关的隐射"""
+    # 删除任务
+    task = TestTask.objects.filter(id=task_id)[0]
+    task.delete()
+    # 删除CachedTask中的任务
+    cachedTask = CachedTask.objects.filter(task_id=task_id)
+    if cachedTask.count() == 1:
+        cachedTask[0].delete()
+    # 跳转到任务列表页面
+    return redirect("/task/tasks/0")
+
+
+@dec_request_dict
+def is_task_existed(request):
+    # 判断任务名称是否存在
+    task_name = request.POST["task_name"]
+    product_id = request.POST["product_id"]
+    tasks = [task.title for task in TestTask.objects.filter(product=product_id)]
+    try:
+        task_id = request.POST["task_id"]
+        current_task_name = TestTask.objects.filter(id=task_id)[0].title
+    except MultiValueDictKeyError:
+        current_task_name = None
+    if task_name in tasks and task_name != current_task_name:
+        return JsonResponse({"res": True})
+    return JsonResponse({"res": False})

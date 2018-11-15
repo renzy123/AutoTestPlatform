@@ -37,6 +37,16 @@ class JsonResult(SqlResultData):
         }
 
 
+class RenderResPageData:
+    def __init__(self):
+        self.button_text = "确定"
+        self.button_url = "back"
+        self.button_value = "confirm"
+
+    def to_json(self):
+        return self.__dict__
+
+
 if __name__ == '__main__':
     result = SqlResultData(ResultEnum.Success)
     print(result_to_json(result))
