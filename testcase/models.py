@@ -40,10 +40,12 @@ class CaseModule(models.Model):
     name:模块名称
     parent_module:父模块
     child_module:子模块
+    product:从属的产品
     """
     name = models.CharField(max_length=255, unique=True)
     parent_module = models.IntegerField(null=True)
     child_module = models.IntegerField(null=True)
+    product = models.IntegerField(null=True)
 
 
 class TestSuite(models.Model):
@@ -75,3 +77,11 @@ class SuitCaseMapping(models.Model):
     """
     suit = models.IntegerField()
     case = models.IntegerField()
+
+
+class SuiteScriptMapping(models.Model):
+    """
+    测试套件、测试脚本隐射类，不再将测试套件隐射到测试用例
+    """
+    suite = models.IntegerField()
+    script = models.IntegerField(primary_key=True)

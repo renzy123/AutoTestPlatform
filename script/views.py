@@ -2,64 +2,43 @@ import time
 
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.utils.datastructures import MultiValueDictKeyError
 
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
 from script.dataModels import ScriptData
 from script.form import ScriptUploadForm
 from script.models import Script
 from script.models import ScriptType
-from testcase.models import CaseModule
 from testcase.models import TestCase
 from user.models import User
 from utils.utilsFunc import *
+from product.models import Product
+from testcase.models import SuiteScriptMapping
 
 
 # Create your views here.
 
 
-def init_upload_page(request):
+def init_upload_page(request, suite_id=None):
     """初始化测试用例列表页面的显示方式"""
     if request.method == "GET":
         """
         当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/list.html
         首先请求用例模组，然后根据用例模组初始化用例列表
         """
-        module_queryset = CaseModule.objects.all()
-        module_dict = dict(
-            [(m.id, m) for m in module_queryset]
-        )
+        # 获取product列表
         # 获取脚本的分类列表
         script_types = [s_type for s_type in ScriptType.objects.all()]
-        # 在/storage/scripts/目录下创建各个脚本分类的文件夹
-        _create_script_folder()
-        # 请求用例列表
-        case_queryset = TestCase.objects.all()
-        # 根据用例列表来进行分组，生成DICT
-        module_case_dict = {}
-        for _id in module_dict.keys():
-            case_list = [case for case in case_queryset if case.case_module == _id]
-            module_case_dict[module_dict.get(_id).name] = case_list
-        # 传输数据说明：
-        # module_case_list：NAME:LIST
-        # user_dict：用户ID:NAME 字典
-        # selected_case：需要选中的case
-        selected_case = "no_case"
-        try:
-            current_case = request.session[SESSION_CASE_ID]
-            selected_case = TestCase.objects.filter(id=current_case)[0].title
-        except MultiValueDictKeyError:
-            pass
-        # 将当前操作的测试用例ID写入到session
+        products = Product.objects.all()
         return render(request, "pages/script/upload.html",
-                      {"module_case_dict": module_case_dict, "types": script_types, "selected_case": selected_case})
+                      {"types": script_types, "products": products})
     if request.method == "POST":
         """请求方式为POST，即为提交脚本数据"""
         upload_form = ScriptUploadForm(request.POST, request.FILES)
         if upload_form.is_valid():
             cleaned_data = upload_form.cleaned_data
             script_file = cleaned_data["scriptFile"]
-            script_case = cleaned_data["case"]
+            title = cleaned_data["title"]
+            suite = cleaned_data["suite"]
             script_type = cleaned_data["scriptType"]
             desc = cleaned_data["desc"]
             # 将脚本保存到制定的目录下
@@ -69,17 +48,23 @@ def init_upload_page(request):
                 return JsonResponse(result_to_json(result))
             # 生成Script对象并且将其保存到数据库
             script = Script()
-            script.title = title_and_path[0]
+            script.title = title
             script.path = title_and_path[1]
             user = request.session[SESSION_USER_NAME]
             user_id = User.objects.filter(name=user)[0].id
             script.create_user = user_id
             script.last_edit_user = user_id
             script.desc = desc
-            script.related_case = TestCase.objects.filter(title=script_case)[0].id
             script.script_type = script_type
             try:
                 script.save()
+                # 如果suite!=-1，那写映射关系表
+                if suite != -1:
+                    script_id = script.id
+                    _map = SuiteScriptMapping()
+                    _map.suite = suite
+                    _map.script = script_id
+                    _map.save()
             except ValueError:
                 result = SqlResultData(ResultEnum.Error, "插入数据库失败！")
                 return JsonResponse(result_to_json(result))
