@@ -52,7 +52,7 @@ def init_case_list(request):
     """初始化测试用例列表页面的显示方式"""
     if request.method == "GET":
         """
-        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/list.html
+        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/scripts.html
         首先请求用例模组，然后根据用例模组初始化用例列表
         """
         module_queryset = CaseModule.objects.all()

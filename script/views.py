@@ -4,15 +4,15 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
+from product.models import Product
 from script.dataModels import ScriptData
 from script.form import ScriptUploadForm
 from script.models import Script
 from script.models import ScriptType
+from testcase.models import SuiteScriptMapping
 from testcase.models import TestCase
 from user.models import User
 from utils.utilsFunc import *
-from product.models import Product
-from testcase.models import SuiteScriptMapping
 
 
 # Create your views here.
@@ -22,7 +22,7 @@ def init_upload_page(request, suite_id=None):
     """初始化测试用例列表页面的显示方式"""
     if request.method == "GET":
         """
-        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/list.html
+        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/scripts.html
         首先请求用例模组，然后根据用例模组初始化用例列表
         """
         # 获取product列表
@@ -84,11 +84,11 @@ def script_of_case(request):
     return JsonResponse(data)
 
 
-def init_scripts_list(request):
+def init_scripts(request):
     """构建脚本列表页面"""
     if request.method == "GET":
         # 初始化页面
-        pass
+        return render(request, "pages/script/scripts.html")
     if request.method == "POST":
         # 处理AJAX请求
         scripts = Script.objects.all()

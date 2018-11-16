@@ -5,9 +5,9 @@
 CELERY_TASK_COMPLETE = ["FAILURE", "SUCCESS"]
 
 from celery.result import AsyncResult
-from utils.decorators import dec_singleton
 
 from task.models import CachedTask
+from utils.decorators import dec_singleton
 
 
 class _CeleryTask:
@@ -19,7 +19,8 @@ class _CeleryTask:
 
 def _state_of_result(result_id):
     """获取指定result的ID"""
-    return AsyncResult(result_id).state
+    state = AsyncResult(result_id).state
+    return state
 
 
 @dec_singleton

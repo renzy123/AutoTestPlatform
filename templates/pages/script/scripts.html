@@ -1,0 +1,83 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    脚本列表
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .textarea {
+            resize: none;
+            overflow-y: hidden;
+        }
+
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+    </style>
+{% endblock %}
+{% block mainbody %}
+    <div id="page-wrapper">
+        <div class="row">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <div>
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="#">全部</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    其他分类
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">API自动化</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            {#用表格来展示脚本列表#}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>脚本标题</th>
+                    <th>脚本类型</th>
+                </tr>
+                </thead>
+
+
+            </table>
+
+
+        </div>
+
+
+        ﻿
+
+    </div>
+{% endblock %}
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+                $.views.settings.delimiters("<%", "%>");
+            }
+        )
+    </script>
+{% endblock %}
+
