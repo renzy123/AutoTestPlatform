@@ -9,10 +9,11 @@ from script.dataModels import ScriptData
 from script.form import ScriptUploadForm
 from script.models import Script
 from script.models import ScriptType
-from testcase.models import SuiteScriptMapping
+from testcase.models import SuiteScriptMapping, TestSuite
 from testcase.models import TestCase
 from user.models import User
 from utils.utilsFunc import *
+from utils.utilsFunc import gen_data_json
 
 
 # Create your views here.
@@ -84,11 +85,35 @@ def script_of_case(request):
     return JsonResponse(data)
 
 
-def init_scripts(request):
+def init_scripts(request, _type=None):
     """构建脚本列表页面"""
     if request.method == "GET":
         # 初始化页面
-        return render(request, "pages/script/scripts.html")
+        # 获取所有的脚本信息
+        scripts = Script.objects.all()
+        script_info = []
+        selected_type = _type
+        if selected_type:
+            scripts = scripts.filter(script_type=selected_type)
+            selected_type = ScriptType.objects.filter(id=selected_type)[0].name
+        for script in scripts:
+            """获取脚本的所有信息"""
+            script_type = ScriptType.objects.filter(id=script.script_type)[0].name
+            create_user = User.objects.filter(id=script.create_user)[0].real_name
+            editor = User.objects.filter(id=script.last_edit_user)[0].real_name
+            suites = SuiteScriptMapping.objects.filter(script=script.id)
+            # 获取套件相关的信息
+            suites_info = {}
+            for suite in suites:
+                suites_info[suite] = TestSuite.objects.filter(id=suite)[0].title
+            info = gen_data_json(script,
+                                 {"script_type": script_type, "create_user": create_user, "editor": editor,
+                                  "suites_info": suites_info})
+            script_info.append(info)
+        # 获取分类信息
+        script_types = ScriptType.objects.all()
+        return render(request, "pages/script/scripts.html",
+                      {"script_info": script_info, "script_types": script_types, "selected_type": selected_type})
     if request.method == "POST":
         # 处理AJAX请求
         scripts = Script.objects.all()

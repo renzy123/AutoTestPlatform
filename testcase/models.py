@@ -84,4 +84,4 @@ class SuiteScriptMapping(models.Model):
     测试套件、测试脚本隐射类，不再将测试套件隐射到测试用例
     """
     suite = models.IntegerField()
-    script = models.IntegerField(primary_key=True)
+    script = models.IntegerField()
