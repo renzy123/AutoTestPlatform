@@ -1,0 +1,79 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    脚本列表
+{% endblock %}
+{% block cssLink %}
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+        .textarea {
+            resize: none;
+            overflow-y: hidden;
+        }
+
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+
+        td, th {
+
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+    </style>
+{% endblock %}
+{% block mainbody %}
+
+    <h1 class="page-header">脚本一览</h1>
+    <div class="panel panel-default">
+        <div class="panel panel-body">
+            <div class="col-lg-4">
+                <form role="form" method="post">
+                    <select class="form form-control" id="scriptSelect">
+                        <option>类型1</option>
+                    </select>
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+    </div>
+
+
+{% endblock %}
+{% block scriptLinks %}
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+                $.views.settings.delimiters("<%", "%>");
+            }
+        )
+    </script>
+{% endblock %}
+

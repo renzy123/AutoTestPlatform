@@ -150,6 +150,17 @@ def _create_script_folder():
             os.mkdir(a_dir)
 
 
+def script_type_management(request):
+    """管理脚本类型"""
+    if request.method == "GET":
+        # 初始化脚本类型管理页面
+        script_types = ScriptType.objects.all()
+        return render(request, "pages/script/types.html", {"types": script_types})
+    else:
+        # 处理修改脚本类型的需求
+        pass
+
+
 def _create_script_file(file, s_type):
     """在指定的目录下创建文件
         为了解决重名问题，所有的文件在传输到服务器后，名称将统一变为name+当前毫秒数+后缀名的方式
