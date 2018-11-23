@@ -150,12 +150,21 @@ def _create_script_folder():
             os.mkdir(a_dir)
 
 
-def script_type_management(request):
+def script_type_management(request, type_id=None):
     """管理脚本类型"""
     if request.method == "GET":
         # 初始化脚本类型管理页面
         script_types = ScriptType.objects.all()
-        return render(request, "pages/script/types.html", {"types": script_types})
+        selected_type = script_types[0].id
+        if type_id:
+            selected_type = type_id
+        # 获取第一个类型的所有关联的脚本列表
+        scripts_of_type = Script.objects.filter(script_type=selected_type)
+        # 获取脚本类型的相应信息
+        selected_type_detail = ScriptType.objects.filter(id=selected_type)[0]
+        return render(request, "pages/script/types.html",
+                      {"types": script_types, "selected_type": selected_type_detail,
+                       "scripts_of_type": scripts_of_type})
     else:
         # 处理修改脚本类型的需求
         pass

@@ -7,4 +7,6 @@ urlpatterns = [
     path('scripts/', views.init_scripts, name="scripts"),
     path('scripts/<int:_type>', views.init_scripts, name="scriptsOfType"),
     path('scriptOfCase/', views.script_of_case, name="scriptOfCase"),
+    path('types/', views.script_type_management, name="types"),
+    path('types/<int:type_id>', views.script_type_management, name="types"),
 ]
