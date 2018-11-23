@@ -71,16 +71,17 @@
                     <div class="panel-body">
                         <form role="form" method="post" action="{% url 'script:types' %}">
                             {% csrf_token %}
-                            <input type="text" value="{{ selected_type.id }}" style="display: none">
+                            <input type="text" value="{{ selected_type.id }}" style="display: none" name="id"
+                                   id="typeId">
                             <div class="form-group">
                                 <label for="name">名称：</label>
                                 <input type="text" value="{{ selected_type.name }}" name="name" class="form-control"
-                                       id="name" readonly>
+                                       id="name" readonly maxlength="20">
                             </div>
                             <div class="form-group">
                                 <label for="name">说明：</label>
                                 <textarea name="desc" class="form-control" id="desc"
-                                          readonly>{{ selected_type.desc }}!</textarea>
+                                          readonly maxlength="50">{{ selected_type.desc }}!</textarea>
                             </div>
                         </form>
                         <div class="form-group">
@@ -100,24 +101,28 @@
                         关联脚本
                     </div>
                     <div class="panel-body">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                            <tr>
-                                <th>名称</th>
-                                <th>描述</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for script in scripts_of_type %}
+                        {% ifequal scripts_of_type|length 0 %}
+                            无相应类型的脚本！
+                        {% else %}
+                            <table class="table table-striped table-hover">
+                                <thead>
                                 <tr>
-                                    <td><a href="">{{ script.title }}</a></td>
-                                    <td>{{ script.title }}</td>
+                                    <th>名称</th>
+                                    <th>描述</th>
                                 </tr>
-                            {% empty %}
-                                空
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                {% for script in scripts_of_type %}
+                                    <tr>
+                                        <td><a href="">{{ script.title }}</a></td>
+                                        <td>{{ script.title }}</td>
+                                    </tr>
+                                {% empty %}
+                                    空
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endifequal %}
                     </div>
                 </div>
             </div>
@@ -125,25 +130,26 @@
     </div>
 {% endblock %}
 {% block scriptLinks %}
-    <script src="{% static 'js/jsrender.min.js' %}"></script>
-
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/validator.js' %}"></script>
 {% endblock %}
 {% block script %}
     <script type="text/javascript">
 
 
         $(document).ready(function () {
-                $.views.settings.delimiters("<%", "%>");
             {#为编辑按钮添加点击事件#}
+            $("form").validator();
             $("#btnEdit").click(function () {
                 if ($(this).is(".btn-warning")) {
                     {#修改样式到OK#}
-                    $("#name").removeAttr("readonly");
-                    $("#desc").removeAttr("readonly");
+                    $("#name").removeAttr("readonly").val();
+                    $("#desc").removeAttr("readonly").val();
                     $(this).removeClass("btn-warning").addClass("btn-success").html("OK");
+
                 }
                 else if ($(this).is(".btn-success")) {
-                    {# 提交表单并且修改样式 #}
+                    {#如果数据发生变动则提交表单并且修改样式 #}
                     $("form").submit();
                     $("#name").attr("readonly", "readonly");
                     $("#desc").attr("readonly", "readonly");
@@ -153,6 +159,45 @@
                 }
 
             });
+            {#    为删除操作添加点击事件#}
+            $("#btnDelete").click(function () {
+                {#    弹出二次确认框#}
+                swal({
+                    text: "确认删除该脚本类型?",
+                    icon: "warning",
+                    buttons: {
+                        cancel: "取消",
+                        "run": {
+                            text: "确定",
+                            value: "confirm"
+                        },
+                    },
+                })
+                    .then((value) => {
+                        switch (value) {
+                            case "confirm":
+                                let id = $("#typeId").val();
+                                $.ajax({
+                                    method: "post",
+                                    url: "{% url 'script:deleteType' %}",
+                                    data: {
+                                        "id": id,
+                                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                                    },
+                                    dataType: "json",
+                                    success: function (data) {
+                                        console.log(data);
+                                        if (data["res"] === "success") {
+                                            swal("删除完成！");
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
+                        }
+                    });
+
+
+            })
 
 
             }

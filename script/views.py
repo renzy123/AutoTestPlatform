@@ -155,6 +155,9 @@ def script_type_management(request, type_id=None):
     if request.method == "GET":
         # 初始化脚本类型管理页面
         script_types = ScriptType.objects.all()
+        # 当无脚本类型时，将直接返回错误页面
+        if script_types.count() == 0:
+            return render(request, "alertPage.html", {"alert": "当前无可用的脚本类型数据!"})
         selected_type = script_types[0].id
         if type_id:
             selected_type = type_id
@@ -167,7 +170,25 @@ def script_type_management(request, type_id=None):
                        "scripts_of_type": scripts_of_type})
     else:
         # 处理修改脚本类型的需求
-        pass
+        data = request.POST
+        _name = data["name"]
+        _desc = data["desc"]
+        _id = data["id"]
+        # 修改脚本类型
+        _type = ScriptType.objects.filter(id=_id)[0]
+        _type.name = _name
+        _type.desc = _desc
+        _type.save()
+        return redirect("/script/types/" + _id)
+
+
+def delete_script_type(request):
+    # 处理删除脚本类型的请求
+    if request.method == "POST":
+        _id = request.POST["id"]
+        _type = ScriptType.objects.filter(id=_id)[0]
+        _type.delete()
+        return JsonResponse({"result": "success"})
 
 
 def _create_script_file(file, s_type):
