@@ -280,12 +280,13 @@
 
 
 
+
     </script>
 
     <script type="text/javascript">
         function display_script_info() {
             $.ajax({
-                url: "{% url 'script:list' %}",
+                url: "{% url 'script:scripts' %}",
                 type: "post",
                 data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
                 dataType: "json",
@@ -312,8 +313,7 @@
             {#    start to render template#}
             let rowScript = $.templates("#rowScript");
             let row = rowScript(scripts);
-            $("#tScripts tbody").empty();
-            $("#tScripts tbody").html(row)
+            $("#tScripts tbody").empty().html(row);
         }
 
 
