@@ -37,6 +37,14 @@
             text-align: left;
         }
 
+        li {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+
     </style>
 {% endblock %}
 {% block mainbody %}
@@ -98,14 +106,16 @@
                             <td>{{ info.desc }}</td>
                             <td>
                                 <ul class="list-unstyled">
-                                    <li>创建者：{{ info.create_user }}</li>
-                                    <li>时间：{{ info.create_time | date:"Y-m-d H:i" }}</li>
+                                    <li title="{{ info.create_user }}">创建者：{{ info.create_user }}</li>
+                                    <li title="{{ info.create_time | date:"Y-m-d H:i" }}">
+                                        时间：{{ info.create_time | date:"Y-m-d H:i" }}</li>
                                 </ul>
                             </td>
                             <td>
                                 <ul class="list-unstyled">
-                                    <li>创建者：{{ info.editor }}</li>
-                                    <li>时间：{{ info.last_edit_time | date:"Y-m-d H:i" }}</li>
+                                    <li title="{{ info.editor }}">创建者：{{ info.editor }}</li>
+                                    <li title="{{ info.last_edit_time | date:"Y-m-d H:i" }}">
+                                        时间：{{ info.last_edit_time | date:"Y-m-d H:i" }}</li>
                                 </ul>
                             </td>
                             <td>{{ info.suites_info }}</td>
