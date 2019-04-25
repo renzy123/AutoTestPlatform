@@ -1,0 +1,493 @@
+{% extends "navs.html" %}
+{% load staticfiles %}
+{% load customTags %}
+{% block title %}
+    Web接口测试
+{% endblock %}
+{% block cssLink %}
+    <link href="{% static 'css/datatable/dataTables.responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'css/datatable/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
+
+{% endblock %}
+{% block css %}
+    <style type="text/css">
+
+
+        .panel.noborder {
+            border: none;
+            box-shadow: none;
+        }
+
+        .panel.noborder > .panel-heading {
+            border: 1px solid #dddddd;
+            border-radius: 0;
+        }
+
+        table.borderless td, table.borderless th {
+            border: none !important;
+        }
+
+        td {
+
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+
+    </style>
+{% endblock %}
+{% block mainbody %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">接口测试</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa  fa-gear"> Web Server</span>
+
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <!-- 执行区块 -->
+                    <div class="row col-lg-12">
+                        <div class="row col-lg-12">
+                            <div class="form-group col-lg-12">
+                                <label>协议：</label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="protocol" id="protocol"
+                                           value="Http">Http
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="protocol" id="protocol"
+                                           value="Https">Https
+                                </label>
+
+                            </div>
+                            <div>
+                                <div class="col-lg-8 form-group">
+                                    <label>Host：</label>
+                                    <input class="form-control" name="host" id="host"
+                                           placeholder="此处为全域设置，请输入请求的HOST地址！"/>
+                                </div>
+                                <div class="col-lg-4 form-group">
+                                    <label class="control-label">Port：</label>
+                                    <input class="form-control" name="port" id="port" placeholder="请输入服务器的端口号！">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row col-lg-12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <span><i class="fa fa-history"></i> Http(s)请求</span>
+                </div>
+
+                <div class="panel-body">
+                    <div class="form-group col-lg-12">
+                        <div class="row">
+                            <label>请求方式：</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="method" id="method"
+                                       value="get">get
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="method" id="method" checked
+                                       value="post">post
+                            </label>
+
+                        </div>
+                        <div class="row">
+                            <label style="text-align: center">请求地址：</label>
+                            <input class="form-control" name="url" id="url" placeholder="请输入URL!" required/>
+                        </div>
+                        <div class="row" style="margin-top: 5px">
+                            <label>编码格式：</label>
+                            <input class="form-control" name="encoding" id="encoding" placeholder="UTF-8">
+                        </div>
+                        <div class="row" style="margin-top: 5px">
+                            <ul class="nav nav-tabs" id="tabs">
+                                <li class="active">
+                                    <a href="#params" data-toggle="tab">Parameters</a>
+                                </li>
+                                <li>
+                                    <a href="#bodydata" data-toggle="tab">BodyData</a>
+                                </li>
+                                <li>
+                                    <a href="#headParams" data-toggle="tab">Head Params</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="params">
+
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th class="col-lg-6">参数名</th>
+                                            <th class="col-lg-6">值</th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        <tr>
+                                            <td contenteditable="true">
+                                                请输入参数名！
+                                            </td>
+                                            <td contenteditable="true">
+                                                请输入参数值！
+                                            </td>
+                                        </tr>
+
+
+                                        </tbody>
+
+
+                                    </table>
+
+
+                                </div>
+                                <div class="tab-pane fade" id="bodydata"></div>
+
+
+                            </div>
+
+                            <div class="tab-pane fade" id="headParams"></div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel panel-default noborder " id="panelTasks">
+            <div class="panel-heading">
+                <span class="fa fa-tasks"> 任务队列</span>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped  table-hover" id="tableProgress">
+                    <thead>
+                    <tr>
+                        <th>
+                            名称
+                        </th>
+                        <th>
+                            状态
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button class="btn btn-success col-lg-12" data-toggle="modal"
+                        data-target="#mTasks">添加任务
+                </button>
+            </div>
+        </div>
+        <div class="panel panel-info noborder" id="panelProgress">
+            <div class="panel-heading">
+                <span class="fa fa-flash"> 任务进度</span>
+            </div>
+            <div class="panel-body">
+                当前无任务
+            </div>
+
+
+        </div>
+
+    </div>
+    </div>
+{% endblock %}
+
+{% block scriptLinks %}
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/datatable/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/datatable/dataTables.responsive.js' %}"></script>
+    <script src="{% static 'js/bootstrap-progressbar.min.js' %}"></script>
+    <script src="{% static 'js/jsrender.min.js' %}"></script>
+{% endblock %}
+{% block script %}
+    <script id="rowProgress" type="text/x-jsrender">
+ <div>
+                        <label><%:task_title%></label>
+                        <div class="progress progress-striped">
+                            <div class="progress-bar <%:css%>" role="progressbar"
+                                 data-transitiongoal="<%:tested%>" aria-valuemax="<%:count%>"></div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+    <script id="rowTask" type="text/x-jsrender">
+                                <tr>
+                                    <td>
+                                        <%:task_title%>
+                                    </td>
+                                    <td>
+                                        <%:state%>
+                                    </td>
+                                </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+    <script type="text/javascript">
+        function handleAjax(verbosity, failfast, task_id) {
+            {#处理ajax的请求#}
+
+            $.ajax({
+                    url: '{% url "task:runTask" %}',
+                    method: "post",
+                    data: {
+                        'verbosity': verbosity,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'failfast': failfast,
+                        'task_id': task_id,
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data["result_code"] === 1) {
+                            $("#spanRunTask").html("执行中");
+                            swal("", "已添加到任务队列！", "success")
+                        }
+                        else {
+                            swal(data["result_reason"]);
+                            $("#btnRunTask").removeAttr("disabled");
+                            $("#tableTasks").find("button").removeAttr("disabled");
+
+                        }
+
+                    }
+                }
+            )
+        }
+
+        function setDataTable(id) {
+            $("#" + id).DataTable({
+                responsive: true,
+                language: {
+                    "sProcessing": "处理中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有匹配结果",
+                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中数据为空",
+                    "sLoadingRecords": "载入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 以升序排列此列",
+                        "sSortDescending": ": 以降序排列此列"
+                    }
+                }
+            });
+
+
+        }
+
+        function readLog(logTitle) {
+            {#            异步阅读日志#}
+            $.ajax(
+                {
+                    beforeSend: function () {
+                        $("pre").html("正在读取日志，请稍后!");
+                    },
+                    url: "/task/readLog/" + logTitle,
+                    method: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $("pre").html(data.content);
+                    }
+                }
+            )
+        }
+
+
+        function requestProgress() {
+            {#            请求队列中所有任务的进度#}
+            $.ajax({
+                method: "get",
+                dataType: "json",
+                url: "{% url "task:progress" %}",
+                success: function (data) {
+                    console.log(data);
+                    let progressOfTasks = data["progress_of_tasks"];
+                    for (let i = 0; i < progressOfTasks.length; i++) {
+                        let taskProgress = progressOfTasks[i];
+                        let count = taskProgress["count"];
+                        let tested = taskProgress["tested"];
+                        if (tested / count < 0.3) {
+                            taskProgress["css"] = "progress-bar-danger";
+                        }
+                        else if (tested / count < 0.6) {
+                            taskProgress["css"] = "progress-bar-info"
+                        }
+                        else {
+                            taskProgress["css"] = "progress-bar-success"
+                        }
+                    }
+                    {# 渲染进度条#}
+                    console.log(progressOfTasks);
+                    if (progressOfTasks.length === 0) {
+                        {#                        将任务队列置为空#}
+                        $("#tableProgress").css("display", "none");
+                        $("#panelProgress").find(".panel-body").html("无任务");
+                        return
+                    }
+                    let progressTemplates = $.templates("#rowProgress");
+                    let progress = progressTemplates(progressOfTasks);
+                    $("#panelProgress").find(".panel-body").empty().html(progress);
+                    $('.progress .progress-bar').progressbar({display_text: 'center', use_percentage: false});
+                    {#  渲染任务队列#}
+                    let taskRow = $.templates("#rowTask");
+                    let taskRows = taskRow(progressOfTasks);
+                    $("#tableProgress").css("display", "").find("tbody").empty().html(taskRows);
+                }
+            })
+        }
+
+
+        $(document).ready(function () {
+            $.views.settings.delimiters("<%", "%>");
+            setDataTable("tableTasks");
+            setDataTable("tableHistories");
+            requestProgress();
+
+            $("#tableTasks").find("button").click(function () {
+
+                $(this).attr("disabled", "disabled");
+                {# 获取各个设置项的值#}
+                let verbosity = $("input[name='verbosity']:checked").val();
+                let failfast = $("input[name='radioFailfast']:checked").val();
+                let task_id = $(this).attr("name");
+                handleAjax(verbosity, failfast, task_id);
+                requestProgress()
+
+            });
+            {#            为任务历史记录中的日志添加记录#}
+            $("#tableHistories").on("click", "[name='log_href']", function () {
+                let title = $(this).html();
+                readLog(title);
+            });
+        });
+
+
+    </script>
+{% endblock %}
+
