@@ -63,7 +63,7 @@
                             <div class="form-group col-lg-12">
                                 <label>协议：</label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="protocol" id="protocol"
+                                    <input type="radio" name="protocol" id="protocol" checked
                                            value="Http">Http
                                 </label>
                                 <label class="radio-inline">
@@ -120,6 +120,7 @@
                             <input class="form-control" name="encoding" id="encoding" placeholder="UTF-8">
                         </div>
                         <div class="row" style="margin-top: 5px">
+                            <label>请求参数：</label>
                             <ul class="nav nav-tabs" id="tabs">
                                 <li class="active">
                                     <a href="#params" data-toggle="tab">Parameters</a>
@@ -134,11 +135,12 @@
                             <div class="tab-content">
                                 <div class="tab-pane fade in active" id="params">
 
-                                    <table class="table table-striped">
+                                    <table class="table table-hover">
                                         <thead>
                                         <tr>
-                                            <th class="col-lg-6">参数名</th>
-                                            <th class="col-lg-6">值</th>
+                                            <th class="col-lg-5">参数名</th>
+                                            <th class="col-lg-5">值</th>
+                                            <th class="col-lg-2"></th>
                                         </tr>
                                         </thead>
 
@@ -150,6 +152,29 @@
                                             <td contenteditable="true">
                                                 请输入参数值！
                                             </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td contenteditable="true">
+                                                请输入参数名！
+                                            </td>
+                                            <td contenteditable="true">
+                                                请输入参数值！
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td contenteditable="true">
+                                                请输入参数名！
+                                            </td>
+                                            <td contenteditable="true">
+                                                请输入参数值！
+                                            </td>
+                                            <td>
+                                            </td>
                                         </tr>
 
 
@@ -157,65 +182,118 @@
 
 
                                     </table>
+                                    <div id="table-control-buttons">
+                                        <label class="btn btn-success" id="btnReset">重置</label>
+                                        <label class="btn btn-success" id="btnAdd">添加</label>
+                                    </div>
 
 
                                 </div>
-                                <div class="tab-pane fade" id="bodydata"></div>
+                                <div class="tab-pane fade" id="bodydata">
+                                    <textarea class="textarea col-lg-12" placeholder="请输入bodydata"></textarea>
+
+                                </div>
+                                <div class="tab-pane fade" id="headParams">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th class="col-lg-5">参数名</th>
+                                            <th class="col-lg-5">值</th>
+                                            <th class="col-lg-2"></th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody>
+                                        <tr>
+                                            <td contenteditable="true">
+                                                请输入参数名！
+                                            </td>
+                                            <td contenteditable="true">
+                                                请输入参数值！
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td contenteditable="true">
+                                                请输入参数名！
+                                            </td>
+                                            <td contenteditable="true">
+                                                请输入参数值！
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td contenteditable="true">
+                                                请输入参数名！
+                                            </td>
+                                            <td contenteditable="true">
+                                                请输入参数值！
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
 
 
+                                        </tbody>
+
+
+                                    </table>
+                                    <div id="table-control-buttons">
+                                        <label class="btn btn-success" id="btnReset">重置</label>
+                                        <label class="btn btn-success" id="btnAdd">添加</label>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="tab-pane fade" id="headParams"></div>
-
-
                         </div>
-
-
                     </div>
-
-
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="panel panel-default noborder " id="panelTasks">
-            <div class="panel-heading">
-                <span class="fa fa-tasks"> 任务队列</span>
+
+        <div class="col-lg-4">
+            <div class="panel panel-default noborder " id="panelTasks">
+                <div class="panel-heading">
+                    <span class="fa fa-tasks"> 任务队列</span>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped  table-hover" id="tableProgress">
+                        <thead>
+                        <tr>
+                            <th>
+                                名称
+                            </th>
+                            <th>
+                                状态
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success col-lg-12" data-toggle="modal"
+                            data-target="#mTasks">添加任务
+                    </button>
+                </div>
             </div>
-            <div class="panel-body">
-                <table class="table table-striped  table-hover" id="tableProgress">
-                    <thead>
-                    <tr>
-                        <th>
-                            名称
-                        </th>
-                        <th>
-                            状态
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-                <button class="btn btn-success col-lg-12" data-toggle="modal"
-                        data-target="#mTasks">添加任务
-                </button>
+            <div class="panel panel-info noborder" id="panelProgress">
+                <div class="panel-heading">
+                    <span class="fa fa-flash"> 任务进度</span>
+                </div>
+                <div class="panel-body">
+                    当前无任务
+                </div>
+
+
             </div>
+
         </div>
-        <div class="panel panel-info noborder" id="panelProgress">
-            <div class="panel-heading">
-                <span class="fa fa-flash"> 任务进度</span>
-            </div>
-            <div class="panel-body">
-                当前无任务
-            </div>
-
-
-        </div>
-
     </div>
-    </div>
+
+
 {% endblock %}
 
 {% block scriptLinks %}
@@ -277,6 +355,29 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
 
     <script id="rowTask" type="text/x-jsrender">
@@ -288,6 +389,29 @@
                                         <%:state%>
                                     </td>
                                 </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -463,11 +587,47 @@
         }
 
 
+        function clearTableContent() {
+            {#根据奇偶的不同分别设置相应的文本#}
+            let elements = $("[contenteditable='true']");
+            for (let index = 0; index < elements.length; index++) {
+                if (index % 2 === 0) {
+                    elements[index].innerHTML = ("请输入参数名！");
+                }
+                else {
+                    elements[index].innerHTML = ("请输入参数值！")
+                }
+            }
+        }
+
+
         $(document).ready(function () {
             $.views.settings.delimiters("<%", "%>");
             setDataTable("tableTasks");
             setDataTable("tableHistories");
             requestProgress();
+
+            {#set onclick listener for button reset#}
+            $("#btnReset").click(function () {
+                clearTableContent();
+                console.log("click this button");
+            });
+            {#为添加按钮添加点击事件#}
+            $("#btnAdd").click(function () {
+                $("tbody").append(
+                    "                                       <tr>\n" +
+                    "                                            <td contenteditable=\"true\">\n" +
+                    "                                                请输入参数名！\n" +
+                    "                                            </td>\n" +
+                    "                                            <td contenteditable=\"true\">\n" +
+                    "                                                请输入参数值！\n" +
+                    "                                            </td>\n" +
+                    "                                            <td>\n" +
+                    "                                            </td>\n" +
+                    "                                        </tr>"
+                );
+            });
+
 
             $("#tableTasks").find("button").click(function () {
 
