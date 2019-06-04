@@ -12,7 +12,7 @@ from user.models import User
 from user.userUtils import user_dict
 from utils.consts import *
 from django.utils.datastructures import MultiValueDictKeyError
-from utils.utilsFunc import read_scripts
+from utils.utilsFunc import read_scripts, gen_data_json
 from script.models import Script
 from product.models import Product, SuitProductMapping, Status
 
@@ -52,7 +52,7 @@ def init_case_list(request):
     """初始化测试用例列表页面的显示方式"""
     if request.method == "GET":
         """
-        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/list.html
+        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/scripts.html
         首先请求用例模组，然后根据用例模组初始化用例列表
         """
         module_queryset = CaseModule.objects.all()
@@ -161,7 +161,7 @@ def init_case_detail(request):
                        })
 
 
-def init_suit_page(request):
+def init_suit_page(request, suite_id):
     """初始化测试用例详情页面"""
     if request.method == "GET":
         # 获取产品列表
@@ -175,29 +175,50 @@ def init_suit_page(request):
         # 获取第测试套件列表
         suits = TestSuite.objects.all()
         # 是否有参数传入
-        suit_title = None
-        has_default = "no"
-        try:
-            suit_id = request.GET["suit_id"]
-            has_default = "yes"
-            suit_title = TestSuite.objects.filter(id=suit_id)[0].title
-        except MultiValueDictKeyError:
-            pass
+        if suite_id != 0:
+            suite = TestSuite.objects.filter(id=suite_id)[0]
+        else:
+            suite = TestSuite.objects.all()[0]
+
+        user_create = User.objects.filter(id=suite.create_user)[0].real_name
+        user_edit = User.objects.filter(id=suite.last_editer)[0].real_name
+        suite_info = gen_data_json(suite, {"user_create": user_create, "user_edit": user_edit})
+        # 关联的测试用例列表
+        case_of_suite = []
+        for case in [sc_map.case for sc_map in SuitCaseMapping.objects.filter(suit=suite.id)]:
+            case_of_suite.append(TestCase.objects.filter(id=case)[0])
+
+        # 关联的产品列表
+
+        products_of_suite = []
+        for product in [ps_map.product for ps_map in SuitProductMapping.objects.filter(suit=suite.id)]:
+            products_of_suite.append(Product.objects.filter(id=product)[0])
+        print(products_of_suite)
+
+        # 关联的setup和TearDown
+
+        setup = None
+        teardown = None
+        if suite.setup is not None:
+            setup = Script.objects.filter(id=suite.setup)[0]
+        if suite.teardown is not None:
+            teardown = Script.objects.filter(id=suite.teardown)[0]
+
         return render(request, "pages/testcase/suite.html",
-                      {"suits": suits, "has_default": has_default, "suit_title": suit_title,"product_info":product_info})
+                      {"suits": suits, "suite_info": suite_info, "case_of_suite": case_of_suite,
+                       "products_of_suite": products_of_suite, "setup": setup, "teardown": teardown,
+                       "product_info": product_info})
 
 
 def suit_info(request):
     """用于请求某一ID下的测试套件的详细信息"""
     try:
-        print(request.POST)
         suit_id = request.POST["suit_id"]
         suite = TestSuite.objects.filter(id=suit_id)[0]
         # 获取历史信息的字典
         history = {"creator": User.objects.filter(id=suite.create_user)[0].name, "create_time": suite.create_time,
                    "last_editor": User.objects.filter(id=suite.last_editer)[0].name,
-                   "last_edit_time": suite.last_edit_time, "run_count": suite.run_count,
-                   "last_run_time": suite.last_run_time, "desc": suite.desc}
+                   "last_edit_time": suite.last_edit_time, "desc": suite.desc}
         # 获取setup和teardown
         s_t = {}
         if not suite.setup:
@@ -209,7 +230,7 @@ def suit_info(request):
         else:
             s_t["teardown"] = read_scripts(Script.objects.filter(id=suite.teardown)[0].path)
         # 获取测试用例列表
-        case_ids = [case_map.id for case_map in SuitCaseMapping.objects.filter(suit=suite.id)]
+        case_ids = [case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite.id)]
         _case_data = []
         for case_id in case_ids:
             case = TestCase.objects.filter(id=case_id)[0]
@@ -268,11 +289,11 @@ def new_suit(request):
             user = request.session[SESSION_USER_NAME]
             suit.create_user = User.objects.filter(name=user)[0].id
             suit.title = suitName
-            suit.desc = desc
-            suit.setup = setupId
+            suit.desc = desc if desc != "" else None
+            # suit.setup = setupId if setupId != "" else None
             suit.last_editer = suit.create_user
             suit.run_count = 0
-            suit.teardown = teardownId
+            # suit.teardown = teardownId
             suit.save()
             # 获取ID
             currrent_suit_id = suit.id

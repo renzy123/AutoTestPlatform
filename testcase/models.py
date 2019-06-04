@@ -24,6 +24,7 @@ class TestCase(models.Model):
     precondition = models.TextField(max_length=255, null=True)
     steps = models.TextField(null=False)
     expect = models.TextField(null=False)
+    priority = models.IntegerField(default=1)
     create_user = models.IntegerField(null=False)
     create_time = models.DateTimeField(auto_now_add=True)
     last_edit_user = models.IntegerField()
@@ -37,14 +38,14 @@ class CaseModule(models.Model):
     模块的数据模型
     字段说明：
     name:模块名称
-    create_time: 创建时间
-    create_user: 创建者
-    desc: 描述
+    parent_module:父模块
+    child_module:子模块
+    product:从属的产品
     """
     name = models.CharField(max_length=255, unique=True)
-    create_time = models.DateTimeField(auto_now=True)
-    create_user = models.IntegerField()
-    desc = models.TextField()
+    parent_module = models.IntegerField(null=True)
+    child_module = models.IntegerField(null=True)
+    product = models.IntegerField(null=True)
 
 
 class TestSuite(models.Model):
@@ -62,8 +63,6 @@ class TestSuite(models.Model):
     create_user = models.IntegerField()
     last_editer = models.IntegerField(null=True)
     last_edit_time = models.DateTimeField(auto_now=True)
-    last_run_time = models.DateTimeField(null=True)
-    run_count = models.IntegerField(default=0)
     desc = models.CharField(max_length=100, null=True)
     setup = models.IntegerField(null=True)
     teardown = models.IntegerField(null=True)
@@ -78,3 +77,11 @@ class SuitCaseMapping(models.Model):
     """
     suit = models.IntegerField()
     case = models.IntegerField()
+
+
+class SuiteScriptMapping(models.Model):
+    """
+    测试套件、测试脚本隐射类，不再将测试套件隐射到测试用例
+    """
+    suite = models.IntegerField()
+    script = models.IntegerField()

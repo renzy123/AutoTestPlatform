@@ -1,66 +1,45 @@
 import time
 
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils.datastructures import MultiValueDictKeyError
+from django.shortcuts import render, redirect
 
 from AutoTestPlatform.CommonModels import SqlResultData, ResultEnum, result_to_json
+from product.models import Product
 from script.dataModels import ScriptData
 from script.form import ScriptUploadForm
-from script.models import ScriptType, Script
-from testcase.models import CaseModule
+from script.models import Script
+from script.models import ScriptType
+from testcase.models import SuiteScriptMapping, TestSuite
 from testcase.models import TestCase
 from user.models import User
-from utils.consts import *
 from utils.utilsFunc import *
+from utils.utilsFunc import gen_data_json
 
 
 # Create your views here.
 
 
-def init_upload_page(request):
+def init_upload_page(request, suite_id=None):
     """初始化测试用例列表页面的显示方式"""
     if request.method == "GET":
         """
-        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/list.html
+        当请求方式为GET时，初始化测试用例页面的显示，该页面为/pages/testcase/scripts.html
         首先请求用例模组，然后根据用例模组初始化用例列表
         """
-        module_queryset = CaseModule.objects.all()
-        module_dict = dict(
-            [(m.id, m) for m in module_queryset]
-        )
+        # 获取product列表
         # 获取脚本的分类列表
         script_types = [s_type for s_type in ScriptType.objects.all()]
-        # 在/storage/scripts/目录下创建各个脚本分类的文件夹
-        _create_script_folder()
-        # 请求用例列表
-        case_queryset = TestCase.objects.all()
-        # 根据用例列表来进行分组，生成DICT
-        module_case_dict = {}
-        for _id in module_dict.keys():
-            case_list = [case for case in case_queryset if case.case_module == _id]
-            module_case_dict[module_dict.get(_id).name] = case_list
-        # 传输数据说明：
-        # module_case_list：NAME:LIST
-        # user_dict：用户ID:NAME 字典
-        # selected_case：需要选中的case
-        selected_case = "no_case"
-        try:
-            current_case = request.session[SESSION_CASE_ID]
-            selected_case = TestCase.objects.filter(id=current_case)[0].title
-        except MultiValueDictKeyError:
-            pass
-        # 将当前操作的测试用例ID写入到session
+        products = Product.objects.all()
         return render(request, "pages/script/upload.html",
-                      {"module_case_dict": module_case_dict, "types": script_types, "selected_case": selected_case})
+                      {"types": script_types, "products": products})
     if request.method == "POST":
         """请求方式为POST，即为提交脚本数据"""
-        print(request.FILES)
         upload_form = ScriptUploadForm(request.POST, request.FILES)
         if upload_form.is_valid():
             cleaned_data = upload_form.cleaned_data
             script_file = cleaned_data["scriptFile"]
-            script_case = cleaned_data["case"]
+            title = cleaned_data["title"]
+            suite = cleaned_data["suite"]
             script_type = cleaned_data["scriptType"]
             desc = cleaned_data["desc"]
             # 将脚本保存到制定的目录下
@@ -70,23 +49,28 @@ def init_upload_page(request):
                 return JsonResponse(result_to_json(result))
             # 生成Script对象并且将其保存到数据库
             script = Script()
-            script.title = title_and_path[0]
+            script.title = title
             script.path = title_and_path[1]
             user = request.session[SESSION_USER_NAME]
             user_id = User.objects.filter(name=user)[0].id
             script.create_user = user_id
             script.last_edit_user = user_id
             script.desc = desc
-            script.related_case = TestCase.objects.filter(title=script_case)[0].id
             script.script_type = script_type
             try:
                 script.save()
+                # 如果suite!=-1，那写映射关系表
+                if suite != -1:
+                    script_id = script.id
+                    _map = SuiteScriptMapping()
+                    _map.suite = suite
+                    _map.script = script_id
+                    _map.save()
             except ValueError:
                 result = SqlResultData(ResultEnum.Error, "插入数据库失败！")
                 return JsonResponse(result_to_json(result))
             else:
-                result = SqlResultData(ResultEnum.Success, "插入数据库失败！")
-                return JsonResponse(result_to_json(result))
+                return redirect("/testcase/list")
         else:
             print(upload_form.errors)
 
@@ -101,11 +85,35 @@ def script_of_case(request):
     return JsonResponse(data)
 
 
-def init_scripts_list(request):
+def init_scripts(request, _type=None):
     """构建脚本列表页面"""
     if request.method == "GET":
         # 初始化页面
-        pass
+        # 获取所有的脚本信息
+        scripts = Script.objects.all()
+        script_info = []
+        selected_type = _type
+        if selected_type:
+            scripts = scripts.filter(script_type=selected_type)
+            selected_type = ScriptType.objects.filter(id=selected_type)[0].name
+        for script in scripts:
+            """获取脚本的所有信息"""
+            script_type = ScriptType.objects.filter(id=script.script_type)[0].name
+            create_user = User.objects.filter(id=script.create_user)[0].real_name
+            editor = User.objects.filter(id=script.last_edit_user)[0].real_name
+            suites = SuiteScriptMapping.objects.filter(script=script.id)
+            # 获取套件相关的信息
+            suites_info = {}
+            for suite in suites:
+                suites_info[suite] = TestSuite.objects.filter(id=suite)[0].title
+            info = gen_data_json(script,
+                                 {"script_type": script_type, "create_user": create_user, "editor": editor,
+                                  "suites_info": suites_info})
+            script_info.append(info)
+        # 获取分类信息
+        script_types = ScriptType.objects.all()
+        return render(request, "pages/script/scripts.html",
+                      {"script_info": script_info, "script_types": script_types, "selected_type": selected_type})
     if request.method == "POST":
         # 处理AJAX请求
         scripts = Script.objects.all()
@@ -140,6 +148,47 @@ def _create_script_folder():
             continue
         else:
             os.mkdir(a_dir)
+
+
+def script_type_management(request, type_id=None):
+    """管理脚本类型"""
+    if request.method == "GET":
+        # 初始化脚本类型管理页面
+        script_types = ScriptType.objects.all()
+        # 当无脚本类型时，将直接返回错误页面
+        if script_types.count() == 0:
+            return render(request, "alertPage.html", {"alert": "当前无可用的脚本类型数据!"})
+        selected_type = script_types[0].id
+        if type_id:
+            selected_type = type_id
+        # 获取第一个类型的所有关联的脚本列表
+        scripts_of_type = Script.objects.filter(script_type=selected_type)
+        # 获取脚本类型的相应信息
+        selected_type_detail = ScriptType.objects.filter(id=selected_type)[0]
+        return render(request, "pages/script/types.html",
+                      {"types": script_types, "selected_type": selected_type_detail,
+                       "scripts_of_type": scripts_of_type})
+    else:
+        # 处理修改脚本类型的需求
+        data = request.POST
+        _name = data["name"]
+        _desc = data["desc"]
+        _id = data["id"]
+        # 修改脚本类型
+        _type = ScriptType.objects.filter(id=_id)[0]
+        _type.name = _name
+        _type.desc = _desc
+        _type.save()
+        return redirect("/script/types/" + _id)
+
+
+def delete_script_type(request):
+    # 处理删除脚本类型的请求
+    if request.method == "POST":
+        _id = request.POST["id"]
+        _type = ScriptType.objects.filter(id=_id)[0]
+        _type.delete()
+        return JsonResponse({"result": "success"})
 
 
 def _create_script_file(file, s_type):

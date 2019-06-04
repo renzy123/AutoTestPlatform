@@ -7,6 +7,7 @@ from django.forms import *
 
 class ScriptUploadForm(Form):
     scriptFile = FileField()
-    case = CharField(required=True)
+    suite = IntegerField()
     scriptType = CharField()
+    title = CharField()
     desc = CharField(max_length=255, required=False)

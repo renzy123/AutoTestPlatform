@@ -251,7 +251,8 @@
                                 <a href="#"><i class="fa fa-list-ul  fa-fw"></i>测试套件<span class="fa arrow"></span></a>
                                 <ul class="nav nav-third-level">
                                     <li>
-                                        <a href="{% url "testcase:suitList" %}"><i class="fa fa-edit fa-fw"></i>列表</a>
+                                        <a href="{% url "testcase:suiteList" 0 %}"><i
+                                                class="fa fa-edit fa-fw"></i>列表</a>
                                     </li>
                                     <li>
                                         <a href="{% url "testcase:newSuit" %}"><i class="fa fa-plus fa-fw"></i>新增</a>
@@ -264,6 +265,15 @@
 
 
                     <li>
+                        <a href="#"><i class="fa fa-th   fa-fw"></i> 接口测试<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{% url "apitest:index" %}">接口测试</a>
+                            </li>
+                        </ul>
+                        <!-- /.nav-second-level -->
+                    </li>
+                    <li>
                         <a href="#"><i class="fa fa-th   fa-fw"></i> 脚本管理<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
@@ -271,7 +281,11 @@
                             </li>
                             <li>
                                 {#                                TODO 增加产品管理相关功能#}
-                                <a href="#">脚本一览</a>
+                                <a href="{% url 'script:scripts' %}">脚本一览</a>
+                            </li>
+                            <li>
+                                {#                                TODO 增加产品管理相关功能#}
+                                <a href="{% url 'script:types' %}">脚本类型维护</a>
                             </li>
                         </ul>
                         <!-- /.nav-second-level -->
@@ -280,7 +294,10 @@
                         <a href="#"><i class="fa fa-wrench fa-fw"></i> 执行<span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li>
-                                <a href="{% url 'task:new' %}">任务</a>
+                                <a href="{% url 'task:tasks' 0 %}">任务</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'task:taskDetail' %}">执行</a>
                             </li>
                             <li>
                                 <a>报告</a>
@@ -288,6 +305,7 @@
                         </ul>
                         <!-- /.nav-second-level -->
                     </li>
+
                 </ul>
             </div>
             <!-- /.sidebar-collapse -->

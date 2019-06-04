@@ -23,8 +23,22 @@ SECRET_KEY = '4r6%#(e4=^f^^iibhxyuq5$61j_%z=#zrkt+uf+s_$r1o@u_w%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TIME_ZONE = 'Asia/Shanghai'
 
-ALLOWED_HOSTS = []
+# Celery application definition
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Shanghai'
+CELERY_SEND_TASK_SENT_EVENT = True
+task_reject_on_worker_lost = True
+
+ALLOWED_HOSTS = [
+    "100.64.15.40",
+    "127.0.0.1",
+]
 
 # Application definition
 
@@ -40,6 +54,7 @@ INSTALLED_APPS = [
     'testcase',
     'script',
     'task',
+
 ]
 
 MIDDLEWARE = [
@@ -57,7 +72,7 @@ ROOT_URLCONF = 'AutoTestPlatform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, "storage/reports")]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -110,8 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Shanghai'
-
 USE_I18N = True
 
 USE_L10N = True
@@ -125,3 +138,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

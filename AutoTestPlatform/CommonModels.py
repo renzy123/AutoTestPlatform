@@ -19,6 +19,7 @@ class SqlResultData:
 class ResultEnum(Enum):
     Success = 1
     Error = 2
+    PROGRESS = 3
 
 
 def result_to_json(resultData):
@@ -26,6 +27,24 @@ def result_to_json(resultData):
         "result_code": resultData.result_code.value,
         "result_reason": resultData.result_reason,
     }
+
+
+class JsonResult(SqlResultData):
+    def to_json(self):
+        return {
+            "result_code": self.result_code.value,
+            "result_reason": self.result_reason,
+        }
+
+
+class RenderResPageData:
+    def __init__(self):
+        self.button_text = "确定"
+        self.button_url = "back"
+        self.button_value = "confirm"
+
+    def to_json(self):
+        return self.__dict__
 
 
 if __name__ == '__main__':

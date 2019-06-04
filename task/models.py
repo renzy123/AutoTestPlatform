@@ -13,13 +13,13 @@ class TestTask(models.Model):
     test_times:测试的执行次数
     """
     title = models.CharField(max_length=255)
-    test_times = models.IntegerField()
     status = models.IntegerField()
     product = models.IntegerField()
-    suit = models.IntegerField()
     create_time = models.DateTimeField(auto_now_add=True)
     create_user = models.IntegerField()
     desc = models.CharField(max_length=100)
+    runtime = models.IntegerField(default=0)
+    last_run_time = models.DateTimeField(null=True)
 
 
 class TaskStatus(models.Model):
@@ -30,3 +30,38 @@ class TaskStatus(models.Model):
     """
     title = models.CharField(max_length=50, unique=True)
     desc = models.CharField(max_length=100, null=True)
+
+
+class Result(models.Model):
+    """执行结果类，用于记录任务执行的结果
+    report_title:执行报告名
+    log_title:日志目录
+    task:任务名称
+    """
+    report_title = models.CharField(max_length=100)
+    log_title = models.CharField(max_length=100)
+    task = models.IntegerField()
+    result = models.IntegerField(default=0)
+    run_time = models.DateTimeField()
+    run_user = models.IntegerField(default=0)
+
+
+class TestResultType(models.Model):
+    """测试结果的类型"""
+    title = models.CharField(max_length=20)
+    desc = models.CharField(max_length=200)
+
+
+class TaskSuiteMapping(models.Model):
+    """
+    任务和测试套件的多对多的关系的隐射
+    """
+    task = models.IntegerField()
+    suite = models.IntegerField()
+
+
+class CachedTask(models.Model):
+    """用来缓存任务执行的数据，不再使用session来进行保存"""
+    task_id = models.IntegerField(primary_key=True)
+    async_result_id = models.CharField(max_length=255)
+    create_time = models.DateTimeField(auto_now=True)

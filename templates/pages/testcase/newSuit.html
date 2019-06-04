@@ -54,16 +54,13 @@
     </div>
     <div class="alert alert-info alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        请输入测试条件名，并从右侧的测试用例列表中，添加测试用例！
+        请输入测试套件名称，并从右侧的脚本列表中，添加测试脚本！
         同时请指定Setup和TearDown!
     </div>
     <!-- /.row -->
     <div class="row">
         <div class="col-lg-5">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    新增
-                </div>
+            <div class="panel panel-default noborder">
                 <div class="panel-body">
                     <form role="form" method="POST" action="{% url "testcase:addSuit" %}"
                           enctype="multipart/form-data">
@@ -72,6 +69,10 @@
                             <label>请输入名称</label>
                             <input class="form-control" type="text" name="suitName" id="suitName"
                                    placeholder="请输入测试套件名称">
+                        </div>
+
+                        <div class="form-group">
+                            <label>请选择关联的测试脚本</label>
                         </div>
                         <div class="form-group">
                             <label>setup</label>
@@ -183,46 +184,6 @@
 
 
         <!-- /.col-lg-4 -->
-        <div class="col-lg-7">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <span class="fa fa-list"></span>
-                    请选择测试用例
-                </div>
-                <!-- .panel-heading -->
-                <div class="panel-body">
-                    <div class="panel-group" id="listPanel">
-                        {% for case_module,case_list in module_case_dict.items %}
-                            {#  生成标题#}
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a data-toggle="collapse" data-parent="#listPanel"
-                                           href="#group{{ case_module | timestamp }}">
-                                            {{ case_module }}</a>
-                                    </h4>
-                                </div>
-                                <div id="group{{ case_module | timestamp }}"
-                                     class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <div class="list-group">
-                                            {#  生成测试用例列表#}
-                                            {% for case in case_list %}
-                                                <a class="list-group-item" href="#"
-                                                   name="{{ case.id }}">{{ case.title }}</a>
-
-                                            {% empty %}
-                                                <p>该模块下无测试用例</p>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
 {% endblock %}
@@ -280,12 +241,13 @@
 
 
 
+
     </script>
 
     <script type="text/javascript">
         function display_script_info() {
             $.ajax({
-                url: "{% url 'script:list' %}",
+                url: "{% url 'script:scripts' %}",
                 type: "post",
                 data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
                 dataType: "json",
@@ -312,8 +274,7 @@
             {#    start to render template#}
             let rowScript = $.templates("#rowScript");
             let row = rowScript(scripts);
-            $("#tScripts tbody").empty();
-            $("#tScripts tbody").html(row)
+            $("#tScripts tbody").empty().html(row);
         }
 
 

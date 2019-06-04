@@ -2,6 +2,7 @@ from selenium import webdriver
 import unittest
 from time import sleep
 
+
 class TestBaidu(unittest.TestCase):
     chrome_driver = None
 
@@ -25,7 +26,7 @@ class TestBaidu(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    suit=unittest.TestSuite()
+    suit = unittest.TestSuite()
     suit.addTest(TestBaidu)
-    runner=unittest.TextTestRunner()
+    runner = unittest.TextTestRunner()
     runner.run(suit)

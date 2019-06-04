@@ -32,4 +32,9 @@ urlpatterns = [
     path("script/", include(("script.urls", "script"), namespace="script")),
     # 添加script应用的URL列表
     path("task/", include(("task.urls", "task"), namespace="task")),
+    # 添加压力测试相关的URL
+    path("loadtest/", include(("loadtest.urls", "loadtest"), namespace="loadtest")),
+    # 添加API接口测试相关URL
+    path("apitest/", include(("apitest.urls", "apitest"), namespace="apitest")),
+
 ]
