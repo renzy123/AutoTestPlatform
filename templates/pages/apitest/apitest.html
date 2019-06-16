@@ -378,6 +378,7 @@
 
 
 
+
     </script>
 
     <script id="rowTask" type="text/x-jsrender">
@@ -389,6 +390,7 @@
                                         <%:state%>
                                     </td>
                                 </tr>
+
 
 
 
@@ -612,6 +614,28 @@
                 clearTableContent();
                 console.log("click this button");
             });
+
+            {#为可编辑的表格添加焦点事件，清除提示内容#}
+
+            $("[contenteditable='true']").focus(function () {
+                if ($(this).text().trim() === "请输入参数名！" || $(this).text().trim() === "请输入参数值！") {
+                    $(this).text("");
+                }
+
+            }).blur(function () {
+                if ($(this).text().trim() === "") {
+                    console.log($(this));
+
+
+                }
+
+
+            })
+
+
+            ;
+
+
             {#为添加按钮添加点击事件#}
             $("#btnAdd").click(function () {
                 $("tbody").append(
