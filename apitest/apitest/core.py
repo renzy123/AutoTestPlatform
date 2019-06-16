@@ -38,27 +38,26 @@ class ApiTest:
 
     def exe_request(self, res_type=1):
         # 发送请求
-        method = self._request_data.method
         encoding = self._request_data.encoding
         status_code = "None"
         request_handler = self._request()
         result = {}
 
-        if str(method).upper() == "GET":
-            try:
-                res = request_handler(self._handle_url(), self._handle_data(), headers=self._handle_headers())
-                result = {"headers": self._serialized_headers(res.headers),
-                          "cookies": self._handle_cookies(res.cookies._cookies)}
-                status_code = res.status_code
-                res.encoding = encoding
-                # 处理请求数据的现实方式
-                result["code"] = status_code
-                if res_type == 1:
-                    result["body"] = res.text
-                elif res_type == 2:
-                    result["body"] = str(res.json())
-            except ValueError:
-                result["error_msg"] = "错误，错误代码" + str(status_code)
+        try:
+            print(self._handle_url())
+            res = request_handler(self._handle_url(), self._handle_data(), headers=self._handle_headers())
+            result = {"headers": self._serialized_headers(res.headers),
+                      "cookies": self._handle_cookies(res.cookies._cookies)}
+            status_code = res.status_code
+            res.encoding = encoding
+            # 处理请求数据的现实方式
+            result["code"] = status_code
+            if res_type == 1:
+                result["body"] = res.text
+            elif res_type == 2:
+                result["body"] = str(res.json())
+        except ValueError:
+            result["error_msg"] = "错误，错误代码" + str(status_code)
 
         return result
 

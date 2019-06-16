@@ -277,6 +277,7 @@ def new_suit(request):
     if request.method == "POST":
         """增加测试套件的方法"""
         suitForm = form.SuitForm(request.POST)
+        print(suitForm)
         if suitForm.is_valid():
             data = suitForm.cleaned_data
             suitName = data["suitName"]

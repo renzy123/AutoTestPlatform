@@ -73,6 +73,7 @@
 
                         <div class="form-group">
                             <label>请选择关联的测试脚本</label>
+
                         </div>
                         <div class="form-group">
                             <label>setup</label>
@@ -109,6 +110,49 @@
                         <button type="submit" class="btn btn-default" id="btSubmit">提交</button>
                     </form>
                 </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="fa fa-list"></span>
+                    用例列表
+                </div>
+                <!-- .panel-heading -->
+                <div class="panel-body">
+                    <div class="panel-group" id="listPanel">
+                        {#    生成左边的列表#}
+                        {% for case_module,case_list in module_case_dict.items %}
+                            {#  生成标题#}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#listPanel"
+                                           href="#group{{ case_module | timestamp }}">
+                                            {{ case_module }}</a>
+                                    </h4>
+                                </div>
+                                <div id="group{{ case_module | timestamp }}" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <div class="list-group">
+                                            {#  生成测试用例列表#}
+                                            {% for case in case_list %}
+                                                <a class="list-group-item" href="#"
+                                                   name="{{ case.id }}">{{ case.title }}</a>
+                                            {% empty %}
+                                                <p>该模块下无测试用例</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {#    完成生成左边的侧边栏#}
+
+                    </div>
+
+                </div>
+                <!-- .panel-body -->
             </div>
         </div>
         <div class="modal fade" id="scripts" tabindex="-1" role="dialog"
