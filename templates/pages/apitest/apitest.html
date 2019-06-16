@@ -373,7 +373,7 @@
     </script>
 
 
-    <script id="rowCookies" type="text/x-jsrender">
+    <script id="row" type="text/x-jsrender">
                                 <tr>
                                     <td>
                                         <%:task_title%>
@@ -482,7 +482,7 @@
                 data: {
                     protocol: params["protocol"],
                     host: params["host"],
-                    port: params["host"],
+                    port: params["port"],
                     method: params["method"],
                     url: params["url"],
                     encoding: params["encoding"],
@@ -492,14 +492,20 @@
                 url: "{% url 'apitest:request' %}",
                 success: function (data) {
                     $("#responseCode").text(data.body);
-                    $("#responseCookie").text(data.cookies.host);
                     {#                    解析cookie信息#}
-                    let cookiesDict = data.cookies;
-
-
-                    $("#responseHeaders").text(data.headers);
-
-
+                    let cookies = data.cookies;
+                    $("#tableCookie").find("tbody").empty();
+                    $("#tableHeaders").find("tbody").empty();
+                    for (let key in cookies) {
+                        $("#tableCookie").find("tbody").append(
+                            "<tr><td>" + key + "</td><td>" + cookies[key] + "</td></tr>"
+                        )
+                    }
+                    for (let key in data.headers) {
+                        $("#tableHeaders").find("tbody").append(
+                            "<tr><td>" + key + "</td><td>" + data.headers[key] + "</td></tr>"
+                        )
+                    }
                 }
             })
         }
@@ -596,14 +602,21 @@
             });
 
 
+            $("#responseBody").on("load", "#responseCode", function () {
+                console.log("执行到这里！")
+
+
+            });
+
+
             $("#btnSendRequest").click(function () {
                 {#                为发送请求按钮添加点击事件#}
 
                 {#                获取所有输入的数据#}
-                let protocol = $("#protocol").val();
+                let protocol = $("#protocol:checked").val();
                 let host = $("#host").val();
                 let port = $("#port").val();
-                let method = $("#method").val();
+                let method = $("#method:checked").val();
                 let encoding = $("#encoding").val();
                 let bodyParamsElements = $("#params").find("[contenteditable='true']");
                 let bodyParams = {};

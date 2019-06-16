@@ -1,19 +1,19 @@
-from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-
-from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResultType, CachedTask
-from user.models import User
-from utils.utilsFunc import *
-from utils.decorators import dec_sql_insert, dec_request_dict
-from product.models import Product, SuitProductMapping
-from testcase.models import TestSuite
-from task.tasks import run_test
-from AutoTestPlatform.CommonModels import JsonResult, ResultEnum, RenderResPageData
-from task.handleTask import TaskQueue, ProgressHandler
 from django.utils.datastructures import MultiValueDictKeyError
 
+from AutoTestPlatform.CommonModels import JsonResult, ResultEnum
+from product.models import Product, SuitProductMapping
+from task.handleTask import TaskQueue, ProgressHandler
+from task.models import TestTask, TaskStatus, TaskSuiteMapping, Result, TestResultType, CachedTask
+from task.tasks import run_test
+from testcase.models import TestSuite
+from user.models import User
+from utils.decorators import dec_sql_insert, dec_request_dict
+from utils.utilsFunc import *
+
 _taskQueue = TaskQueue()
+
 
 def init_new_task_page(request):
     products = Product.objects.all()

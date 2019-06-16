@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 工具方法模组
+import datetime
 import platform
+import random
+
+from openpyxl import load_workbook
 
 from utils.consts import *
-import datetime
-import random
-from openpyxl import load_workbook
 
 
 class BaseResult:
@@ -130,11 +131,10 @@ def rename_file(file_name):
     """修改文件的命名，以符合操作系统规范"""
     inlegal_chars = ["\\", "/", ":", "*", "?", "''", "<", ">", "|"]
 
-    if current_os() == OS_WINDOWS:
-        for char in inlegal_chars:
-            if char in file_name:
-                file_name = str(file_name).replace(char, "_")
-        return file_name
+    for char in inlegal_chars:
+        if char in file_name:
+            file_name = str(file_name).replace(char, "_")
+    return file_name
 
 
 def gen_data_json(model, *args):

@@ -3,19 +3,22 @@
 # 进行异步任务
 
 from __future__ import absolute_import
-from celery import shared_task
-import unittest
-from utils.consts import *
-from testcase.models import SuitCaseMapping
-from script.models import Script
-from utils.HtmlTestRunner import HTMLTestRunner
-from utils.utilsFunc import current_os, local_time_now
-from task.models import Result, TestResultType
+
 import json
+import threading
+import time
+import unittest
+
 import redis
 from celery import Task
-import time
-import threading
+from celery import shared_task
+
+from script.models import Script
+from task.models import Result, TestResultType
+from testcase.models import SuitCaseMapping
+from utils.HtmlTestRunner import HTMLTestRunner
+from utils.consts import *
+from utils.utilsFunc import current_os, local_time_now
 
 
 class _BaseTask(Task):
@@ -35,19 +38,32 @@ def run_test(self, suites: list, log_title, task_id, current_user):
     case_list = []
     for suite in suites:
         case_list.extend([case_map.case for case_map in SuitCaseMapping.objects.filter(suit=suite)])
-    script_path = [os.path.join(SCRIPT_DIR, Script.objects.filter(related_case=case_id)[0].path) for case_id in
-                   case_list
+
+    # 根据系统的不同，修改最后一个分隔符
+    _script_path = [Script.objects.filter(related_case=case_id)[0].path for case_id in case_list]
+    if current_os() == OS_MACOS:
+        paths = [str(path).replace("\\", "/") for path in _script_path]
+    else:
+        paths = [str(path).replace("/", "\\") for path in _script_path]
+
+    script_path = [os.path.join(SCRIPT_DIR, path) for path in
+                   paths
                    ]
+
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     spliter = "\\"
     if current_os() == OS_MACOS:
         spliter = "/"
     for path in script_path:
+        print(path)
         dir_path, file_name = path.rsplit(spliter, maxsplit=1)[0], path.rsplit(spliter, maxsplit=1)[1]
         print(dir_path)
+        print(file_name)
         suite.addTest(loader.discover(start_dir=dir_path, pattern=file_name))
+
     if progress:
+        print("执行测试的数量为：" + str(suite.countTestCases()))
         progress["count"] = suite.countTestCases()
 
     # 打开redis的pubsub功能，进行消息分发
